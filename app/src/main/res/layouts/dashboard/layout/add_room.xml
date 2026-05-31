@@ -49,12 +49,31 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Room Number / Label"
+                android:hint="Room Number "
                 app:startIconDrawable="@drawable/ic_menu_home"
                 app:startIconTint="?android:attr/textColorSecondary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRoomNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapCharacters"
+                    android:textColor="?attr/colorOnSurface"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <!-- Input 1: Room Number / Name -->
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilRoomType"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:hint="Room Type "
+                app:startIconDrawable="@drawable/ic_menu_home"
+                app:startIconTint="?android:attr/textColorSecondary">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etRoomType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:inputType="textCapCharacters"
