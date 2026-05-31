@@ -1,0 +1,107 @@
+package com.application.bottomnavigationbarui;
+
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
+import com.application.bottomnavigationbarui.databinding.FragmentBillsBinding;
+import com.github.devfrogora.service.dto.BillReportDto;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+public class BillsFragment extends Fragment {
+
+    private FragmentBillsBinding binding;
+
+    private BillingBillsAdapter adapter;
+    private List<BillReportDto> fullBillList; // Holds original data
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        binding = FragmentBillsBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Create dummy list data
+        fullBillList = new ArrayList<>();
+        fullBillList.add(new BillReportDto(1, "105", "Alex", "01 Apr 2026",2.5, "YES"));
+        fullBillList.add(new BillReportDto(2, "104", "Sarah", "01 Apr 2026",8.5, "NO"));
+        fullBillList.add(new BillReportDto(3, "103", "Alex", "01 Mar 2026", 7.5, "YES"));
+        fullBillList.add(new BillReportDto(4, "102",  "Alex", "01 Mar 2026",5 ,"NO"));
+        fullBillList.add(new BillReportDto(5, "101",  "Ramu", "01 Mar 2026", 6,"YES"));
+        fullBillList.add(new BillReportDto(6, "100",  "Alex", "01 Mar 2026", 10,"NO"));
+        fullBillList.add(new BillReportDto(7, "109",  "Ramu", "01 Mar 2026", 15,"Yes" ));
+
+
+        binding.recyclerViewBilling.setLayoutManager(new LinearLayoutManager(getContext()));
+
+        adapter = new BillingBillsAdapter(fullBillList, new BillingBillsAdapter.OnBillClickListener() {
+            @Override public void onReceiptClick(BillReportDto bill) {}
+            @Override public void onShareClick(BillReportDto bill) {}
+        });
+
+
+        binding.recyclerViewBilling.setAdapter(adapter);
+
+        // Add real-time text listener to search bar
+        binding.etSearch.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filter(s.toString());
+            }
+        });
+    }
+
+    // Filter processing logic
+    private void filter(String text) {
+        List<BillReportDto> filteredList = new ArrayList<>();
+
+        for (BillReportDto item : fullBillList) {
+            // Check if input matches room number or name (case-insensitive)
+            if (item.getTenantName().toLowerCase().contains(text.toLowerCase()) ||
+                    item.getRoomNumber().contains(text)) {
+                filteredList.add(item);
+            }
+        }
+
+        // Pass the updated list to the adapter
+        adapter.filterList(filteredList);
+    }
+
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null; // Prevent memory leaks
+    }
+
+}

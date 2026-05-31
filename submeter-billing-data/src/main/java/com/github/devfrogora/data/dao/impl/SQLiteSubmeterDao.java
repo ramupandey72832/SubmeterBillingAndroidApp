@@ -1,0 +1,77 @@
+package com.github.devfrogora.data.dao.impl;
+
+import com.github.devfrogora.data.config.SqlLoader;
+import com.github.devfrogora.data.dao.SubmeterDao;
+import com.github.devfrogora.data.dao.DbUtils;
+import com.github.devfrogora.data.entities.Submeter;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
+
+public class SQLiteSubmeterDao implements SubmeterDao {
+
+    @Override
+    public boolean insertSubmeter(Submeter submeter) throws SQLException{
+        String sql = SqlLoader.get("submeter.insert");
+        return DbUtils.executeUpdate(sql,
+                submeter.getRoomId(),
+                submeter.getMeterSerialNumber(),
+                submeter.getInitialReading()
+        );
+    }
+
+    @Override
+    public Optional<Submeter> getSubmeterById(int meterId) throws SQLException {
+        String sql = SqlLoader.get("submeter.get_by_id");
+        return DbUtils.executeQuerySingle(sql, this::mapResultSetToSubmeter, meterId);
+    }
+
+    @Override
+    public Optional<Submeter> getSubmeterBySerialNumber(String serialNumber)  throws SQLException{
+        String sql = SqlLoader.get("submeter.get_by_serial");
+        return DbUtils.executeQuerySingle(sql, this::mapResultSetToSubmeter, serialNumber);
+    }
+
+    @Override
+    public Optional<Submeter> getSubmeterByRoomId(int roomId) throws SQLException{
+        String sql = SqlLoader.get("submeter.get_by_room");
+        return DbUtils.executeQuerySingle(sql, this::mapResultSetToSubmeter, roomId);
+    }
+
+    @Override
+    public List<Submeter> getAllSubmeters() throws SQLException {
+        String sql = SqlLoader.get("submeter.get_all");
+        return DbUtils.executeQueryList(sql, this::mapResultSetToSubmeter);
+    }
+
+    @Override
+    public boolean updateSubmeter(Submeter submeter) throws SQLException {
+        String sql = SqlLoader.get("submeter.update");
+        return DbUtils.executeUpdate(sql,
+                submeter.getRoomId(),
+                submeter.getMeterSerialNumber(),
+                submeter.getInitialReading(),
+                submeter.getMeterId()
+        );
+    }
+
+    @Override
+    public boolean deleteSubmeter(int meterId) throws SQLException{
+        String sql = SqlLoader.get("submeter.delete");
+        return DbUtils.executeUpdate(sql, meterId);
+    }
+
+    /**
+     * Maps a single row from the ResultSet to a Submeter entity object.
+     */
+    private Submeter mapResultSetToSubmeter(ResultSet rs) throws SQLException {
+        Submeter submeter = new Submeter();
+        submeter.setMeterId(rs.getInt("meter_id"));
+        submeter.setRoomId(rs.getInt("room_id"));
+        submeter.setMeterSerialNumber(rs.getString("meter_serial_number"));
+        submeter.setInitialReading(rs.getDouble("initial_reading"));
+        return submeter;
+    }
+}

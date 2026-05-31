@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.github.devfrogora'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    google()
+    mavenCentral()
+    maven { url 'https://jitpack.io' } // <-- Add this line
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ['src/main/resources']
+        }
+    }
+}
+
+dependencies {
+    // RUNTIME DATABASE DRIVERS
+    implementation 'org.sqldroid:sqldroid:1.0.3' // Keep active FOR ANDROID
+    // implementation 'org.xerial:sqlite-jdbc:3.45.1.0' // COMMENTED OUT: Use this for DESKTOP instead of SQLDroid
+
+    // SQL FRAMEWORK (JDBI)
+    implementation 'org.jdbi:jdbi3-core:3.45.1'
+    implementation 'org.jdbi:jdbi3-sqlobject:3.45.1'
+
+    // LOGGING
+    implementation 'org.slf4j:slf4j-simple:2.0.9'
+
+    // TESTING
+    testImplementation platform('org.junit:junit-bom:6.0.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+test {
+    useJUnitPlatform()
+}

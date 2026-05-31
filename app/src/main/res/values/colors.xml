@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="brand_primary">#1E6B65</color>
+    <color name="brand_on_primary">#FFFFFF</color>
+    <color name="brand_primary_container">#D1ECEB</color>
+    <color name="brand_on_primary_container">#00201D</color>
+
+    <color name="surface_app_background">#EBF3F2</color> <color name="surface_card">#FFFFFF</color>
+    <color name="surface_variant_footer">#F7FAFA</color>
+
+    <color name="text_main">#1A1C1C</color>
+    <color name="text_secondary">#555555</color>
+    <color name="ui_outline_divider">#E5E5E5</color>
+
+    <color name="status_success">#34A853</color> <color name="status_error">#BA1A1A</color>
+</resources>

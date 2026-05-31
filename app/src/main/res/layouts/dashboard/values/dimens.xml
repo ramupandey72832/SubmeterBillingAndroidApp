@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="card_padding_normal">16dp</dimen>
+    <dimen name="card_padding_large">20dp</dimen>
+    <dimen name="card_corner_radius">16dp</dimen>
+    <dimen name="section_margin_bottom">24dp</dimen>
+    <dimen name="grid_item_padding">12dp</dimen>
+    <dimen name="label_margin_top">10dp</dimen>
+    <dimen name="icon_container_size">56dp</dimen>
+    <dimen name="action_icon_size">24dp</dimen>
+    <dimen name="status_icon_size">16dp</dimen>
+    <dimen name="status_text_margin">8dp</dimen>
+
+    <dimen name="text_size_header">18sp</dimen>
+    <dimen name="text_size_label">13sp</dimen>
+    <dimen name="text_size_caption">12sp</dimen>
+</resources>

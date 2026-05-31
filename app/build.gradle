@@ -1,0 +1,61 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.application.bottomnavigationbarui'
+    compileSdk {
+        version = release(36)
+    }
+
+    defaultConfig {
+        applicationId "com.application.bottomnavigationbarui"
+        minSdk 26
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    buildFeatures {
+        viewBinding = true // or dataBinding = true
+    }
+    sourceSets {
+        main {
+            res.srcDirs = [
+                    'src/main/res/layouts/dashboard', // Points to dashboard sub-layouts
+                    'src/main/res/layouts/dashboard/layout/manipulativeSection', // Points to dashboard sub-layouts
+                    'src/main/res/layouts/room',    // Points to common sub-layouts
+                    'src/main/res/layouts/billing',    // Points to common sub-layouts
+                    'src/main/res/layouts/report',    // Points to common sub-layouts
+                    'src/main/res'                    // CRUCIAL: Keeps strings, drawables, etc., working
+            ]
+        }
+    }
+
+
+}
+
+dependencies {
+    implementation(project(":submeter-billing-service"))
+
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+}

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/dashboard"
+        android:title="Dashboard"
+        android:icon="@drawable/ic_dashboard_icon"/>
+
+    <item
+        android:id="@+id/room"
+        android:title="Rooms"
+        android:icon="@drawable/ic_room"/>
+
+    <item
+        android:id="@+id/fab"
+        android:title="Scan"
+        android:enabled="false"/>
+
+    <item
+        android:id="@+id/report"
+        android:title="Reports"
+        android:icon="@drawable/ic_report"/>
+
+    <item
+        android:id="@+id/billing"
+        android:title="Bills"
+        android:icon="@drawable/ic_billing"/>
+
+</menu>
