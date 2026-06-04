@@ -78,7 +78,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         );
 
         if (!isCheckedOut) {
-            throw new BusinessRuleException("Database failed to apply checkout timestamp for Room " + roomNumber);
+            throw new BusinessRuleException(" failed to vacate  Room " + roomNumber);
         }
     }
 
@@ -109,33 +109,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
      */
     @Override
     public void terminateTenancyOfRoom(String roomNumber) throws SQLException{
-
-        try {
-            // 1. Fetch room details to identify the tenant before vacating
-            Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
-                    .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " not found."));
-
-            Optional<Tenancy> activeTenancy = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
-            if (activeTenancy.isEmpty()) {
-//                System.out.println("Notice: Room " + roomNumber + " is already vacant.");
-               throw new ResourceNotFoundException("Tenancy  for " + roomNumber + " not found.");
-            }
-
-            int tenantId = activeTenancy.get().getTenantId();
-            Tenant tenant = DaoManager.getTenantDao().getTenantById(tenantId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Tenant records missing for internal ID " + tenantId));
-
-            // 2. Perform the checkout (End the contract)
             vacateRoom(roomNumber);
-//            System.out.println("Success: Tenancy closed for room " + roomNumber);
-
-            // 3. Delete the profile since they are now completely unattached to any active contracts
-            deleteTenantIfNoActiveTenancy(tenant.getAadharNumber());
-//            System.out.println("Success: Profile account for " + tenant.getName() + " deleted securely.");
-
-        } catch (BusinessRuleException e) {
-            throw new BusinessRuleException("Failed to terminate tenancy");
-        }
     }
 
     @Override
