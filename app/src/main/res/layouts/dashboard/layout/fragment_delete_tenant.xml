@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://tools.tools/"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:fillViewport="true"
+android:background="#F8F9FA"
+tools:context=".fragments.DeleteTenantFragment">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Header Section -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Remove Tenant"
+        android:textColor="#D32F2F"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="24dp"
+        android:text="Removing a tenant clears their profile history and finalizes their utility balance for this room."
+        android:textColor="#666666"
+        android:textSize="14sp" />
+
+    <!-- Warning Notice Box -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#FFEBEE"
+        android:padding="12dp"
+        android:layout_marginBottom="32dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_dialog_alert"
+            app:tint="#D32F2F"
+            android:layout_marginEnd="12dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Warning: This will finalize the tenant's current billing cycle."
+            android:textColor="#C62828"
+            android:textSize="13sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Room/Unit Number Identification -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilTenantRoomNumber"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Room / Unit Number"
+        app:startIconDrawable="@android:drawable/ic_menu_home">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTenantRoomNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Tenant Name Field for Double Verification -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilTenantName"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:hint="Tenant Name (For verification)"
+        app:startIconDrawable="@android:drawable/ic_menu_my_calendar"
+        app:boxStrokeColor="#D32F2F"
+        app:hintTextColor="#D32F2F">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTenantName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Action Buttons Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Delete Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnDeleteTenant"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Permanently Remove Tenant"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="#D32F2F"
+            app:cornerRadius="8dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Cancel Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancelTenantDelete"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Cancel and Go Back"
+            android:textColor="#666666"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</LinearLayout>
+</ScrollView>

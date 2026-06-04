@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:app="http://schemas.android.com/apk/res-auto"
+xmlns:tools="http://tools.tools/"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:fillViewport="true"
+android:background="#F8F9FA"
+tools:context=".fragments.EndRoomTenancyFragment">
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Header Section -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Process Tenant Move-Out"
+        android:textColor="#1976D2"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="24dp"
+        android:text="This will archive the tenant profile and free up the room for future occupants."
+        android:textColor="#666666"
+        android:textSize="14sp" />
+
+    <!-- Info Box (Not a warning, but a status update notice) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:background="#E3F2FD"
+        android:padding="12dp"
+        android:layout_marginBottom="32dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@android:drawable/ic_dialog_info"
+            app:tint="#1976D2"
+            android:layout_marginEnd="12dp"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Tenant history and past bills will be safely archived."
+            android:textColor="#0D47A1"
+            android:textSize="13sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <!-- Room/Unit Identification (Read Only / Pre-filled ideally) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilRoomNumber"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Room Number">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etRoomNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="text"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- End Date Picker Field -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilEndDate"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:hint="Move-Out Date"
+        app:startIconDrawable="@android:drawable/ic_menu_my_calendar">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etEndDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:clickable="true"
+            android:inputType="none" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Final Submeter Reading (Crucial for closing the bill!) -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilFinalReading"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:hint="Final Submeter Reading"
+        app:startIconDrawable="@android:drawable/ic_menu_compass">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etFinalReading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <!-- Action Buttons Layout -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Complete Checkout Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnEndTenancy"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Complete Move-Out"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="#1976D2"
+            app:cornerRadius="8dp"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Cancel Button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Cancel"
+            android:textColor="#666666"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+</LinearLayout>
+</ScrollView>

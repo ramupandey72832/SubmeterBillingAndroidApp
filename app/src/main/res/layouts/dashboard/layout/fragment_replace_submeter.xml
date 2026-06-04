@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:background="#F8F9FA"
-    tools:context=".ReplaceSubmeterFragment">
+    tools:context=".fragments.ReplaceSubmeterFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
