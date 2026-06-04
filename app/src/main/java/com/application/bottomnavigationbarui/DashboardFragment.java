@@ -16,7 +16,7 @@ import com.application.bottomnavigationbarui.databinding.FragmentDashboardBindin
 import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.AddTenantFragment;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.github.devfrogora.service.dto.BillReportDto;
+import com.github.devfrogora.service.dto.reports.BillReportDto;
 
 import java.util.ArrayList;
 import java.util.List;

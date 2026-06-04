@@ -10,9 +10,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.application.bottomnavigationbarui.R;
-import com.application.bottomnavigationbarui.databinding.FragmentAddRoomBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBinding;
+import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.github.devfrogora.service.TenancyManagementService;
+import com.github.devfrogora.service.dto.TenantDTO;
+import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -23,6 +26,7 @@ import java.util.Locale;
 
 public class AddTenantFragment extends Fragment {
 
+    private UiHelper ui;
     private FragmentAddTenantBinding binding;
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,8 +47,34 @@ public class AddTenantFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        ui = new UiHelper(this.getContext());
         startingDataPickerUI();
+
+        binding.layoutAddTenant.btnAddTenant.setOnClickListener(view1 -> {
+            String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
+            String aadharNumber = binding.layoutAddTenant.etAadharNumber.getText().toString();
+            String tenantMobile = binding.layoutAddTenant.etTenantMobile.getText().toString();
+            String tenantParentMobile = binding.layoutAddTenant.etTenantParentMobile.getText().toString();
+            String tenantAddress = binding.layoutAddTenant.etTenantAddress.getText().toString();
+            String roomNumber = binding.layoutAddTenant.etRoomNumber.getText().toString();
+            String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
+
+            // Perform validation and save logic here
+
+            TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
+            try {
+                TenantDTO tenantDTO = new TenantDTO();
+                tenantDTO.setName(tenantName);
+                tenantDTO.setAadharNumber(aadharNumber);
+                tenantDTO.setPhoneNumber(tenantMobile);
+                tenantDTO.setParentPhoneNumber(tenantParentMobile);
+                tenantDTO.setAddress(tenantAddress);
+
+                tenancyManagementService.addTenantWithTenancy(tenantDTO, roomNumber, startDate);
+            } catch(Exception e){
+                ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+            }
+        });
     }
 
     void startingDataPickerUI(){
@@ -52,13 +82,13 @@ public class AddTenantFragment extends Fragment {
 
 // 1. Create the Material Date Picker instance
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Lease Start Date")
+                .setTitleText("Select Tenant Start Date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build();
 
 // 2. Open the picker when clicking the field
         etStartDate.setOnClickListener(v -> {
-            datePicker.show(getParentFragmentManager(), "LEASE_DATE_PICKER");
+            datePicker.show(getParentFragmentManager(), "TENANT_DATE_PICKER");
         });
 
 // 3. Format selected timestamp back to the text field

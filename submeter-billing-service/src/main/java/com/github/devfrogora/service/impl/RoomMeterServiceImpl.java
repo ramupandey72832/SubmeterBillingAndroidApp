@@ -3,7 +3,8 @@ package com.github.devfrogora.service.impl;
 import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.entities.*;
 import com.github.devfrogora.service.RoomMeterService;
-import com.github.devfrogora.service.dto.RoomRegistryDto;
+import com.github.devfrogora.service.dto.RoomDTO;
+import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 import com.github.devfrogora.service.exception.BusinessRuleException;
 import com.github.devfrogora.service.exception.ResourceNotFoundException;
 import com.github.devfrogora.service.exception.RoomOccupiedException;
@@ -117,9 +118,11 @@ public class RoomMeterServiceImpl implements RoomMeterService {
     }
 
     // Keep query methods clean by returning standard Optional/boolean
+
     @Override
-    public Optional<Room> findRoomByNumber(String roomNumber) throws SQLException{
-        return DaoManager.getRoomDao().getRoomByNumber(roomNumber);
+    public Optional<RoomDTO> findRoomByNumber(String roomNumber) throws SQLException {
+        return DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+                .map(room -> new RoomDTO(room.getRoomNumber(), room.getRentAmount()));
     }
 
     @Override

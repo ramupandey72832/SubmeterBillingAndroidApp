@@ -1,16 +1,14 @@
 package com.github.devfrogora;
 
 import com.github.devfrogora.data.dao.DaoManager;
-import com.github.devfrogora.data.entities.Bill;
-import com.github.devfrogora.data.entities.Room;
-import com.github.devfrogora.data.entities.Tenancy;
 import com.github.devfrogora.data.entities.Tenant;
 import com.github.devfrogora.service.DatabaseSetup;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.TenancyManagementService;
 import com.github.devfrogora.service.MeterBillingService;
-import com.github.devfrogora.service.dto.BillReportDto;
-import com.github.devfrogora.service.dto.RoomRegistryDto;
+import com.github.devfrogora.service.dto.TenantDTO;
+import com.github.devfrogora.service.dto.reports.BillReportDto;
+import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 import com.github.devfrogora.service.exception.BusinessRuleException;
 import com.github.devfrogora.service.exception.ResourceNotFoundException;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -19,7 +17,6 @@ import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -40,13 +37,13 @@ public class Main {
         infraService.addRoomWithMeter("404-B", "2BHK", "MTR-404B-XYZ", 100.0);
 
         System.out.println("\n--- Executing Screen B: Tenant Onboarding & Placement ---");
-        Tenant newTenant = new Tenant();
+        TenantDTO newTenant = new TenantDTO();
         newTenant.setName("Amit Sharma");
         newTenant.setPhoneNumber("+919999988888");
         newTenant.setAadharNumber("123456789012");
         newTenant.setAddress("Sector 21, Noida");
-        newTenant.setEmail("amit.sharma@example.com");
-        newTenant.setActive(true);
+
+
 
         tenantService.addTenantWithTenancy(newTenant, "404-B","2026-05-01");
 

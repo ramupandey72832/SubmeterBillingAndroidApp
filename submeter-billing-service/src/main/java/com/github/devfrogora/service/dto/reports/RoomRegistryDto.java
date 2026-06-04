@@ -1,4 +1,4 @@
-package com.github.devfrogora.service.dto;
+package com.github.devfrogora.service.dto.reports;
 
 
 public class RoomRegistryDto {

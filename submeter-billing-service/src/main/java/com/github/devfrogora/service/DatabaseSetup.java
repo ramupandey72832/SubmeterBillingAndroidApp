@@ -6,7 +6,7 @@ import com.github.devfrogora.data.config.SharedSchemaConfigurator;
 import com.github.devfrogora.data.dao.DaoManager;
 
 public class DatabaseSetup {
-    public static void initializeDb(String AndroidOrDesktop) throws Exception {
+    public static void initializeDb(String AndroidOrDesktop,String dbPath) throws Exception {
         System.out.println("System: Initializing database connection configurations...");
         if(AndroidOrDesktop.equalsIgnoreCase("Desktop")){
             DatabaseConfig desktopConfig = new DatabaseConfig(
@@ -19,8 +19,18 @@ public class DatabaseSetup {
             SharedSchemaConfigurator.initializeSchema();
             DaoManager.initialize();
         }else{
+//            String dbPath = getFilesDir().getAbsolutePath() + "/submeter_bill.db";
+            DatabaseConfig androidConfig = new DatabaseConfig(
+                    "jdbc:sqldroid:" + dbPath,
+                    null,
+                    null,
+                    "org.sqldroid.SQLDroidDriver"
+            );
+            DatabaseConnection.initialize(androidConfig);
 
         }
+        SharedSchemaConfigurator.initializeSchema();
+        DaoManager.initialize();
     }
 
     public static void initializeDb(String dburl,String userName,String password,String driverClassName) throws Exception {

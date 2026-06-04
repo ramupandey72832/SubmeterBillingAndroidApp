@@ -9,14 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,10 +21,7 @@ import com.application.bottomnavigationbarui.databinding.FragmentRoomsBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.RoomMeterService;
-import com.github.devfrogora.service.dto.RoomRegistryDto;
-import com.github.devfrogora.service.exception.BusinessRuleException;
-import com.github.devfrogora.service.exception.ResourceNotFoundException;
-import com.github.devfrogora.service.exception.RoomOccupiedException;
+import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 
 

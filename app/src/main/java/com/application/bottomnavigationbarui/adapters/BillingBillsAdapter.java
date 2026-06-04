@@ -8,7 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.bottomnavigationbarui.databinding.BillingItemBillBinding;
-import com.github.devfrogora.service.dto.BillReportDto;
+import com.github.devfrogora.service.dto.reports.BillReportDto;
 
 import java.util.List;
 

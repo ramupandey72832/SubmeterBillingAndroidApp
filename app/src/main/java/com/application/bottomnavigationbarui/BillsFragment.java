@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentBillsBinding;
-import com.github.devfrogora.service.dto.BillReportDto;
+import com.github.devfrogora.service.dto.reports.BillReportDto;
 
 import java.util.ArrayList;
 import java.util.List;

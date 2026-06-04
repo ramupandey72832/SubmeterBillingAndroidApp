@@ -4,29 +4,34 @@ import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.entities.Room;
 import com.github.devfrogora.data.entities.Tenancy;
 import com.github.devfrogora.data.entities.Tenant;
+import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.exception.*;
 
 import com.github.devfrogora.service.TenancyManagementService;
 
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 public class TenancyManagementServiceImpl implements TenancyManagementService {
 
     @Override
-    public void addTenantWithTenancy(Tenant tenant,String roomNumber, String startDate) throws SQLException {
-        Optional<Tenant> existing = DaoManager.getTenantDao().getTenantByAadhar(tenant.getAadharNumber());
+    public void addTenantWithTenancy(TenantDTO tenantDto, String roomNumber, String startDate) throws SQLException {
+        Optional<Tenant> existing = DaoManager.getTenantDao().getTenantByAadhar(tenantDto.getAadharNumber());
         int tenantId;
 
         if (existing.isEmpty()) {
-            boolean inserted = DaoManager.getTenantDao().insertTenant(tenant);
+            Tenant tenantEntity = new Tenant();
+            tenantEntity.setName(tenantDto.getName());
+            tenantEntity.setAadharNumber(tenantDto.getAadharNumber());
+            tenantEntity.setPhoneNumber(tenantDto.getPhoneNumber());
+
+            boolean inserted = DaoManager.getTenantDao().insertTenant(tenantEntity);
             if (!inserted) {
                 throw new BusinessRuleException("Failed to register the new tenant profile.");
             }
 
-            tenantId = DaoManager.getTenantDao().getTenantByAadhar(tenant.getAadharNumber())
+            tenantId = DaoManager.getTenantDao().getTenantByAadhar(tenantDto.getAadharNumber())
                     .orElseThrow(() -> new ResourceNotFoundException("Tenant registration failed to verify in database records."))
                     .getTenantId();
         } else {
@@ -113,7 +118,12 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
     }
 
     @Override
-    public Optional<Tenant> findTenantByAadhar(String aadhar) throws SQLException{
-        return DaoManager.getTenantDao().getTenantByAadhar(aadhar);
+    public Optional<TenantDTO> findTenantByAadhar(String aadhar) throws SQLException{
+        return DaoManager.getTenantDao().getTenantByAadhar(aadhar)
+                .map(entity -> new TenantDTO(
+                        entity.getName(),
+                        entity.getAadharNumber(),
+                        entity.getPhoneNumber()
+                ));
     }
 }

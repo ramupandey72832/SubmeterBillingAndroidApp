@@ -1,13 +1,12 @@
 package com.application.bottomnavigationbarui.adapters;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.bottomnavigationbarui.databinding.RoomsItemRoomBinding;
-import com.github.devfrogora.service.dto.RoomRegistryDto;
+import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 
 import java.util.List;
 

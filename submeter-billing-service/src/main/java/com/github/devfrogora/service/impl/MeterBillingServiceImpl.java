@@ -2,7 +2,8 @@ package com.github.devfrogora.service.impl;
 
 import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.entities.*;
-import com.github.devfrogora.service.dto.BillReportDto;
+import com.github.devfrogora.service.dto.BillDTO;
+import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.exception.*;
 import com.github.devfrogora.service.MeterBillingService;
 
@@ -183,7 +184,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
-    public List<Bill> getAllPendingBills() throws SQLException {
+    public List<BillDTO> getAllPendingBills() throws SQLException {
         List<Bill> bills = DaoManager.getBillDao().getAllBills();
 
         long pendingCount = bills.stream().filter(b -> !b.isPaid()).count();
@@ -194,6 +195,14 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         // Change .toList() to .collect(Collectors.toList())
         return bills.stream()
                 .filter(b -> !b.isPaid())
+                .map(b -> new BillDTO(
+                        b.getBillId(),
+                        b.getBillingDate(),
+                        b.getUnitsConsumed(),
+                        b.getRatePerUnit(),
+                        b.getTotalAmount(),
+                        b.isPaid()
+                ))
                 .collect(Collectors.toList());
     }
 

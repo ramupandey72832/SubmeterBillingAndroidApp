@@ -14,7 +14,7 @@ import java.util.List;
 
 
 import com.application.bottomnavigationbarui.R;
-import com.github.devfrogora.service.dto.BillReportDto;
+import com.github.devfrogora.service.dto.reports.BillReportDto;
 
 public class DashboardBillsAdapter extends RecyclerView.Adapter<DashboardBillsAdapter.DashboardBillViewHolder> {
 
