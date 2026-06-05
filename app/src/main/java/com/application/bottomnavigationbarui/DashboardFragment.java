@@ -16,6 +16,10 @@ import com.application.bottomnavigationbarui.databinding.FragmentDashboardBindin
 import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.AddTenantFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteRoomFragment;
+import com.application.bottomnavigationbarui.fragments.DeleteTenantFragment;
+import com.application.bottomnavigationbarui.fragments.EndRoomTenancyFragment;
+import com.application.bottomnavigationbarui.fragments.MeterReadingFragment;
+import com.application.bottomnavigationbarui.fragments.ReplaceSubmeterFragment;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
@@ -68,12 +72,50 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        binding.dashboardSection.deleteRoom.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Fragment targetFragment = new DeleteRoomFragment();
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+            }
+        });
+
         binding.dashboardSection.addTenant.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Fragment targetFragment = new AddTenantFragment();
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
             }
         });
+
+        binding.dashboardSection.deleteTenant.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Fragment targetFragment = new DeleteTenantFragment();
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+            }
+        });
+
+        binding.dashboardSection.replaceSubmeter.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Fragment targetFragment = new ReplaceSubmeterFragment();
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+            }
+        });
+
+        binding.dashboardSection.endTenancy.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Fragment targetFragment = new EndRoomTenancyFragment();
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+            }
+        });
+
+        binding.btnScanMeter.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Fragment targetFragment = new MeterReadingFragment();
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+            }
+        });
+
+
+
 
         binding.dashboardSection.mpin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -82,12 +124,6 @@ public class DashboardFragment extends Fragment {
             }
         });
 
-        binding.dashboardSection.deleteRoom.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View view) {
-                Fragment targetFragment = new DeleteRoomFragment();
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
-            }
-        });
     }
 
     @Override

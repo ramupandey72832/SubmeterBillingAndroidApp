@@ -13,6 +13,12 @@ import android.view.ViewGroup;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentEndRoomTenancyBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
+import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.github.devfrogora.service.TenancyManagementService;
+import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
+
+import java.sql.SQLException;
 
 /**
  * How to handle this in your Backend/Database:
@@ -29,6 +35,7 @@ import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBin
 public class EndRoomTenancyFragment extends Fragment {
 
     FragmentEndRoomTenancyBinding binding;
+    private UiHelper ui;
 
     public EndRoomTenancyFragment() {
         // Required empty public constructor
@@ -53,13 +60,24 @@ public class EndRoomTenancyFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ui = new UiHelper(this.getContext());
 
-        binding.etRoomNumber.getText().toString();
-        binding.etFinalReading.getText().toString();
-        binding.etEndDate.getText().toString();
 
         binding.btnEndTenancy.setOnClickListener(view1 -> {
+            String roomNumber =  binding.etRoomNumber.getText().toString();
+            binding.etFinalReading.getText().toString();
 
+            TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
+            try {
+                // Show Caution to user: add Final Reading Before Terminating Tenancy ;
+                // popup mpin here
+
+                tenancyManagementService.terminateTenancyOfRoom(roomNumber);
+
+
+            } catch (SQLException e) {
+                ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+            }
         });
     }
 }
