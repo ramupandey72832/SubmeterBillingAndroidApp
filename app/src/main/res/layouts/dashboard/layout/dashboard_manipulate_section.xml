@@ -110,6 +110,41 @@
                         android:text="Add Room" />
                 </LinearLayout>
 
+                <!-- Action: Add Room -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/grid_item_padding"
+                    android:paddingBottom="@dimen/grid_item_padding"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+                    <FrameLayout
+                        android:layout_width="@dimen/icon_container_size"
+                        android:layout_height="@dimen/icon_container_size"
+                        android:id="@+id/deleteRoom"
+                        android:background="@drawable/bg_circle_icon"
+                        android:layout_gravity="center_horizontal">
+                        <ImageView
+                            android:layout_width="@dimen/action_icon_size"
+                            android:layout_height="@dimen/action_icon_size"
+                            android:layout_gravity="center"
+                            app:tint="?attr/colorError"
+                            android:src="@android:drawable/ic_menu_delete" />
+                    </FrameLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/label_margin_top"
+                        android:gravity="center"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="@dimen/text_size_label"
+                        android:text="Add Room" />
+                </LinearLayout>
+
                 <!-- Action: Add Tenant -->
                 <LinearLayout
                     android:layout_width="0dp"
@@ -145,7 +180,7 @@
                         android:text="Add Tenant" />
                 </LinearLayout>
 
-                <!-- Action: Delete Submeter -->
+                <!-- Action: Delete Tenant -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -160,6 +195,7 @@
                     <FrameLayout
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
+                        android:id="@+id/deleteTenant"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
@@ -176,10 +212,11 @@
                         android:gravity="center"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
-                        android:text="Delete Submeter" />
+                        android:text="Delete Tenant" />
                 </LinearLayout>
 
-                <!-- Action: Delete Tenancy -->
+
+                <!-- Action: Replace Submeter -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -194,6 +231,42 @@
                     <FrameLayout
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
+                        android:id="@+id/replaceSubmeter"
+                        android:background="@drawable/bg_circle_icon"
+                        android:layout_gravity="center_horizontal">
+                        <ImageView
+                            android:layout_width="@dimen/action_icon_size"
+                            android:layout_height="@dimen/action_icon_size"
+                            android:layout_gravity="center"
+                            app:tint="?attr/colorPrimary"
+                            android:src="@android:drawable/ic_menu_delete" />
+                    </FrameLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/label_margin_top"
+                        android:gravity="center"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="@dimen/text_size_label"
+                        android:text="Replace Submeter" />
+                </LinearLayout>
+
+                <!-- Action: End Tenancy -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/grid_item_padding"
+                    android:paddingBottom="@dimen/grid_item_padding"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+                    <FrameLayout
+                        android:layout_width="@dimen/icon_container_size"
+                        android:layout_height="@dimen/icon_container_size"
+                        android:id="@+id/endTenancy"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
@@ -210,7 +283,43 @@
                         android:gravity="center"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
-                        android:text="Delete Tenancy" />
+                        android:text="End Tenancy" />
+                </LinearLayout>
+
+
+                <!-- Action: SET MPIN  -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_columnWeight="1"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/grid_item_padding"
+                    android:paddingBottom="@dimen/grid_item_padding"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+                    <FrameLayout
+                        android:layout_width="@dimen/icon_container_size"
+                        android:layout_height="@dimen/icon_container_size"
+                        android:id="@+id/mpin"
+                        android:background="@drawable/bg_circle_icon"
+                        android:layout_gravity="center_horizontal">
+                        <ImageView
+                            android:layout_width="@dimen/action_icon_size"
+                            android:layout_height="@dimen/action_icon_size"
+                            android:layout_gravity="center"
+                            app:tint="?attr/colorError"
+                            android:src="@android:drawable/ic_delete" />
+                    </FrameLayout>
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/label_margin_top"
+                        android:gravity="center"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="@dimen/text_size_label"
+                        android:text="SET MPIN" />
                 </LinearLayout>
 
             </GridLayout>

@@ -69,8 +69,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Enter Room / Unit Number to Delete"
-            app:startIconDrawable="@android:drawable/ic_menu_home"
+            android:hint="Enter Room Number to Delete"
+            app:startIconDrawable="@drawable/ic_menu_home"
             app:boxStrokeColor="#D32F2F"
             app:hintTextColor="#D32F2F">
 

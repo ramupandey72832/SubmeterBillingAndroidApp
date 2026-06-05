@@ -15,6 +15,7 @@ import com.application.bottomnavigationbarui.adapters.DashboardBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentDashboardBinding;
 import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.AddTenantFragment;
+import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 
@@ -73,6 +74,12 @@ public class DashboardFragment extends Fragment {
             }
         });
 
+        binding.dashboardSection.mpin.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                Fragment targetFragment = new SetupMpinFragment();
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+            }
+        });
     }
 
     @Override
