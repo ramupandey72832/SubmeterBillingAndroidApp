@@ -11,10 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.application.bottomnavigationbarui.R;
+import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
+import com.application.bottomnavigationbarui.databinding.FragmentReplaceSubmeterBinding;
 
 public class ReplaceSubmeterFragment extends Fragment {
 
-
+    private FragmentReplaceSubmeterBinding binding;
 
     public ReplaceSubmeterFragment() {
         // Required empty public constructor
@@ -34,7 +36,8 @@ public class ReplaceSubmeterFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_replace_submeter, container, false);
+        binding = FragmentReplaceSubmeterBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override

@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface RoomMeterService {
     void addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, double meterInitialReading) throws SQLException;
     public boolean isRoomExist(String roomNumber) throws SQLException;
-    Optional<RoomDTO> findRoomByNumber(String roomNumber) throws SQLException;
+    Optional<RoomDTO> findByRoomNumber(String roomNumber) throws SQLException;
 
     boolean isRoomVacant(String roomNumber ) throws SQLException ;
 

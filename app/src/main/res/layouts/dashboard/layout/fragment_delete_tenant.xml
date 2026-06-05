@@ -69,7 +69,7 @@ tools:context=".fragments.DeleteTenantFragment">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="Room / Unit Number"
+        android:hint="Room Number"
         app:startIconDrawable="@drawable/ic_menu_home">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -87,13 +87,13 @@ tools:context=".fragments.DeleteTenantFragment">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="32dp"
-        android:hint="Tenant Name (For verification)"
+        android:hint="aadhaar Number (For verification)"
         app:startIconDrawable="@android:drawable/ic_menu_my_calendar"
         app:boxStrokeColor="#D32F2F"
         app:hintTextColor="#D32F2F">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etTenantName"
+            android:id="@+id/etTenantAadhaarNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
@@ -120,7 +120,7 @@ tools:context=".fragments.DeleteTenantFragment">
 
         <!-- Cancel Button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnCancelTenantDelete"
+            android:id="@+id/btnCancel"
             style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"

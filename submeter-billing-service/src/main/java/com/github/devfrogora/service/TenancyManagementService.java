@@ -1,6 +1,7 @@
 package com.github.devfrogora.service;
 
 import com.github.devfrogora.data.entities.Tenant;
+import com.github.devfrogora.service.dto.TenancyDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
 
 import java.sql.SQLException;
@@ -10,7 +11,8 @@ public interface TenancyManagementService {
     public void addTenantWithTenancy(TenantDTO tenant,String roomNumber, String startDate) throws SQLException ;
 
     Optional<TenantDTO> findTenantByAadhar(String aadhar) throws SQLException;
-
+    public TenancyDTO findActiveTenancyByTenantAadhar(String aadharNumber)throws SQLException;
+    public TenancyDTO findActiveTenancyByRoomNumber(String roomNumber)throws SQLException;
     /**
      * Terminates the active tenancy for a given room, marking it vacant.
      * @param roomNumber The physical identifier code of the room (e.g., "302-C").

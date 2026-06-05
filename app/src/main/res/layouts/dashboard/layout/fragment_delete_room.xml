@@ -120,7 +120,7 @@
 
             <!-- Cancel Button -->
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnCancelDelete"
+                android:id="@+id/btnCancel"
                 style="@style/Widget.MaterialComponents.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"

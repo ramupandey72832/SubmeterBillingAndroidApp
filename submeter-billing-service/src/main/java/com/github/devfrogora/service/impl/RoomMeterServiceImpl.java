@@ -120,7 +120,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
     // Keep query methods clean by returning standard Optional/boolean
 
     @Override
-    public Optional<RoomDTO> findRoomByNumber(String roomNumber) throws SQLException {
+    public Optional<RoomDTO> findByRoomNumber(String roomNumber) throws SQLException {
         return DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                 .map(room -> new RoomDTO(room.getRoomNumber(), room.getRentAmount()));
     }

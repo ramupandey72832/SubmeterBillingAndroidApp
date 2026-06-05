@@ -4,6 +4,7 @@ import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.entities.Room;
 import com.github.devfrogora.data.entities.Tenancy;
 import com.github.devfrogora.data.entities.Tenant;
+import com.github.devfrogora.service.dto.TenancyDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.exception.*;
 
@@ -115,6 +116,39 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
     @Override
     public void terminateTenancyOfRoom(String roomNumber) throws SQLException{
             vacateRoom(roomNumber);
+    }
+
+    public TenancyDTO findActiveTenancyByRoomNumber(String roomNumber)throws SQLException{
+        Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " does not exist."));
+        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
+        if (activeTenancyOpt.isEmpty()) {
+//            throw new BusinessRuleException("Room " + roomNumber + " is  vacant ");
+            return null;
+        }
+        Tenancy activeTenancy = activeTenancyOpt.get();
+        Optional<Tenant> tenant = DaoManager.getTenantDao().getTenantById(activeTenancy.getTenantId());
+
+
+        return new TenancyDTO( activeTenancy.getTenancyId(),activeTenancy.getRoomId(),activeTenancy.getTenantId(),roomNumber,
+                tenant.get().getAadharNumber(),activeTenancy.getStartDate(),activeTenancy.getEndDate());
+    }
+
+    public TenancyDTO findActiveTenancyByTenantAadhar(String aadharNumber)throws SQLException{
+        Tenant tenant = DaoManager.getTenantDao().getTenantByAadhar(aadharNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("No tenant client matches the given identity key."));
+        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(tenant.getTenantId());
+
+        if (activeTenancyOpt.isEmpty()) {
+//            throw new BusinessRuleException("Tenant " + aadharNumber + " is  not exist ");
+            return null;
+        }
+        Tenancy activeTenancy = activeTenancyOpt.get();
+        Optional<Room> room = DaoManager.getRoomDao().getRoomById(activeTenancy.getRoomId());
+
+        return new TenancyDTO( activeTenancy.getTenancyId(),activeTenancy.getRoomId(),activeTenancy.getTenantId(),room.get().getRoomNumber(),
+                tenant.getAadharNumber(),activeTenancy.getStartDate(),activeTenancy.getEndDate());
+
     }
 
     @Override

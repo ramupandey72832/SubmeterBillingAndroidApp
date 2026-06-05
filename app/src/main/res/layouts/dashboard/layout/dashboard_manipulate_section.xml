@@ -142,7 +142,7 @@
                         android:gravity="center"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
-                        android:text="Add Room" />
+                        android:text="Delete Room" />
                 </LinearLayout>
 
                 <!-- Action: Add Tenant -->
