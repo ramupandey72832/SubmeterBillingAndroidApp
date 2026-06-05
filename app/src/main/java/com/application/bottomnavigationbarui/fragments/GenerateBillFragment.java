@@ -2,6 +2,8 @@ package com.application.bottomnavigationbarui.fragments;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -9,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.application.bottomnavigationbarui.R;
+import com.application.bottomnavigationbarui.databinding.FragmentDashboardBinding;
+import com.application.bottomnavigationbarui.databinding.FragmentGenerateBillBinding;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -17,14 +21,24 @@ import com.application.bottomnavigationbarui.R;
  */
 public class GenerateBillFragment extends Fragment {
 
+    FragmentGenerateBillBinding binding;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_ROOMNUMBER = "param1";
+    private static final String ARG_TENANTNAME = "param2";
+    private static final String ARG_SUBMETERSERIALNUMBER = "param3";
+    private static final String ARG_METERREADING = "param4";
+    private static final String ARG_RATEPERUNIT = "param5";
+    private static final String ARG_FIXEDCHARGE = "param6";
 
     // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    private String getArgRoomnumber;
+    private String getArgTenantname;
+    private String getArgSubmeterserialnumber;
+    private double getArgMeterreading;
+    private double getArgRateperunit;
+    private double getArgFixedcharge;
 
     public GenerateBillFragment() {
         // Required empty public constructor
@@ -34,16 +48,21 @@ public class GenerateBillFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
+     * @param roomNumber Parameter 1 .
+     * @param tenantName paramter 2 .
      * @return A new instance of fragment GenerateBillFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static GenerateBillFragment newInstance(String param1, String param2) {
+    public static GenerateBillFragment newInstance(String roomNumber, String tenantName, String submeterSerialNumber,
+                                                   double meterReading, double ratePerUnit ,double fixedCharge) {
         GenerateBillFragment fragment = new GenerateBillFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_ROOMNUMBER, roomNumber);
+        args.putString(ARG_TENANTNAME, tenantName);
+        args.putString(ARG_SUBMETERSERIALNUMBER, submeterSerialNumber);
+        args.putDouble(ARG_METERREADING, meterReading);
+        args.putDouble(ARG_RATEPERUNIT, ratePerUnit);
+        args.putDouble(ARG_FIXEDCHARGE, fixedCharge);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,8 +71,12 @@ public class GenerateBillFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            getArgRoomnumber = getArguments().getString(ARG_ROOMNUMBER);
+            getArgTenantname = getArguments().getString(ARG_TENANTNAME);
+            getArgSubmeterserialnumber = getArguments().getString(ARG_SUBMETERSERIALNUMBER);
+            getArgMeterreading = getArguments().getDouble(ARG_METERREADING);
+            getArgRateperunit = getArguments().getDouble(ARG_RATEPERUNIT);
+            getArgFixedcharge = getArguments().getDouble(ARG_FIXEDCHARGE);
         }
     }
 
@@ -61,6 +84,34 @@ public class GenerateBillFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_generate_bill, container, false);
+        binding = FragmentGenerateBillBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        binding.tvRoomNumberLabel.setText(getArgRoomnumber);
+        binding.tvTenantName.setText(getArgTenantname);
+
+        binding.tvInitialReading.setText((int) getArgMeterreading);
+        binding.tvFinalReading.setText("");
+        binding.tvUnitsConsumed.setText("");
+        binding.tvCalculation.setText("");
+        binding.tvUnitRate.setText("");
+
+        binding.tvFixedCharges.setText("");
+        binding.tvTotalAmount.setText("");
+
+        // How much Unit Consumed Should be calculated here and also fetch the previous reading from database
+
+        binding.btnGenerateSendBill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
     }
 }

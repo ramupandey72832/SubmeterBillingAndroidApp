@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.application.bottomnavigationbarui.R;
+import com.application.bottomnavigationbarui.databinding.FragmentEndRoomTenancyBinding;
+import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 
 /**
  * How to handle this in your Backend/Database:
@@ -24,7 +26,7 @@ import com.application.bottomnavigationbarui.R;
  */
 public class EndRoomTenancyFragment extends Fragment {
 
-
+    FragmentEndRoomTenancyBinding binding;
 
     public EndRoomTenancyFragment() {
         // Required empty public constructor
@@ -42,7 +44,8 @@ public class EndRoomTenancyFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_end_room_tenancy, container, false);
+        binding = FragmentEndRoomTenancyBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
 

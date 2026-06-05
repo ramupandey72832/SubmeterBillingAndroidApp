@@ -42,17 +42,34 @@ tools:context=".fragments.MeterReadingFragment">
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:hint="Room / Unit Number"
+        android:hint="Room Number"
         app:startIconDrawable="@android:drawable/ic_menu_home">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etReadingRoomNumber"
+            android:id="@+id/etRoomNumber"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="text"
             android:maxLines="1" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <!-- Submeter Serial Number Field -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilSubmeterNumber"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:hint="Submeter Serial Number"
+        app:startIconDrawable="@android:drawable/ic_menu_compass">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSubmeterSerialNumber"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:maxLines="1" />
+    </com.google.android.material.textfield.TextInputLayout>
     <!-- Current Meter Reading Field -->
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tilMeterReading"

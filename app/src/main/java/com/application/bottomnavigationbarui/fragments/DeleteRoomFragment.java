@@ -9,10 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.application.bottomnavigationbarui.R;
+import com.application.bottomnavigationbarui.databinding.FragmentDeleteRoomBinding;
+import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 
 public class DeleteRoomFragment extends Fragment {
 
-
+    FragmentDeleteRoomBinding binding;
     public DeleteRoomFragment() {
         // Required empty public constructor
     }
@@ -30,6 +32,7 @@ public class DeleteRoomFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_delete_room, container, false);
+        binding = FragmentDeleteRoomBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 }
