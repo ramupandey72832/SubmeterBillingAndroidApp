@@ -4,6 +4,7 @@ import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.entities.Room;
 import com.github.devfrogora.data.entities.Tenancy;
 import com.github.devfrogora.data.entities.Tenant;
+import com.github.devfrogora.data.utils.DateUtils;
 import com.github.devfrogora.service.dto.TenancyDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.exception.*;
@@ -65,7 +66,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
     }
 
     @Override
-    public void vacateRoom(String roomNumber)  throws SQLException{
+    public void vacateRoom(String roomNumber,String endTenancyDate)  throws SQLException{
         Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " does not exist."));
 
@@ -75,12 +76,12 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         }
 
         Tenancy activeTenancy = activeTenancyOpt.get();
-        String todayIsoString = LocalDate.now().toString();
+        String endDate = DateUtils.validateDate(endTenancyDate);
 
         boolean isCheckedOut = DaoManager.getTenancyDao().endContract(
                 room.getRoomId(),
                 activeTenancy.getTenantId(),
-                todayIsoString
+                endDate
         );
 
         if (!isCheckedOut) {
@@ -114,8 +115,8 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
      * @return true if success and false or exception if not
      */
     @Override
-    public void terminateTenancyOfRoom(String roomNumber) throws SQLException{
-            vacateRoom(roomNumber);
+    public void terminateTenancyOfRoom(String roomNumber,String endTenancyDate) throws SQLException{
+            vacateRoom(roomNumber,endTenancyDate);
     }
 
     public TenancyDTO findActiveTenancyByRoomNumber(String roomNumber)throws SQLException{

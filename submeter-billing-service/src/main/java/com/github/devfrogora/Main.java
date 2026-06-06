@@ -16,6 +16,7 @@ import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -55,7 +56,8 @@ public class Main {
     void terminateTenancyOfRoom(String roomNumber) throws SQLException {
         System.out.println("\n--- Offboarding Operation for Room: " + roomNumber + " ---");
         try {
-             tenantService.terminateTenancyOfRoom(roomNumber);
+            String todayDate = LocalDate.now().toString();
+             tenantService.terminateTenancyOfRoom(roomNumber, todayDate);
         }catch (ResourceNotFoundException e){
             System.err.println("Failed to Terminate tenancy :  " + e.getMessage());
         }

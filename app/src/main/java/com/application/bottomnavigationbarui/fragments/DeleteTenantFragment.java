@@ -27,7 +27,7 @@ import java.sql.SQLException;
 import java.util.Optional;
 
 
-public class DeleteTenantFragment extends Fragment {
+public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
     private UiHelper ui;
 
     FragmentDeleteTenantBinding binding;
@@ -63,34 +63,56 @@ public class DeleteTenantFragment extends Fragment {
             String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString();
             String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString();
 
-
-            TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
-            RoomMeterService roomMeterService = new RoomMeterServiceImpl();
-            try {
-                boolean isRoomExist = roomMeterService.isRoomExist(tenantRoomNumber);
-                if(isRoomExist){
-
-                   TenancyDTO tenancyDTO = tenancyManagementService.findActiveTenancyByTenantAadhar(tenantAadhaarNumber);
-
-                       if(tenancyDTO != null){
-                           Toast.makeText(getContext(), "Tenant is using room " + tenancyDTO.getRoomNumber(), Toast.LENGTH_SHORT).show();
-                       }else{
-                           if(tenancyDTO.getRoomNumber().equals(tenantRoomNumber)){
-                               tenancyManagementService.deleteTenantIfNoActiveTenancy(tenantAadhaarNumber);
-                               Toast.makeText(getContext(), "Tenant successfully removed", Toast.LENGTH_SHORT).show();
-                           }else{
-                               Toast.makeText(getContext(), "Tenant have Active Tenancy but not this room: " + tenancyDTO.getRoomNumber(), Toast.LENGTH_SHORT).show();
-                           }
-                       }
-                }
-            } catch(Exception e){
-                ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+            if(tenantAadhaarNumber.isEmpty() || tenantRoomNumber.isEmpty()){
+                return;
             }
+
+            // luanch MPIN verification dialog
+
+            // 3. LAUNCH THE POPUP DIALOG GATE HERE
+            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+            dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
 
         binding.btnCancel.setOnClickListener(view1 -> {
             binding.etTenantAadhaarNumber.setText("");
             binding.etTenantRoomNumber.setText("");
         });
+    }
+
+    @Override
+    public void onMpinVerified(boolean isSuccess) {
+        if(isSuccess){
+            executeDeleteTenantLogic();
+        }
+    }
+
+    private void executeDeleteTenantLogic() {
+        String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString();
+        String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString();
+
+
+        TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
+        RoomMeterService roomMeterService = new RoomMeterServiceImpl();
+        try {
+            boolean isRoomExist = roomMeterService.isRoomExist(tenantRoomNumber);
+            if(isRoomExist){
+
+                TenancyDTO tenancyDTO = tenancyManagementService.findActiveTenancyByTenantAadhar(tenantAadhaarNumber);
+
+                if(tenancyDTO != null){
+                    Toast.makeText(getContext(), "Tenant is using room " + tenancyDTO.getRoomNumber(), Toast.LENGTH_SHORT).show();
+                }else{
+                    if(tenancyDTO.getRoomNumber().equals(tenantRoomNumber)){
+                        tenancyManagementService.deleteTenantIfNoActiveTenancy(tenantAadhaarNumber);
+                        Toast.makeText(getContext(), "Tenant successfully removed", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Toast.makeText(getContext(), "Tenant have Active Tenancy but not this room: " + tenancyDTO.getRoomNumber(), Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
+        } catch(Exception e){
+            ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+        }
     }
 }

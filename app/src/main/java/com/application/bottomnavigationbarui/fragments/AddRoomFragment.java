@@ -19,7 +19,7 @@ import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 
 
-public class AddRoomFragment extends Fragment {
+public class AddRoomFragment extends Fragment  implements VerifyMpinDialogFragment.MpinVerificationListener {
 
     private FragmentAddRoomBinding binding;
     private UiHelper ui;
@@ -55,15 +55,15 @@ public class AddRoomFragment extends Fragment {
                 String roomType = binding.layoutAddroom.etRoomType.getText().toString();
                 String meterSerial = binding.layoutAddroom.etMeterSerial.getText().toString();
                 String initialReading = binding.layoutAddroom.etInitialReading.getText().toString();
-
+                if(roomNumber.isEmpty() || roomType.isEmpty() || meterSerial.isEmpty() || initialReading.isEmpty())
+                {
+                    return;
+                }
                 // Perform validation and save logic here
 
-                RoomMeterService roomMeterService = new RoomMeterServiceImpl();
-                try {
-                  roomMeterService.addRoomWithMeter(roomNumber, roomType, meterSerial, Double.parseDouble(initialReading));
-                } catch(Exception e){
-                    ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
-                }
+                // 3. LAUNCH THE POPUP DIALOG GATE HERE
+                VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+                dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
             }
         });
 
@@ -76,5 +76,26 @@ public class AddRoomFragment extends Fragment {
                 binding.layoutAddroom.etInitialReading.setText("");
             }
         });
+    }
+
+    @Override
+    public void onMpinVerified(boolean isSuccess) {
+        if (isSuccess) {
+            // Proceed to execute your database code or API calls to delete the room!
+            executeAddRoomLogic();
+        }
+    }
+
+    private void executeAddRoomLogic() {
+        String roomNumber = binding.layoutAddroom.etRoomNumber.getText().toString();
+        String roomType = binding.layoutAddroom.etRoomType.getText().toString();
+        String meterSerial = binding.layoutAddroom.etMeterSerial.getText().toString();
+        String initialReading = binding.layoutAddroom.etInitialReading.getText().toString();
+        RoomMeterService roomMeterService = new RoomMeterServiceImpl();
+        try {
+            roomMeterService.addRoomWithMeter(roomNumber, roomType, meterSerial, Double.parseDouble(initialReading));
+        } catch(Exception e){
+            ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+        }
     }
 }

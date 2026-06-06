@@ -5,6 +5,7 @@ import com.github.devfrogora.data.entities.*;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.dto.RoomDTO;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
+import com.github.devfrogora.service.dto.reports.SubmeterDTO;
 import com.github.devfrogora.service.exception.BusinessRuleException;
 import com.github.devfrogora.service.exception.ResourceNotFoundException;
 import com.github.devfrogora.service.exception.RoomOccupiedException;
@@ -116,6 +117,34 @@ public class RoomMeterServiceImpl implements RoomMeterService {
 
         return registryList;
     }
+
+    @Override
+    public SubmeterDTO getSubmeterByRoomNumber(String roomNumber) throws SQLException {
+        Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " not found."));
+        Optional<Submeter> submeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId());
+        if (submeter.isPresent()) {
+            return new SubmeterDTO(submeter.get().getMeterId(), submeter.get().getRoomId(), submeter.get().getMeterSerialNumber(),
+                    submeter.get().getInitialReading());
+        }
+        return null;
+    }
+
+    @Override
+    public void updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber) throws SQLException {
+
+        Optional<Submeter> submeter = DaoManager.getSubmeterDao().getSubmeterBySerialNumber(oldMeterSerialNumber);
+        if (submeter.isPresent()) {
+            Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+                    .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " not found."));
+            submeter.get().setRoomId(room.getRoomId());
+            submeter.get().setMeterSerialNumber(newMeterSerialNumber);
+            DaoManager.getSubmeterDao().updateSubmeter(submeter.get());
+        } else {
+            throw new ResourceNotFoundException("Meter " + oldMeterSerialNumber + " not found.");
+        }
+    }
+
 
     // Keep query methods clean by returning standard Optional/boolean
 

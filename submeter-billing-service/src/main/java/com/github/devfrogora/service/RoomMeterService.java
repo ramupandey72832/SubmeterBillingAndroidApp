@@ -2,6 +2,7 @@ package com.github.devfrogora.service;
 
 import com.github.devfrogora.service.dto.RoomDTO;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
+import com.github.devfrogora.service.dto.reports.SubmeterDTO;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -17,4 +18,8 @@ public interface RoomMeterService {
     public void deleteRoomIfVacant(String roomNumber) throws SQLException;
 
     List<RoomRegistryDto> getRoomRegistryReport();
+
+    SubmeterDTO getSubmeterByRoomNumber(String roomNumber) throws SQLException;
+
+    public void updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber) throws SQLException;
 }

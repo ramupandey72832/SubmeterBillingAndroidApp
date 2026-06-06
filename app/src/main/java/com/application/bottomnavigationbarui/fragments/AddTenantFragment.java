@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.Locale;
 
 
-public class AddTenantFragment extends Fragment {
+public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
     private UiHelper ui;
     private FragmentAddTenantBinding binding;
@@ -59,21 +59,16 @@ public class AddTenantFragment extends Fragment {
             String roomNumber = binding.layoutAddTenant.etRoomNumber.getText().toString();
             String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
 
+            if(tenantName.isEmpty() || aadharNumber.isEmpty() || tenantMobile.isEmpty() || tenantParentMobile.isEmpty() || tenantAddress.isEmpty() || roomNumber.isEmpty() || startDate.isEmpty())
+            {
+                return;
+            }
             // Perform validation and save logic here
 
-            TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
-            try {
-                TenantDTO tenantDTO = new TenantDTO();
-                tenantDTO.setName(tenantName);
-                tenantDTO.setAadharNumber(aadharNumber);
-                tenantDTO.setPhoneNumber(tenantMobile);
-                tenantDTO.setParentPhoneNumber(tenantParentMobile);
-                tenantDTO.setAddress(tenantAddress);
+            // 3. LAUNCH THE POPUP DIALOG GATE HERE
+            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+            dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
 
-                tenancyManagementService.addTenantWithTenancy(tenantDTO, roomNumber, startDate);
-            } catch(Exception e){
-                ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
-            }
         });
     }
 
@@ -97,5 +92,38 @@ public class AddTenantFragment extends Fragment {
             String dateString = formatter.format(new Date(selectionTimestamp));
             etStartDate.setText(dateString);
         });
+    }
+
+    @Override
+    public void onMpinVerified(boolean isSuccess) {
+        if (isSuccess) {
+            executeAddTenantLogic();
+        }
+    }
+
+    private void executeAddTenantLogic() {
+        String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
+        String aadharNumber = binding.layoutAddTenant.etAadharNumber.getText().toString();
+        String tenantMobile = binding.layoutAddTenant.etTenantMobile.getText().toString();
+        String tenantParentMobile = binding.layoutAddTenant.etTenantParentMobile.getText().toString();
+        String tenantAddress = binding.layoutAddTenant.etTenantAddress.getText().toString();
+        String roomNumber = binding.layoutAddTenant.etRoomNumber.getText().toString();
+        String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
+
+
+        TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
+        try {
+            TenantDTO tenantDTO = new TenantDTO();
+            tenantDTO.setName(tenantName);
+            tenantDTO.setAadharNumber(aadharNumber);
+            tenantDTO.setPhoneNumber(tenantMobile);
+            tenantDTO.setParentPhoneNumber(tenantParentMobile);
+            tenantDTO.setAddress(tenantAddress);
+
+            tenancyManagementService.addTenantWithTenancy(tenantDTO, roomNumber, startDate);
+        } catch(Exception e){
+            ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+        }
+
     }
 }

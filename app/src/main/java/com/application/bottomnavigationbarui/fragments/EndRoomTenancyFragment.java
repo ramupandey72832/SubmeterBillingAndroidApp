@@ -32,7 +32,7 @@ import java.sql.SQLException;
  *
  * Step 4: Use a Date Picker: In your Java/Kotlin activity code, attach a MaterialDatePicker to the etMoveOutDate input field. Setting android:focusable="false" ensures the keyboard won't pop up and annoy the user when they tap the date field to open the calendar picker.
  */
-public class EndRoomTenancyFragment extends Fragment {
+public class EndRoomTenancyFragment extends Fragment  implements VerifyMpinDialogFragment.MpinVerificationListener {
 
     FragmentEndRoomTenancyBinding binding;
     private UiHelper ui;
@@ -62,22 +62,40 @@ public class EndRoomTenancyFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(this.getContext());
 
+        // TODO Show Caution to user: please check latest Reading Before Terminating Tenancy ;
+       // and Remove Final Reading from here
 
         binding.btnEndTenancy.setOnClickListener(view1 -> {
             String roomNumber =  binding.etRoomNumber.getText().toString();
-            binding.etFinalReading.getText().toString();
+            String endDate = binding.etEndDate.getText().toString();
+            if(roomNumber.isEmpty() || endDate.isEmpty()){
+                return;
+            }
+//            binding.etFinalReading.getText().toString();
 
+            // 3. LAUNCH THE POPUP DIALOG GATE HERE
+            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+
+            // Crucial: UsegetChildFragmentManager() because it is being popped up from WITHIN a fragment
+            dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
+
+
+        });
+    }
+
+    @Override
+    public void onMpinVerified(boolean isSuccess) {
+        if (isSuccess) {
             TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
             try {
-                // Show Caution to user: add Final Reading Before Terminating Tenancy ;
-                // popup mpin here
 
-                tenancyManagementService.terminateTenancyOfRoom(roomNumber);
+                String roomNumber =  binding.etRoomNumber.getText().toString();
+                String endDate = binding.etEndDate.getText().toString();
+                tenancyManagementService.terminateTenancyOfRoom(roomNumber,endDate);
 
-
-            } catch (SQLException e) {
-                ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+            } catch (Exception e) {
+                ErrorUtils.handleDatabaseException("Error : ", e, ui);
             }
-        });
+        }
     }
 }

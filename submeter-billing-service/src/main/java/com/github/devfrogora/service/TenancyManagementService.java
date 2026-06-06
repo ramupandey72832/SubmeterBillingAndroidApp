@@ -18,9 +18,9 @@ public interface TenancyManagementService {
      * @param roomNumber The physical identifier code of the room (e.g., "302-C").
      * @return true if the room was successfully checked out and marked vacant.
      */
-    void vacateRoom(String roomNumber) throws SQLException;
+    void vacateRoom(String roomNumber,String endTenancyDate) throws SQLException;
     public void deleteTenantIfNoActiveTenancy(String aadharNumber) throws SQLException;
 
-    void terminateTenancyOfRoom(String roomNumber) throws SQLException;
+    void terminateTenancyOfRoom(String roomNumber,String endTenancyDate) throws SQLException;
 
 }

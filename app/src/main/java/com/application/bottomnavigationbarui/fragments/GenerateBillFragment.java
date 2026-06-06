@@ -94,15 +94,18 @@ public class GenerateBillFragment extends Fragment {
 
         binding.tvRoomNumberLabel.setText(getArgRoomnumber);
         binding.tvTenantName.setText(getArgTenantname);
+        double previousReading = 0;
+        double unitsConsumed = getArgMeterreading - previousReading;
+        binding.tvPreviousReading.setText(Double.toString(previousReading));
+        binding.tvCurrentReading.setText(Double.toString(getArgMeterreading));
+        binding.tvUnitsConsumed.setText(Double.toString(unitsConsumed));
+        binding.tvUnitRate.setText(Double.toString(getArgRateperunit));
+        binding.tvCalculation.setText(unitsConsumed +" KWh * "+ getArgRateperunit +" + "+ getArgFixedcharge);
 
-        binding.tvInitialReading.setText((int) getArgMeterreading);
-        binding.tvFinalReading.setText("");
-        binding.tvUnitsConsumed.setText("");
-        binding.tvCalculation.setText("");
-        binding.tvUnitRate.setText("");
+        binding.tvFixedCharges.setText(Double.toString(getArgFixedcharge));
+        double totalAmount = unitsConsumed * getArgRateperunit + getArgFixedcharge;
 
-        binding.tvFixedCharges.setText("");
-        binding.tvTotalAmount.setText("");
+        binding.tvTotalAmount.setText(Double.toString(totalAmount));
 
         // How much Unit Consumed Should be calculated here and also fetch the previous reading from database
 
