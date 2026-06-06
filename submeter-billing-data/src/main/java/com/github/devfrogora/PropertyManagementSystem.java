@@ -179,8 +179,8 @@ public class PropertyManagementSystem {
             currentReading.setReadingValue(currentVal);
             currentReading.setImageUrlOrPath(null);
             currentReading.setReadingDate(currentDate);
-            boolean isReadingSaved = DaoManager.getMeterReadingDao().insertReading(currentReading);
-            System.out.println("Utility Track: New monthly meter dial reading stored -> " + isReadingSaved);
+            int readingID = DaoManager.getMeterReadingDao().insertReading(currentReading);
+            System.out.println("Utility Track: New monthly meter dial reading stored -> " + readingID);
         } else {
             System.out.println("Utility Track: Monthly reading entry already captured for timestamp: " + currentDate);
         }
@@ -208,7 +208,7 @@ public class PropertyManagementSystem {
         finalBill.setBillingDate(latestReading.getReadingDate());
         finalBill.setPaid(false);
 
-        boolean isBillIssued = DaoManager.getBillDao().insertBill(finalBill);
+        boolean isBillIssued = DaoManager.getBillDao().insertBill(finalBill) > 0 ;
         System.out.println("Billing: Invoice operation executed -> " + isBillIssued);
         System.out.println(">> Total Units Used: " + totalUnitsConsumed + " kWh");
         System.out.println(">> Total Invoice Cost: ₹" + calculatedTotalCost);

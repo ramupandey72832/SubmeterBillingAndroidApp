@@ -14,8 +14,8 @@ import java.util.Optional;
 public class SQLiteBillDao implements BillDao {
 
     @Override
-    public boolean insertBill(Bill bill) throws SQLException {
-        return DbUtils.executeUpdate(SqlLoader.get("bill.insert"),
+    public int insertBill(Bill bill) throws SQLException {
+        return DbUtils.executeInsert(SqlLoader.get("bill.insert"),
                 bill.getPreviousReadingId(),
                 bill.getCurrentReadingId(),
                 bill.getUnitsConsumed(),

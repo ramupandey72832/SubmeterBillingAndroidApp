@@ -13,9 +13,9 @@ import java.util.Optional;
 public class SQLiteMeterReadingDao implements MeterReadingDao {
 
     @Override
-    public boolean insertReading(MeterReading reading) throws SQLException {
+    public int insertReading(MeterReading reading) throws SQLException {
         String sql = SqlLoader.get("reading.insert");
-        return DbUtils.executeUpdate(sql,
+        return DbUtils.executeInsert(sql,
                 reading.getMeterId(),
                 reading.getReadingValue(),
                 reading.getImageUrlOrPath(),

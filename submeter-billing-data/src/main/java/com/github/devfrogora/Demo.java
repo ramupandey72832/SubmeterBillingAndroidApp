@@ -220,7 +220,7 @@ public class Demo {
         bill.setPaid(false); // New bills default to unpaid until processed
 
         // 3. Write record to the SQLite database via BillDao
-        boolean isSaved = DaoManager.getBillDao().insertBill(bill);
+        boolean isSaved = DaoManager.getBillDao().insertBill(bill) > 0 ;
 
         // Visual Presentation Format Engine
         System.out.println("\n==================================================");

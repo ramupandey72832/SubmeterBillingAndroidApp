@@ -94,6 +94,7 @@ public class AddRoomFragment extends Fragment  implements VerifyMpinDialogFragme
         RoomMeterService roomMeterService = new RoomMeterServiceImpl();
         try {
             roomMeterService.addRoomWithMeter(roomNumber, roomType, meterSerial, Double.parseDouble(initialReading));
+
         } catch(Exception e){
             ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
         }

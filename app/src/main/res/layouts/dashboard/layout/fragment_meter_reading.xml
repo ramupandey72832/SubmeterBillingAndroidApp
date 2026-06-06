@@ -1,150 +1,161 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto"
-xmlns:tools="http://tools.tools/"
-android:layout_width="match_parent"
-android:layout_height="match_parent"
-android:fillViewport="true"
-android:background="#F8F9FA"
-tools:context=".fragments.MeterReadingFragment">
-
-<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#F8F9FA"
+    tools:context=".fragments.MeterReadingFragment">
 
-    <!-- Header Section -->
-    <TextView
-        android:id="@+id/tvTitle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="New Meter Reading"
-        android:textColor="#212121"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <TextView
-        android:id="@+id/tvSubtitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="32dp"
-        android:text="Enter current usage and rate details to calculate the utility bill."
-        android:textColor="#666666"
-        android:textSize="14sp" />
-
-    <!-- Room/Unit Number Field -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilReadingRoomNumber"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="Room Number"
-        app:startIconDrawable="@drawable/ic_menu_home">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etRoomNumber"
+        <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="16dp"
+            android:text="New Meter Reading"
+            android:textColor="#212121"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-    <!-- Submeter Serial Number Field -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilSubmeterNumber"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:hint="Submeter Serial Number"
-        app:startIconDrawable="@android:drawable/ic_menu_compass">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etSubmeterSerialNumber"
+        <TextView
+            android:id="@+id/tvSubtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
-    <!-- Current Meter Reading Field -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilMeterReading"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
-        android:hint="Current Meter Reading"
-        app:startIconDrawable="@android:drawable/ic_menu_compass">
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="32dp"
+            android:text="Enter current usage and rate details to calculate the utility bill."
+            android:textColor="#666666"
+            android:textSize="14sp" />
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etMeterReading"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-    <!-- Section Label for Billing Rates -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Billing Configuration"
-        android:textColor="#1976D2"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="12dp" />
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilReadingRoomNumber"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Room Number"
+                app:startIconDrawable="@drawable/ic_menu_home">
 
-    <!-- Rate Per Unit Field -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilRatePerUnit"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:hint="Rate per Unit"
-        app:startIconDrawable="@android:drawable/ic_menu_slideshow">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etRoomNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLines="1" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etRatePerUnit"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCheck"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginTop="4dp"
+                android:text="Check"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilSubmeterNumber"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginBottom="24dp"
+            android:hint="Submeter Serial Number"
+            app:startIconDrawable="@android:drawable/ic_menu_compass">
 
-    <!-- Fixed Charge Field -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/tilFixedCharge"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="40dp"
-        android:hint="Fixed Base Charge"
-        app:startIconDrawable="@android:drawable/ic_menu_add">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etSubmeterSerialNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etFixedCharge"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilMeterReading"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:maxLines="1" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginBottom="24dp"
+            android:hint="Current Meter Reading"
+            app:startIconDrawable="@android:drawable/ic_menu_compass">
 
-    <!-- Next Button -->
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnNext"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Next"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        app:cornerRadius="8dp"
-        app:icon="@android:drawable/ic_media_next"
-        app:iconGravity="textEnd" />
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etMeterReading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-</LinearLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Billing Configuration"
+            android:textColor="#1976D2"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilRatePerUnit"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="Rate per Unit"
+            app:startIconDrawable="@android:drawable/ic_menu_slideshow">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etRatePerUnit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilFixedCharge"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            android:hint="Fixed Base Charge"
+            app:startIconDrawable="@android:drawable/ic_menu_add">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etFixedCharge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="numberDecimal"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnNext"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Next"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:cornerRadius="8dp"
+            app:icon="@android:drawable/ic_media_next"
+            app:iconGravity="textEnd" />
+
+    </LinearLayout>
 </ScrollView>

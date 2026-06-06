@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface MeterReadingDao {
     // Create
-    boolean insertReading(MeterReading reading) throws SQLException;
+    int insertReading(MeterReading reading) throws SQLException;
 
     // Read
     Optional<MeterReading> getReadingById(int readingId) throws SQLException;

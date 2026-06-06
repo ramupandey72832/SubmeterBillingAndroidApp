@@ -2,6 +2,7 @@ package com.github.devfrogora.service.impl;
 
 import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.entities.*;
+import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.dto.RoomDTO;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
@@ -27,7 +28,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
         } else {
             Room room = new Room();
             room.setRoomNumber(roomNumber);
-            room.setRentAmount(roomType.equalsIgnoreCase("2BHK") ? 12000.00 : 7500.00);
+//            room.setRentAmount(roomType.equalsIgnoreCase("2BHK") ? 12000.00 : 7500.00);
 
             boolean inserted = DaoManager.getRoomDao().insertRoom(room);
             if (!inserted) {
@@ -51,6 +52,9 @@ public class RoomMeterServiceImpl implements RoomMeterService {
                 throw new BusinessRuleException("Failed to attach hardware submeter registry.");
             }
         }
+        MeterBillingService  meterBillingService = new MeterBillingServiceImpl();
+        meterBillingService.initialMeterReading(linkedMeters.get().getMeterId(),meterInitialReading,50,10);
+
     }
 
     @Override

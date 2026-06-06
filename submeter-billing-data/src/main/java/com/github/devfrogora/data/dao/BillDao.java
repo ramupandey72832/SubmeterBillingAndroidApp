@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface BillDao {
     // Create
-    boolean insertBill(Bill bill) throws SQLException;
+    int insertBill(Bill bill) throws SQLException;
 
     // Read
     Optional<Bill> getBillById(int billId) throws SQLException;
