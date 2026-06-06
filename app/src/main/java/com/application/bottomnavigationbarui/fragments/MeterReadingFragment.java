@@ -35,7 +35,6 @@ public class MeterReadingFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +56,10 @@ public class MeterReadingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        binding.etSubmeterSerialNumber.setEnabled(false);
+        binding.etSubmeterSerialNumber.setEnabled(false);
+        binding.etPreviousMeterReading.setEnabled(false);
+
         RoomMeterService roomMeterService = new RoomMeterServiceImpl();
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
         TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
@@ -77,11 +80,9 @@ public class MeterReadingFragment extends Fragment {
                 }
 
                 tenantName = tenantDTO.get().getName();
-
-
                 double findPreviousReading = meterBillingService.getLatestReading(submeterDTO.getMeterSerialNumber());
 
-                binding.etMeterReading.setText(Double.toString(findPreviousReading));
+                binding.etPreviousMeterReading.setText(Double.toString(findPreviousReading));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -98,7 +99,8 @@ public class MeterReadingFragment extends Fragment {
                String submeterSerialNumber = binding.etSubmeterSerialNumber.getText().toString();
 
 
-              double currentMeterReading = Double.parseDouble(binding.etMeterReading.getText().toString());
+              double currentMeterReading = Double.parseDouble(binding.etCurrentMeterReading.getText().toString());
+              double previousMeterReading = Double.parseDouble(binding.etPreviousMeterReading.getText().toString());
               double fixedCharge = Double.parseDouble(binding.etFixedCharge.getText().toString());
               double ratePerUnit = Double.parseDouble(binding.etRatePerUnit.getText().toString());
 
@@ -106,7 +108,8 @@ public class MeterReadingFragment extends Fragment {
                   return;
               }
 
-              GenerateBillFragment.newInstance(roomNumber, tenantName , submeterSerialNumber, currentMeterReading, ratePerUnit, fixedCharge);
+              GenerateBillFragment.newInstance(roomNumber, tenantName , submeterSerialNumber, currentMeterReading,
+                      previousMeterReading,  ratePerUnit, fixedCharge);
             }
         });
 

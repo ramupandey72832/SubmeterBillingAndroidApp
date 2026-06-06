@@ -88,8 +88,8 @@ public class PropertyManagementSystem {
             submeter.setMeterSerialNumber(serialNumber);
             submeter.setRoomId(roomId);
             submeter.setInitialReading(150.00);
-            boolean isMeterInstalled = DaoManager.getSubmeterDao().insertSubmeter(submeter);
-            System.out.println("Infrastructure: Submeter " + serialNumber + " Connected -> " + isMeterInstalled);
+            int meterid = DaoManager.getSubmeterDao().insertSubmeter(submeter);
+            System.out.println("Infrastructure: Submeter " + serialNumber + " Connected meter id-> " + meterid);
 
             return DaoManager.getSubmeterDao().getSubmeterBySerialNumber(serialNumber).orElseThrow().getMeterId();
         }

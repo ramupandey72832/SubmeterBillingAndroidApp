@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface SubmeterDao {
     // Create
-    boolean insertSubmeter(Submeter submeter) throws SQLException;
+    int insertSubmeter(Submeter submeter) throws SQLException;
 
     // Read
     Optional<Submeter> getSubmeterById(int meterId) throws SQLException;

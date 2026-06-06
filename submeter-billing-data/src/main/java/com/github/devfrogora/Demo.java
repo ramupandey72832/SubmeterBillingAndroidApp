@@ -85,8 +85,8 @@ public class Demo {
             meter.setMeterSerialNumber(meterSerialNumber);
             meter.setInitialReading(meterInitialReading);
 
-            boolean meterSaved = DaoManager.getSubmeterDao().insertSubmeter(meter);
-            System.out.println("Screen A: Submeter hardware attached -> " + meterSaved);
+            int meterid = DaoManager.getSubmeterDao().insertSubmeter(meter) ;
+            System.out.println("Screen A: Submeter hardware attached with meter id-> " + meterid);
         } else {
             System.out.println("Screen A: Submeter already linked to this unit: " + linkedMeters.get().getMeterSerialNumber());
         }

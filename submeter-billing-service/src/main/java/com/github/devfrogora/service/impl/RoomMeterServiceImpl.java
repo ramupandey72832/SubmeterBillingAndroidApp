@@ -41,19 +41,22 @@ public class RoomMeterServiceImpl implements RoomMeterService {
         }
 
         Optional<Submeter> linkedMeters = DaoManager.getSubmeterDao().getSubmeterByRoomId(roomId);
+        MeterBillingService  meterBillingService = new MeterBillingServiceImpl();
+
         if (linkedMeters.isEmpty()) {
             Submeter meter = new Submeter();
             meter.setRoomId(roomId);
             meter.setMeterSerialNumber(meterSerialNumber);
             meter.setInitialReading(meterInitialReading);
 
-            boolean meterSaved = DaoManager.getSubmeterDao().insertSubmeter(meter);
-            if (!meterSaved) {
+            int meterId = DaoManager.getSubmeterDao().insertSubmeter(meter);
+            if (meterId < 0) {
                 throw new BusinessRuleException("Failed to attach hardware submeter registry.");
             }
+            meterBillingService.initialMeterReading(meterId,meterInitialReading,50,10);
+        }else {
+            meterBillingService.initialMeterReading(linkedMeters.get().getMeterId(), meterInitialReading, 50, 10);
         }
-        MeterBillingService  meterBillingService = new MeterBillingServiceImpl();
-        meterBillingService.initialMeterReading(linkedMeters.get().getMeterId(),meterInitialReading,50,10);
 
     }
 

@@ -15,14 +15,19 @@ import android.view.ViewGroup;
 
 import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentBillsBinding;
+import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
+import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class BillsFragment extends Fragment {
-
+    private UiHelper ui;
     private FragmentBillsBinding binding;
 
     private BillingBillsAdapter adapter;
@@ -47,17 +52,25 @@ public class BillsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        ui = new UiHelper(requireContext());
 
-        // Create dummy list data
-        fullBillList = new ArrayList<>();
-        fullBillList.add(new BillReportDto(1, "105", "Alex", "01 Apr 2026",2.5, "YES"));
-        fullBillList.add(new BillReportDto(2, "104", "Sarah", "01 Apr 2026",8.5, "NO"));
-        fullBillList.add(new BillReportDto(3, "103", "Alex", "01 Mar 2026", 7.5, "YES"));
-        fullBillList.add(new BillReportDto(4, "102",  "Alex", "01 Mar 2026",5 ,"NO"));
-        fullBillList.add(new BillReportDto(5, "101",  "Ramu", "01 Mar 2026", 6,"YES"));
-        fullBillList.add(new BillReportDto(6, "100",  "Alex", "01 Mar 2026", 10,"NO"));
-        fullBillList.add(new BillReportDto(7, "109",  "Ramu", "01 Mar 2026", 15,"Yes" ));
+        MeterBillingService meterBillingService = new MeterBillingServiceImpl();
+        try {
+            fullBillList =  meterBillingService.getAllBillsReport();
+        } catch (SQLException e) {
+            ErrorUtils.handleDatabaseException("Error : ", e, ui);
+        }
 
+//        // Create dummy list data
+//        fullBillList = new ArrayList<>();
+//        fullBillList.add(new BillReportDto(1, "105", "Alex", "01 Apr 2026",2.5, "YES"));
+//        fullBillList.add(new BillReportDto(2, "104", "Sarah", "01 Apr 2026",8.5, "NO"));
+//        fullBillList.add(new BillReportDto(3, "103", "Alex", "01 Mar 2026", 7.5, "YES"));
+//        fullBillList.add(new BillReportDto(4, "102",  "Alex", "01 Mar 2026",5 ,"NO"));
+//        fullBillList.add(new BillReportDto(5, "101",  "Ramu", "01 Mar 2026", 6,"YES"));
+//        fullBillList.add(new BillReportDto(6, "100",  "Alex", "01 Mar 2026", 10,"NO"));
+//        fullBillList.add(new BillReportDto(7, "109",  "Ramu", "01 Mar 2026", 15,"Yes" ));
+//
 
         binding.recyclerViewBilling.setLayoutManager(new LinearLayoutManager(getContext()));
 

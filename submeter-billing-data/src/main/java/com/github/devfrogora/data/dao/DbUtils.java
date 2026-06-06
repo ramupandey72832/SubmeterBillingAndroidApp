@@ -61,7 +61,7 @@ public class DbUtils {
         }
     }
 
-    public static int executeInsert(String sql, Object... params) throws SQLException {
+    public static int executeInsertArchieved(String sql, Object... params) throws SQLException {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -83,4 +83,42 @@ public class DbUtils {
         }
         return -1; // Return -1 if the operation fails
     }
+
+    public static int executeInsert(String sql, Object... params) throws SQLException {
+        // 1. Get connection and ensure it's not null
+        try (Connection conn = DatabaseConnection.getConnection()) {
+            if (conn == null) {
+                throw new SQLException("Database connection could not be established (returned null).");
+            }
+
+            // 2. Fall back to a standard prepareStatement if the driver chokes on RETURN_GENERATED_KEYS
+            try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+                if (pstmt == null) {
+                    throw new SQLException("Failed to prepare statement. Driver returned null for SQL: " + sql);
+                }
+
+                // Dynamically bind parameters to placeholders
+                if (params != null) {
+                    for (int i = 0; i < params.length; i++) {
+                        pstmt.setObject(i + 1, params[i]);
+                    }
+                }
+
+                int affectedRows = pstmt.executeUpdate();
+
+                // 3. If rows were inserted, query SQLite for the last generated ID
+                if (affectedRows > 0) {
+                    try (Statement idStmt = conn.createStatement();
+                         ResultSet rs = idStmt.executeQuery("SELECT last_insert_rowid();")) {
+                        if (rs.next()) {
+                            return rs.getInt(1); // Returns the newly created auto-incremented primary key
+                        }
+                    }
+                }
+            }
+        }
+        return -1; // Return -1 if the operation fails
+    }
+
 }

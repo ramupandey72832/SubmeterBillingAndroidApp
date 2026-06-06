@@ -13,9 +13,9 @@ import java.util.Optional;
 public class SQLiteSubmeterDao implements SubmeterDao {
 
     @Override
-    public boolean insertSubmeter(Submeter submeter) throws SQLException{
+    public int insertSubmeter(Submeter submeter) throws SQLException{
         String sql = SqlLoader.get("submeter.insert");
-        return DbUtils.executeUpdate(sql,
+        return DbUtils.executeInsert(sql,
                 submeter.getRoomId(),
                 submeter.getMeterSerialNumber(),
                 submeter.getInitialReading()
