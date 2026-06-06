@@ -167,6 +167,11 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         Bill bill = new Bill();
         bill.setPreviousReadingId(previousReadingId);
         bill.setCurrentReadingId(currentReadingId);
+        bill.setTenantName(tenantName);
+        bill.setMeterSerialNumber("serialNumber");
+        bill.setMeterId(0);
+        bill.setTenantId(null);
+        bill.setPreviousReadingId(null);
         bill.setUnitsConsumed(consumption);
         bill.setRatePerUnit(ratePerUnit);
         bill.setTotalAmount(totalDue);

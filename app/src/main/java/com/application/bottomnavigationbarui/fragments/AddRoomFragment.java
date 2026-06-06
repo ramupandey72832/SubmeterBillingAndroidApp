@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentAddRoomBinding;
@@ -94,9 +95,9 @@ public class AddRoomFragment extends Fragment  implements VerifyMpinDialogFragme
         RoomMeterService roomMeterService = new RoomMeterServiceImpl();
         try {
             roomMeterService.addRoomWithMeter(roomNumber, roomType, meterSerial, Double.parseDouble(initialReading));
-
+            Toast.makeText(getContext(), "Room added successfully", Toast.LENGTH_SHORT).show();
         } catch(Exception e){
-            ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+            ErrorUtils.handleDatabaseException("Error : ", e, ui);
         }
     }
 }

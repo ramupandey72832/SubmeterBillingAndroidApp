@@ -24,7 +24,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
         Optional<Room> existingRoom = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
 
         if (existingRoom.isPresent()) {
-            roomId = existingRoom.get().getRoomId();
+            throw new BusinessRuleException(roomNumber+ " room already exists with room id : "+existingRoom.get().getRoomId());
         } else {
             Room room = new Room();
             room.setRoomNumber(roomNumber);

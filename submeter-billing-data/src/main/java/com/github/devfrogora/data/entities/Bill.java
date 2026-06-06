@@ -2,8 +2,12 @@ package com.github.devfrogora.data.entities;
 
 public class Bill {
     private int billId;
-    private int previousReadingId;
+    private Integer previousReadingId;
     private int currentReadingId;
+    private int meterId;
+    private String meterSerialNumber;
+    private Integer tenantId;
+    private String tenantName;
     private double unitsConsumed;
     private double ratePerUnit;
     private double totalAmount;
@@ -15,10 +19,15 @@ public class Bill {
     }
 
     // Parameterized Constructor
-    public Bill(int billId, int previousReadingId, int currentReadingId, double ratePerUnit, double totalAmount, String billingDate, boolean isPaid) {
+    public Bill(int billId, Integer previousReadingId , int currentReadingId, int meterId, String meterSerialNumber, Integer tenantId, String tenantName, double unitsConsumed, double ratePerUnit, double totalAmount, String billingDate, boolean isPaid) {
         this.billId = billId;
         this.previousReadingId = previousReadingId;
         this.currentReadingId = currentReadingId;
+        this.meterId = meterId;
+        this.meterSerialNumber = meterSerialNumber;
+        this.tenantId = tenantId;
+        this.tenantName = tenantName;
+        this.unitsConsumed = unitsConsumed;
         this.ratePerUnit = ratePerUnit;
         this.totalAmount = totalAmount;
         this.billingDate = billingDate;
@@ -34,11 +43,11 @@ public class Bill {
         this.billId = billId;
     }
 
-    public int getPreviousReadingId() {
+    public Integer getPreviousReadingId() {
         return previousReadingId;
     }
 
-    public void setPreviousReadingId(int previousReadingId) {
+    public void setPreviousReadingId(Integer previousReadingId) {
         this.previousReadingId = previousReadingId;
     }
 
@@ -102,5 +111,37 @@ public class Bill {
 
     public void setUnitsConsumed(double unitsConsumed) {
         this.unitsConsumed = unitsConsumed;
+    }
+
+    public String getTenantName() {
+        return tenantName;
+    }
+
+    public void setTenantName(String tenantName) {
+        this.tenantName = tenantName;
+    }
+
+    public Integer getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(Integer tenantId) {
+        this.tenantId = tenantId;
+    }
+
+    public String getMeterSerialNumber() {
+        return meterSerialNumber;
+    }
+
+    public void setMeterSerialNumber(String meterSerialNumber) {
+        this.meterSerialNumber = meterSerialNumber;
+    }
+
+    public int getMeterId() {
+        return meterId;
+    }
+
+    public void setMeterId(int meterId) {
+        this.meterId = meterId;
     }
 }
