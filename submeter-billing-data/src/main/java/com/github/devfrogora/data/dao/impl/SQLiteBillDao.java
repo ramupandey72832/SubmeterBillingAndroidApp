@@ -115,8 +115,12 @@ public class SQLiteBillDao implements BillDao {
     private Bill mapResultSetToBill(ResultSet rs) throws SQLException {
         Bill bill = new Bill();
         bill.setBillId(rs.getInt("bill_id"));
-        bill.setPreviousReadingId(rs.getInt("previous_reading_id"));
+        bill.setPreviousReadingId(Integer.parseInt(rs.getString("previous_reading_id")));
         bill.setCurrentReadingId(rs.getInt("current_reading_id"));
+        bill.setMeterId(rs.getInt("meter_id"));
+        bill.setTenantId(Integer.parseInt(rs.getString("tenant_id")));
+        bill.setTenantName(rs.getString("tenant_name"));
+        bill.setMeterSerialNumber(rs.getString("meter_serial_number"));
         bill.setUnitsConsumed(rs.getDouble("units_consumed"));
         bill.setRatePerUnit(rs.getDouble("rate_per_unit"));
         bill.setTotalAmount(rs.getDouble("total_amount"));

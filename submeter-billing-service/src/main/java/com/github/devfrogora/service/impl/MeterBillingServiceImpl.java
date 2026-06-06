@@ -63,10 +63,10 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Room ID " + submeter.get().getRoomId() + " not found."));
         String roomNumber = room.getRoomNumber();
 
-        addIntialMeterReading(submeter.get().getRoomId(),roomNumber,insertedReadingId, initialReading, fixedCharge , rate);
+        addIntialMeterReading(submeterId, submeter.get().getMeterSerialNumber()  ,submeter.get().getRoomId(),roomNumber,insertedReadingId, initialReading, fixedCharge , rate);
     }
 
-    void addIntialMeterReading(int roomId,String roomNumber,int currentReadingId ,
+    void addIntialMeterReading(int submeterId, String submeterSerialNumber, int roomId,String roomNumber,int currentReadingId ,
                                double currentMeterReading , int fixedCharge, double rate  ) throws SQLException{
         // 5. Query active lease profile for tenant details
         Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(roomId);
@@ -83,7 +83,11 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 roomNumber,
                 currentReadingId,
                 currentMeterReading,
-                0,0,
+                null,
+                submeterId,
+                activeLease.map(Tenancy::getTenantId).orElse(null),
+                submeterSerialNumber,
+                0,
                 fixedCharge,
                 rate
         );
@@ -103,7 +107,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         // 2. Resolve historical readings and baseline properties
         Optional<MeterReading> latestDbReading = DaoManager.getMeterReadingDao().getLatestReadingByMeterId(submeter.getMeterId());
 
-        int previousReadingId = latestDbReading.map(MeterReading::getReadingId).orElse(0);
+        Integer previousReadingId = latestDbReading.map(MeterReading::getReadingId).orElse(null);
         double previousValue = latestDbReading.map(MeterReading::getReadingValue).orElse(submeter.getInitialReading());
 
         // Business Validation: Prevent negative utility consumption processing
@@ -148,6 +152,9 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 currentReadingId,
                 currentMeterReading,
                 previousReadingId,
+                submeter.getMeterId(),
+                activeLease.map(Tenancy::getTenantId).orElse(null),
+                submeter.getMeterSerialNumber(),
                 previousValue,
                 fixedCharge,
                 rate
@@ -158,7 +165,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
      * Core Invoice Processing Component.
      */
     private int generateBill(String tenantName, String roomNumber, int currentReadingId, double currentReading,
-                              int previousReadingId, double previousReading, double fixedCharge, double ratePerUnit) throws SQLException {
+                              Integer previousReadingId, int meterId, Integer tenantId, String submeterSerialNumber, double previousReading, double fixedCharge, double ratePerUnit) throws SQLException {
 
         double consumption = currentReading - previousReading;
         double usageCost = consumption * ratePerUnit;
@@ -168,10 +175,9 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         bill.setPreviousReadingId(previousReadingId);
         bill.setCurrentReadingId(currentReadingId);
         bill.setTenantName(tenantName);
-        bill.setMeterSerialNumber("serialNumber");
-        bill.setMeterId(0);
-        bill.setTenantId(null);
-        bill.setPreviousReadingId(null);
+        bill.setMeterSerialNumber(submeterSerialNumber);
+        bill.setMeterId(meterId);
+        bill.setTenantId(tenantId);
         bill.setUnitsConsumed(consumption);
         bill.setRatePerUnit(ratePerUnit);
         bill.setTotalAmount(totalDue);
