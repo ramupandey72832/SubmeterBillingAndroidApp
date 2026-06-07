@@ -27,4 +27,6 @@ public interface BillDao {
 
     // Delete
     boolean deleteBill(int billId)throws SQLException;
+
+    Optional<Bill> getLatestBill(String roomNumber) throws SQLException;
 }

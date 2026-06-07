@@ -74,16 +74,6 @@ public class BillsFragment extends Fragment {
             @Override public void onReceiptClick(BillReportDto bill) {
                 try {
                     PdfGenerator.generateBillPdf(requireContext(), bill);
-                    List<BillReportDto> bills = new ArrayList<>();
-                    bills.add(bill);
-                    bills.add(bill);
-                    bills.add(bill);
-                    bills.add(bill);
-                    bills.add(bill);
-                    bills.add(bill);
-                    bills.add(bill);
-                    bills.add(bill);
-                    PdfGenerator.generateMultipleBillsPdf(requireContext(), bills);
                 } catch (Exception e) {
                     ErrorUtils.handleDatabaseException("Error : ", e, ui);
                 }

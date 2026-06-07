@@ -45,7 +45,7 @@ public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomAction
 
         try {
             RoomMeterService roomMeterService = new RoomMeterServiceImpl();
-            List<RoomRegistryDto> rooms = roomMeterService.getRoomRegistryReport();
+            List<RoomRegistryDto> rooms = roomMeterService.getAllRoomReport();
             // 1. Setup mock data
             roomList = new ArrayList<>();
             for (RoomRegistryDto room : rooms) {

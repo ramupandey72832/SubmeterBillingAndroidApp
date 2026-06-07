@@ -86,7 +86,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
     }
 
     @Override
-    public List<RoomRegistryDto> getRoomRegistryReport() {
+    public List<RoomRegistryDto> getAllRoomReport() {
         List<RoomRegistryDto> registryList = new ArrayList<>();
 
         try {

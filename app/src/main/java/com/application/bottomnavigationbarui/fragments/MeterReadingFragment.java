@@ -13,7 +13,9 @@ import android.view.ViewGroup;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentGenerateBillBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
+import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
+import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.TenancyManagementService;
@@ -29,7 +31,7 @@ import java.util.Optional;
 
 
 public class MeterReadingFragment extends Fragment {
-
+    private UiHelper ui;
     FragmentMeterReadingBinding binding;
 
     public MeterReadingFragment() {
@@ -56,7 +58,7 @@ public class MeterReadingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        ui = new UiHelper(this.getContext());
         binding.etSubmeterSerialNumber.setEnabled(false);
         binding.etSubmeterSerialNumber.setEnabled(false);
         binding.etPreviousMeterReading.setEnabled(false);
@@ -84,8 +86,8 @@ public class MeterReadingFragment extends Fragment {
                 double findPreviousReading = meterBillingService.getLatestReading(submeterDTO.getMeterSerialNumber());
 
                 binding.etPreviousMeterReading.setText(Double.toString(findPreviousReading));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
+            } catch (Exception e) {
+                ErrorUtils.handleDatabaseException("Error : ", e, ui);
             }
 
         });

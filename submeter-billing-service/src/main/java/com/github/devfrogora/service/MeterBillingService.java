@@ -1,5 +1,6 @@
 package com.github.devfrogora.service;
 
+import com.github.devfrogora.data.entities.Bill;
 import com.github.devfrogora.service.dto.BillDTO;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 
@@ -12,6 +13,7 @@ public interface MeterBillingService {
     void addMeterReadingWithGenerateBill(String roomNumber, double currentMeterReading, double rate, double fixedCharge) throws SQLException;
     void updateBillPaymentStatus(int billId, boolean isPaid) throws SQLException;
 
+    BillReportDto getLatestBill(String roomNumber) throws SQLException;
     List<BillReportDto> getAllBillsReport() throws SQLException;
     public double getLatestReading(String submeterSerialNumber) throws SQLException;
     // Replace Bill entities with BillDTOs

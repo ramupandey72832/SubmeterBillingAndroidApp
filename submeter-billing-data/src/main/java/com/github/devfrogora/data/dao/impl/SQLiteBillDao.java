@@ -113,6 +113,12 @@ public class SQLiteBillDao implements BillDao {
         return DbUtils.executeUpdate(sql, billId);
     }
 
+    @Override
+    public Optional<Bill> getLatestBill(String roomNumber) throws SQLException {
+        String sql = SqlLoader.get("bill.get_latest_by_room");
+        return DbUtils.executeQuerySingle(sql, this::mapResultSetToBill, roomNumber);
+    }
+
     private Bill mapResultSetToBill(ResultSet rs) throws SQLException {
         Bill bill = new Bill();
         bill.setBillId(rs.getInt("bill_id"));

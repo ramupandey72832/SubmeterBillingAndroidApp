@@ -17,7 +17,7 @@ public interface RoomMeterService {
 
     public void deleteRoomIfVacant(String roomNumber) throws SQLException;
 
-    List<RoomRegistryDto> getRoomRegistryReport();
+    List<RoomRegistryDto> getAllRoomReport();
 
     SubmeterDTO getSubmeterByRoomNumber(String roomNumber) throws SQLException;
 

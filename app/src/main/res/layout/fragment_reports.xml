@@ -200,7 +200,18 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
 
+        </androidx.cardview.widget.CardView>
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGenerateLatestMonthlyBillsReport"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="Generate All ROOM Latest Monthly Bill"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            app:backgroundTint="#126650"
+            app:cornerRadius="30dp"
+            android:layout_marginBottom="28dp" />
     </LinearLayout>
 </ScrollView>

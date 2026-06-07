@@ -212,6 +212,23 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
+    public BillReportDto getLatestBill(String roomNumber) throws SQLException {
+        Optional<Bill> latestBill = DaoManager.getBillDao().getLatestBill(roomNumber);
+        if (latestBill.isPresent()) {
+            Bill bill= latestBill.get();
+            double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
+                    0;
+//            double currentReading = getLatestReading(submeter.get().getMeterSerialNumber());
+
+            double currentReading = bill.getCurrentReadingId() > 0   ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
+
+            return new BillReportDto( bill.getBillId(), bill.getRoomNumber(), bill.getMeterSerialNumber(), previousReading, currentReading,
+                    bill.getRatePerUnit(), bill.getFixedCharge(), bill.getTenantName(), bill.getBillingDate(), bill.getTotalAmount(), bill.isPaid() ? "PAID" : "UNPAID");
+        }
+        return null;
+    }
+
+    @Override
     public List<BillReportDto> getAllBillsReport() throws SQLException {
         List<Bill> bills = DaoManager.getBillDao().getAllBills();
         List<BillReportDto> reportList = new ArrayList<>();
