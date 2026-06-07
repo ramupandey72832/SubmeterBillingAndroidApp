@@ -69,6 +69,13 @@ public class DeleteRoomFragment extends Fragment implements VerifyMpinDialogFrag
         // Execute Room DB / Firebase / API deletion logic here...
         Toast.makeText(getContext(), "Room " + targetRoom + " successfully deleted!", Toast.LENGTH_LONG).show();
 
+        String confirmation = binding.etConfirmDelete.getText().toString().trim();
+        if(!confirmation.equals("DELETE")){
+            //TODO display error message Show ui error
+            return;
+        }
+
+
         // Navigate away or clean fields up
         binding.etDeleteRoomNumber.setText("");
         binding.etConfirmDelete.setText("");

@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentGenerateBillBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.TenancyManagementService;
@@ -108,8 +109,10 @@ public class MeterReadingFragment extends Fragment {
                   return;
               }
 
-              GenerateBillFragment.newInstance(roomNumber, tenantName , submeterSerialNumber, currentMeterReading,
-                      previousMeterReading,  ratePerUnit, fixedCharge);
+                Fragment targetFragment =  GenerateBillFragment.newInstance(roomNumber, tenantName , submeterSerialNumber, currentMeterReading,
+                        previousMeterReading,  ratePerUnit, fixedCharge);
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+
             }
         });
 

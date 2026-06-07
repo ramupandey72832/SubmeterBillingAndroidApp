@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F8F9FA"
+    android:background="?attr/colorSurface"
     tools:context=".fragments.MeterReadingFragment">
 
     <LinearLayout
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:text="New Meter Reading"
-            android:textColor="#212121"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -31,7 +31,7 @@
             android:layout_marginTop="4dp"
             android:layout_marginBottom="32dp"
             android:text="Enter current usage and rate details to calculate the utility bill."
-            android:textColor="#666666"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="14sp" />
 
         <LinearLayout
@@ -125,7 +125,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Billing Configuration"
-            android:textColor="#1976D2"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="14sp"
             android:textStyle="bold"
             android:layout_marginBottom="12dp" />

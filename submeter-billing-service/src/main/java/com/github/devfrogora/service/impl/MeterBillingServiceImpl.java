@@ -118,7 +118,9 @@ public class MeterBillingServiceImpl implements MeterBillingService {
 
         // 3. Verify calendar constraints
         String todayIsoString = LocalDate.now().toString();
-        validateMeterReadingDate(submeter.getMeterId(), todayIsoString);
+
+        //TODO uncomment this right after entry
+//        validateMeterReadingDate(submeter.getMeterId(), todayIsoString);
 
         // 4. Record current tracking entries
         MeterReading currentReading = new MeterReading();
@@ -213,7 +215,6 @@ public class MeterBillingServiceImpl implements MeterBillingService {
 
         for (Bill bill : bills) {
             String roomNumber = "Unknown";
-            String tenantName = "Vacant Asset";
 
             // Stitch database relations safely in the business layer
             Optional<MeterReading> reading = DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId());
@@ -223,12 +224,6 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     Optional<Room> room = DaoManager.getRoomDao().getRoomById(submeter.get().getRoomId());
                     if (room.isPresent()) {
                         roomNumber = room.get().getRoomNumber();
-
-                        Optional<Tenancy> tenancy = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.get().getRoomId());
-                        if (tenancy.isPresent()) {
-                            tenantName = DaoManager.getTenantDao().getTenantById(tenancy.get().getTenantId())
-                                    .map(Tenant::getName).orElse("Vacant Asset");
-                        }
                     }
                 }
             }
@@ -236,7 +231,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
             reportList.add(new BillReportDto(
                     bill.getBillId(),
                     roomNumber,
-                    tenantName,
+                    bill.getTenantName(),
                     bill.getBillingDate(),
                     bill.getTotalAmount(),
                     bill.isPaid() ? "PAID" : "UNPAID"

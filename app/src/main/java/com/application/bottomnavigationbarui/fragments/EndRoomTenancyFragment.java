@@ -9,16 +9,30 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentEndRoomTenancyBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.github.devfrogora.service.MeterBillingService;
+import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.TenancyManagementService;
+import com.github.devfrogora.service.dto.TenancyDTO;
+import com.github.devfrogora.service.dto.TenantDTO;
+import com.github.devfrogora.service.dto.reports.MeterReadingDTO;
+import com.github.devfrogora.service.dto.reports.SubmeterDTO;
+import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
+import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * How to handle this in your Backend/Database:
@@ -61,9 +75,45 @@ public class EndRoomTenancyFragment extends Fragment  implements VerifyMpinDialo
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(this.getContext());
+        startingDataPickerUI();
 
+        binding.llTenantDetailsContainer.setVisibility(View.GONE);
         // TODO Show Caution to user: please check latest Reading Before Terminating Tenancy ;
        // and Remove Final Reading from here
+
+
+        binding.btnCheck.setOnClickListener(view1 -> {
+            String roomNumber =  binding.etRoomNumber.getText().toString();
+            if(roomNumber.isEmpty()){
+                //TODO show empty error
+
+                return;
+            }
+            TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
+            try {
+                binding.llTenantDetailsContainer.setVisibility(View.VISIBLE);
+                TenancyDTO tenancyDTO = tenancyManagementService.findActiveTenancyByRoomNumber(roomNumber);
+                if(tenancyDTO == null){
+                    return;
+                }
+                tenancyManagementService.findTenantByAadhar(tenancyDTO.getTenantAaddhar()).ifPresentOrElse(tenantDTO -> {
+                            binding.tvTenantName.setText(tenantDTO.getName());
+                            binding.tvAadhaarNumber.setText(tenantDTO.getAadharNumber());
+                            binding.tvMobileNumber.setText(tenantDTO.getPhoneNumber());
+                        }, () -> {
+                        // show error , not tenant is present in that room
+                    Toast.makeText(getContext(), "Tenant not found", Toast.LENGTH_SHORT).show();
+
+                });
+                MeterBillingService meterReadingService = new MeterBillingServiceImpl();
+                RoomMeterService roomMeterService = new RoomMeterServiceImpl();
+                SubmeterDTO submeterDTO= roomMeterService.getSubmeterByRoomNumber(roomNumber);
+                double latestReading = meterReadingService.getLatestReading(submeterDTO.getMeterSerialNumber());
+
+                binding.tvLastMeterReading.setText(String.valueOf(latestReading));
+            }catch (Exception e){}
+        });
+
 
         binding.btnEndTenancy.setOnClickListener(view1 -> {
             String roomNumber =  binding.etRoomNumber.getText().toString();
@@ -97,5 +147,27 @@ public class EndRoomTenancyFragment extends Fragment  implements VerifyMpinDialo
                 ErrorUtils.handleDatabaseException("Error : ", e, ui);
             }
         }
+    }
+
+    void startingDataPickerUI(){
+        TextInputEditText etStartDate = binding.etEndDate;
+
+// 1. Create the Material Date Picker instance
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Tenant Start Date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build();
+
+// 2. Open the picker when clicking the field
+        etStartDate.setOnClickListener(v -> {
+            datePicker.show(getParentFragmentManager(), "TENANT_DATE_PICKER");
+        });
+
+// 3. Format selected timestamp back to the text field
+        datePicker.addOnPositiveButtonClickListener(selectionTimestamp -> {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String dateString = formatter.format(new Date(selectionTimestamp));
+            etStartDate.setText(dateString);
+        });
     }
 }

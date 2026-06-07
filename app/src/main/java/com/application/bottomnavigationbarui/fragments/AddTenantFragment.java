@@ -50,6 +50,9 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         ui = new UiHelper(this.getContext());
         startingDataPickerUI();
 
+        demoTenant();
+
+
         binding.layoutAddTenant.btnAddTenant.setOnClickListener(view1 -> {
             String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
             String aadharNumber = binding.layoutAddTenant.etAadharNumber.getText().toString();
@@ -124,6 +127,16 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         } catch(Exception e){
             ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
         }
+    }
+
+    void demoTenant(){
+        binding.layoutAddTenant.etTenantName.setText("Himadari");
+        binding.layoutAddTenant.etAadharNumber.setText("123456789012");
+        binding.layoutAddTenant.etTenantMobile.setText("1234567890");
+        binding.layoutAddTenant.etTenantParentMobile.setText("9876543210");
+        binding.layoutAddTenant.etTenantAddress.setText("123 Main Street");
+        binding.layoutAddTenant.etRoomNumber.setText("301");
 
     }
+
 }
