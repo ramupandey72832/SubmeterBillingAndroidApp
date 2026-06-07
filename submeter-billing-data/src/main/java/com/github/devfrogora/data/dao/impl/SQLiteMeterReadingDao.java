@@ -24,7 +24,7 @@ public class SQLiteMeterReadingDao implements MeterReadingDao {
     }
 
     @Override
-    public Optional<MeterReading> getReadingById(int readingId)  throws SQLException {
+    public Optional<MeterReading> getReadingById(Integer readingId)  throws SQLException {
         String sql = SqlLoader.get("reading.get_by_id");
         return DbUtils.executeQuerySingle(sql, this::mapResultSetToReading, readingId);
     }

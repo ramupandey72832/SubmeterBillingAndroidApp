@@ -19,6 +19,11 @@ public class BillReportDto {
                          String billingDate, double totalAmount, String paymentStatus) {
         this.billId = billId;
         this.roomNumber = roomNumber;
+        this.meterSerialNumber = meterSerialNumber;
+        this.previousReading = previousReading;
+        this.currentReading = currentReading;
+        this.ratePerUnit = ratePerUnit;
+        this.fixedCharge = fixedCharge;
         this.tenantName = tenantName;
         this.billingDate = billingDate;
         this.totalAmount = totalAmount;
@@ -70,5 +75,22 @@ public class BillReportDto {
 
     public void setFixedCharge(double fixedCharge) {
         this.fixedCharge = fixedCharge;
+    }
+
+    @Override
+    public String toString() {
+        return "BillReportDto{" +
+                "billId=" + billId +
+                ", roomNumber='" + roomNumber + '\'' +
+                ", tenantName='" + tenantName + '\'' +
+                ", billingDate='" + billingDate + '\'' +
+                ", meterSerialNumber='" + meterSerialNumber + '\'' +
+                ", previousReading=" + previousReading +
+                ", currentReading=" + currentReading +
+                ", ratePerUnit=" + ratePerUnit +
+                ", fixedCharge=" + fixedCharge +
+                ", totalAmount=" + totalAmount +
+                ", paymentStatus='" + paymentStatus + '\'' +
+                '}';
     }
 }

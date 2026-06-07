@@ -59,6 +59,7 @@ public class BillsFragment extends Fragment {
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
         try {
             fullBillList =  meterBillingService.getAllBillsReport();
+            fullBillList.forEach( System.out::println );
         } catch (SQLException e) {
             ErrorUtils.handleDatabaseException("Error : ", e, ui);
         }
@@ -72,8 +73,17 @@ public class BillsFragment extends Fragment {
         adapter = new BillingBillsAdapter(fullBillList, new BillingBillsAdapter.OnBillClickListener() {
             @Override public void onReceiptClick(BillReportDto bill) {
                 try {
-                    BillDTO billDTO = meterBillingService.getBillById(bill.getBillId());
                     PdfGenerator.generateBillPdf(requireContext(), bill);
+                    List<BillReportDto> bills = new ArrayList<>();
+                    bills.add(bill);
+                    bills.add(bill);
+                    bills.add(bill);
+                    bills.add(bill);
+                    bills.add(bill);
+                    bills.add(bill);
+                    bills.add(bill);
+                    bills.add(bill);
+                    PdfGenerator.generateMultipleBillsPdf(requireContext(), bills);
                 } catch (Exception e) {
                     ErrorUtils.handleDatabaseException("Error : ", e, ui);
                 }

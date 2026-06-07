@@ -14,97 +14,340 @@ import com.github.devfrogora.service.dto.reports.BillReportDto;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 
 public class PdfGenerator {
 
-    public static void generateBillPdf(Context context, BillReportDto bill) {
-        // 1. Create a native PdfDocument instance
-        PdfDocument pdfDocument = new PdfDocument();
+    // Enhanced single thermal bill dimensions (scaled slightly up for readability)
+    private static final int PAGE_WIDTH = 220;
+    private static final int PAGE_HEIGHT = 340;
 
-        // 2. Define page size (Standard A4 size is roughly 595 x 842 pixels at 72 DPI)
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(595, 842, 1).create();
+    // Standard A4 dimensions at 72 DPI
+    private static final int A4_WIDTH = 595;
+    private static final int A4_HEIGHT = 842;
+
+    /**
+     * Generates a single A4 PDF containing up to 8 bills organized in a 2x4 grid.
+     * Typography sizes and vertical paddings have been increased significantly.
+     */
+    public static void generateMultipleBillsPdf(Context context, List<BillReportDto> bills) {
+        if (bills == null || bills.isEmpty()) {
+            Toast.makeText(context, "No bills provided to generate", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        PdfDocument pdfDocument = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(A4_WIDTH, A4_HEIGHT, 1).create();
         PdfDocument.Page page = pdfDocument.startPage(pageInfo);
 
         Canvas canvas = page.getCanvas();
         Paint paint = new Paint();
+        paint.setAntiAlias(true);
 
-        // --- DRAWING THE PDF CONTENT ---
+        // Grid parameters for 2 Columns x 4 Rows
+        final int COLUMNS = 2;
 
-        // Header / Title
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setTextSize(24);
-        paint.setColor(Color.parseColor("#333333"));
-        canvas.drawText("INVOICE / BILL", 40, 60, paint);
+        // Size allocation per bill block within the A4 container
+        final int SLOT_WIDTH = A4_WIDTH / COLUMNS;  // ~297 pixels
+        final int SLOT_HEIGHT = A4_HEIGHT / 4;      // ~210 pixels
 
-        // Divider line
-        paint.setStrokeWidth(2f);
-        paint.setColor(Color.LTGRAY);
-        canvas.drawLine(40, 80, 555, 80, paint);
+        // --- ENLARGED TYPOGRAPHY CONFIGURATION ---
+        final float titleTextSize = 12.0f;   // Increased from 9.5f
+        final float regularTextSize = 9.5f;  // Increased from 7.5f
+        final int leading = 11;              // Increased from 8 to support larger fonts
+        final int indent = 16;
 
-        // Bill Details (Labels)
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.NORMAL));
-        paint.setTextSize(14);
-        paint.setColor(Color.DKGRAY);
+        int totalBillsToPrint = Math.min(bills.size(), 8);
 
-        int startXLabel = 40;
-        int startXValue = 180;
+        for (int i = 0; i < totalBillsToPrint; i++) {
+            BillReportDto bill = bills.get(i);
 
-        canvas.drawText("Bill Number:", startXLabel, 120, paint);
-        canvas.drawText("Billing Date:", startXLabel, 150, paint);
-        canvas.drawText("Tenant Name:", startXLabel, 180, paint);
-        canvas.drawText("Room Number:", startXLabel, 210, paint);
-        canvas.drawText("Payment Status:", startXLabel, 240, paint);
+            int col = i % COLUMNS;
+            int row = i / COLUMNS;
 
-        // Bill Details (Values)
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        paint.setColor(Color.BLACK);
+            int offsetX = col * SLOT_WIDTH;
+            int offsetY = row * SLOT_HEIGHT;
 
-        canvas.drawText("#" + bill.getBillId(), startXValue, 120, paint);
-        canvas.drawText(bill.getBillingDate(), startXValue, 150, paint);
-        canvas.drawText(bill.getTenantName(), startXValue, 180, paint);
-        canvas.drawText(String.valueOf(bill.getRoomNumber()), startXValue, 210, paint);
+            int rightMarginEdge = offsetX + SLOT_WIDTH - indent;
+            int currentY = offsetY + 16; // Top margin padding
 
-        // Color-coded status text
-        if (bill.getPaymentStatus().equalsIgnoreCase("PAID")) {
-            paint.setColor(Color.parseColor("#008000")); // Solid Green
-        } else {
-            paint.setColor(Color.parseColor("#800000")); // Solid Red
+            // --- METADATA HEADER ---
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+            paint.setTextSize(titleTextSize);
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setColor(Color.BLACK);
+
+            canvas.drawText("Room Number: " + bill.getRoomNumber(), offsetX + (SLOT_WIDTH / 2f), currentY, paint);
+
+            // Reset typography to enlarged regular scale
+            paint.setTextAlign(Paint.Align.LEFT);
+            paint.setTypeface(Typeface.MONOSPACE);
+            paint.setTextSize(regularTextSize);
+
+            currentY += leading + 3;
+            canvas.drawText("Bill Date  : " + bill.getBillingDate(), offsetX + indent, currentY, paint);
+            currentY += leading + 2;
+
+            // --- TENANT BLOCK ---
+            canvas.drawText("Tenant Name: " + bill.getTenantName(), offsetX + indent, currentY, paint);
+            currentY += 6;
+
+            paint.setStrokeWidth(0.75f);
+            canvas.drawLine(offsetX + indent, currentY, rightMarginEdge, currentY, paint);
+            currentY += 11;
+
+            // --- DYNAMIC READINGS SECTION ---
+            double unitConsumed = bill.getCurrentReading() - bill.getPreviousReading();
+
+            canvas.drawText("Current Reading", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.valueOf((int) bill.getCurrentReading()), rightMarginEdge, currentY, paint);
+            currentY += leading;
+
+            paint.setTextAlign(Paint.Align.LEFT);
+            canvas.drawText("Previous Reading", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.valueOf((int) bill.getPreviousReading()), rightMarginEdge, currentY, paint);
+            currentY += leading;
+
+            paint.setTextAlign(Paint.Align.LEFT);
+            canvas.drawText("Units Consumed", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.valueOf((int) unitConsumed), rightMarginEdge, currentY, paint);
+            currentY += leading;
+
+            currentY += 2;
+            canvas.drawLine(offsetX + indent, currentY, rightMarginEdge, currentY, paint);
+            currentY += 11;
+
+            // --- DYNAMIC CHARGES SECTION ---
+            String chargeFormat = "%.2f";
+
+            paint.setTextAlign(Paint.Align.LEFT);
+            canvas.drawText("Rate per Unit", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getRatePerUnit()), rightMarginEdge, currentY, paint);
+            currentY += leading;
+
+            paint.setTextAlign(Paint.Align.LEFT);
+            canvas.drawText("Fixed Charges", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getFixedCharge()), rightMarginEdge, currentY, paint);
+            currentY += leading + 3;
+
+            paint.setTextAlign(Paint.Align.LEFT);
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)); // Bold section total
+            canvas.drawText("Bill Amount", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)); // Revert
+            currentY += 5;
+
+            canvas.drawLine(offsetX + indent, currentY, rightMarginEdge, currentY, paint);
+            currentY += 11;
+
+            // --- ARREARS & TOTAL DUE ---
+            paint.setTextAlign(Paint.Align.LEFT);
+            canvas.drawText("Arrears Due", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText("0.00", rightMarginEdge, currentY, paint);
+            currentY += leading;
+
+            paint.setTextAlign(Paint.Align.LEFT);
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+            canvas.drawText("Total Due", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+            currentY += 5;
+
+            canvas.drawLine(offsetX + indent, currentY, rightMarginEdge, currentY, paint);
+            currentY += 12;
+
+            // --- STATUS SYSTEM ---
+            paint.setTextAlign(Paint.Align.LEFT);
+            canvas.drawText("STATUS:", offsetX + indent, currentY, paint);
+
+            if (bill.getPaymentStatus() != null && bill.getPaymentStatus().equalsIgnoreCase("PAID")) {
+                paint.setColor(Color.parseColor("#008000"));
+            } else {
+                paint.setColor(Color.parseColor("#800000"));
+            }
+
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+            canvas.drawText(bill.getPaymentStatus() != null ? bill.getPaymentStatus().toUpperCase() : "UNPAID", offsetX + indent + 50, currentY, paint);
+
+            // Revert settings for the next slot
+            paint.setColor(Color.BLACK);
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+
+            // Structural cutting lines
+            paint.setColor(Color.LTGRAY);
+            paint.setStrokeWidth(0.5f);
+            canvas.drawLine(offsetX, offsetY + SLOT_HEIGHT, offsetX + SLOT_WIDTH, offsetY + SLOT_HEIGHT, paint);
+            canvas.drawLine(offsetX + SLOT_WIDTH, offsetY, offsetX + SLOT_WIDTH, offsetY + SLOT_HEIGHT, paint);
+            paint.setColor(Color.BLACK);
         }
-        canvas.drawText(bill.getPaymentStatus().toUpperCase(), startXValue, 240, paint);
 
-        // Another Divider
-        paint.setColor(Color.LTGRAY);
-        canvas.drawLine(40, 280, 555, 280, paint);
-
-        // Total Amount Due Section
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(18);
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-        canvas.drawText("Total Amount:", 40, 320, paint);
-        canvas.drawText("Rs. " + bill.getTotalAmount(), startXValue, 320, paint);
-
-        // Footer Note
-        paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
-        paint.setTextSize(12);
-        paint.setColor(Color.GRAY);
-        canvas.drawText("Thank you for your business!", 40, 400, paint);
-
-        // Finish writing the page
         pdfDocument.finishPage(page);
 
-        // 3. Save the document to the Downloads folder
-        String fileName = "Bill_" + bill.getBillId() + ".pdf";
+        // Save File Block
+        String fileName = "A4_Combined_8_Bills.pdf";
         File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File pdfFile = new File(downloadsDir, fileName);
 
         try {
             pdfDocument.writeTo(new FileOutputStream(pdfFile));
-            Toast.makeText(context, "PDF saved to Downloads: " + fileName, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "8-Grid A4 Document Saved Successfully", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(context, "Error generating PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Save Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         } finally {
-            // Always close the document to avoid memory leaks
+            pdfDocument.close();
+        }
+    }
+
+    /**
+     * Generates a single dedicated layout slip.
+     * All typography and visual structure components have been scaled up.
+     */
+    public static void generateBillPdf(Context context, BillReportDto bill) {
+        PdfDocument pdfDocument = new PdfDocument();
+        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, 1).create();
+        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
+
+        Canvas canvas = page.getCanvas();
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+
+        // --- ENLARGED SINGLE SLIP TYPOGRAPHY ---
+        final float titleTextSize = 13.0f;   // Increased from 10.5f
+        final float regularTextSize = 10.0f; // Increased from 8.5f
+        final int leading = 13;              // Increased from 10
+        final int indent = 10;
+        final int rightMarginEdge = PAGE_WIDTH - indent;
+
+        int currentY = 22;
+
+        // Header Title
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+        paint.setTextSize(titleTextSize);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setColor(Color.BLACK);
+        canvas.drawText("Room Number: " + bill.getRoomNumber(), PAGE_WIDTH / 2f, currentY, paint);
+
+        // Restoring Body configuration attributes
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTypeface(Typeface.MONOSPACE);
+        paint.setTextSize(regularTextSize);
+
+        currentY += leading + 5;
+        canvas.drawText("Bill Date  : " + bill.getBillingDate(), indent, currentY, paint);
+        currentY += leading + 3;
+
+        canvas.drawText("Tenant Name: " + bill.getTenantName(), indent, currentY, paint);
+        currentY += 7;
+
+        paint.setStrokeWidth(1.2f);
+        canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
+        currentY += 14;
+
+        double unitConsumed = bill.getCurrentReading() - bill.getPreviousReading();
+
+        // Calculations Data Map
+        canvas.drawText("Current Reading", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.valueOf((int)bill.getCurrentReading()), rightMarginEdge, currentY, paint);
+        currentY += leading;
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText("Previous Reading", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.valueOf((int)bill.getPreviousReading()), rightMarginEdge, currentY, paint);
+        currentY += leading;
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText("Units Consumed", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.valueOf((int)unitConsumed), rightMarginEdge, currentY, paint);
+        currentY += leading;
+
+        currentY += 3;
+        canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
+        currentY += 14;
+
+        String chargeFormat = "%.2f";
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText("Rate per Unit", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getRatePerUnit()), rightMarginEdge, currentY, paint);
+        currentY += leading;
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText("Fixed Charges", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getFixedCharge()), rightMarginEdge, currentY, paint);
+        currentY += leading + 5;
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+        canvas.drawText("Bill Amount", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+        currentY += 10;
+
+        canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
+        currentY += 14;
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+        canvas.drawText("Arrears", indent, currentY, paint);
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+        currentY += leading;
+
+        canvas.drawText("  Arrears Due", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText("0.00", rightMarginEdge, currentY, paint);
+        currentY += leading;
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+        canvas.drawText("  Total Due", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+        currentY += 10;
+
+        canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
+        currentY += 15;
+
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText("STATUS:", indent, currentY, paint);
+
+        if (bill.getPaymentStatus() != null && bill.getPaymentStatus().equalsIgnoreCase("PAID")) {
+            paint.setColor(Color.parseColor("#008000"));
+        } else {
+            paint.setColor(Color.parseColor("#800000"));
+        }
+
+        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+        canvas.drawText(bill.getPaymentStatus() != null ? bill.getPaymentStatus().toUpperCase() : "UNPAID", indent + 55, currentY, paint);
+
+        pdfDocument.finishPage(page);
+
+        String fileName = "Thermal_Bill_" + bill.getBillId() + ".pdf";
+        File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File pdfFile = new File(downloadsDir, fileName);
+
+        try {
+            pdfDocument.writeTo(new FileOutputStream(pdfFile));
+            Toast.makeText(context, "Receipt Generated Successfully", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
             pdfDocument.close();
         }
     }

@@ -10,6 +10,8 @@ public class Bill {
     private String tenantName;
     private double unitsConsumed;
     private double ratePerUnit;
+    private String roomNumber;
+    private double fixedCharge;
     private double totalAmount;
     private String billingDate; // Stored as ISO-8601 string (YYYY-MM-DD)
     private boolean isPaid;     // Maps cleanly to SQLite's 0/1 Integer
@@ -19,7 +21,9 @@ public class Bill {
     }
 
     // Parameterized Constructor
-    public Bill(int billId, Integer previousReadingId , int currentReadingId, int meterId, String meterSerialNumber, Integer tenantId, String tenantName, double unitsConsumed, double ratePerUnit, double totalAmount, String billingDate, boolean isPaid) {
+    public Bill(int billId, Integer previousReadingId , int currentReadingId, int meterId, String meterSerialNumber,
+                Integer tenantId, String tenantName, double unitsConsumed, double ratePerUnit, String roomNumber,
+                double fixedCharge, double totalAmount, String billingDate, boolean isPaid) {
         this.billId = billId;
         this.previousReadingId = previousReadingId;
         this.currentReadingId = currentReadingId;
@@ -29,6 +33,8 @@ public class Bill {
         this.tenantName = tenantName;
         this.unitsConsumed = unitsConsumed;
         this.ratePerUnit = ratePerUnit;
+        this.roomNumber = roomNumber;
+        this.fixedCharge = fixedCharge;
         this.totalAmount = totalAmount;
         this.billingDate = billingDate;
         this.isPaid = isPaid;
@@ -98,7 +104,14 @@ public class Bill {
                 "billId=" + billId +
                 ", previousReadingId=" + previousReadingId +
                 ", currentReadingId=" + currentReadingId +
+                ", meterId=" + meterId +
+                ", meterSerialNumber='" + meterSerialNumber + '\'' +
+                ", tenantId=" + tenantId +
+                ", tenantName='" + tenantName + '\'' +
+                ", unitsConsumed=" + unitsConsumed +
                 ", ratePerUnit=" + ratePerUnit +
+                ", roomNumber='" + roomNumber + '\'' +
+                ", fixedCharge=" + fixedCharge +
                 ", totalAmount=" + totalAmount +
                 ", billingDate='" + billingDate + '\'' +
                 ", isPaid=" + isPaid +
@@ -143,5 +156,21 @@ public class Bill {
 
     public void setMeterId(int meterId) {
         this.meterId = meterId;
+    }
+
+    public String getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(String roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+
+    public double getFixedCharge() {
+        return fixedCharge;
+    }
+
+    public void setFixedCharge(double fixedCharge) {
+        this.fixedCharge = fixedCharge;
     }
 }

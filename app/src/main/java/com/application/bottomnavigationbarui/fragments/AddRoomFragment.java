@@ -49,6 +49,8 @@ public class AddRoomFragment extends Fragment  implements VerifyMpinDialogFragme
         super.onViewCreated(view, savedInstanceState);
 
         ui = new UiHelper(this.getContext());
+
+        demo();
         binding.layoutAddroom.btnAddRoom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,4 +102,12 @@ public class AddRoomFragment extends Fragment  implements VerifyMpinDialogFragme
             ErrorUtils.handleDatabaseException("Error : ", e, ui);
         }
     }
+
+    void demo(){
+        binding.layoutAddroom.etRoomNumber.setText("301");
+        binding.layoutAddroom.etRoomType.setText("1RK");
+        binding.layoutAddroom.etMeterSerial.setText("600001");
+        binding.layoutAddroom.etInitialReading.setText("396");
+    }
+
 }

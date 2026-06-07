@@ -20,8 +20,10 @@ public class SQLiteBillDao implements BillDao {
                 bill.getMeterSerialNumber(),
                 bill.getTenantId(),          // Can be null
                 bill.getTenantName(),        // Can be null
+                bill.getRoomNumber(),
                 bill.getUnitsConsumed(),
                 bill.getRatePerUnit(),
+                bill.getFixedCharge(),
                 bill.getTotalAmount(),
                 bill.getBillingDate(),
                 bill.isPaid() ? 1 : 0
@@ -129,6 +131,8 @@ public class SQLiteBillDao implements BillDao {
         bill.setMeterSerialNumber(rs.getString("meter_serial_number"));
         bill.setUnitsConsumed(rs.getDouble("units_consumed"));
         bill.setRatePerUnit(rs.getDouble("rate_per_unit"));
+        bill.setRoomNumber(rs.getString("room_number"));
+        bill.setFixedCharge(rs.getDouble("fixed_charge"));
         bill.setTotalAmount(rs.getDouble("total_amount"));
         bill.setBillingDate(rs.getString("billing_date"));
         bill.setPaid(rs.getBoolean("paid"));

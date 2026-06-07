@@ -63,7 +63,8 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Room ID " + submeter.get().getRoomId() + " not found."));
         String roomNumber = room.getRoomNumber();
 
-        addIntialMeterReading(submeterId, submeter.get().getMeterSerialNumber()  ,submeter.get().getRoomId(),roomNumber,insertedReadingId, initialReading, fixedCharge , rate);
+        addIntialMeterReading(submeterId, submeter.get().getMeterSerialNumber()  ,submeter.get().getRoomId(),roomNumber,
+                insertedReadingId, initialReading, fixedCharge , rate);
     }
 
     void addIntialMeterReading(int submeterId, String submeterSerialNumber, int roomId,String roomNumber,int currentReadingId ,
@@ -183,7 +184,9 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         bill.setUnitsConsumed(consumption);
         bill.setRatePerUnit(ratePerUnit);
         bill.setTotalAmount(totalDue);
+        bill.setFixedCharge(fixedCharge);
         bill.setBillingDate(LocalDate.now().toString());
+        bill.setRoomNumber(roomNumber);
         bill.setPaid(false);
         int billId = DaoManager.getBillDao().insertBill(bill);
         if ( billId < 0 ) {
@@ -228,19 +231,20 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     }
                 }
             }
-
             double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
-                    submeter.get().getInitialReading();
-            double currentReading = getLatestReading(submeter.get().getMeterSerialNumber());
+                    0;
+//            double currentReading = getLatestReading(submeter.get().getMeterSerialNumber());
+
+            double currentReading = bill.getCurrentReadingId() > 0   ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
 
             reportList.add(new BillReportDto(
                     bill.getBillId(),
-                    roomNumber,
+                    bill.getRoomNumber(),
                     bill.getMeterSerialNumber(),
                     previousReading,
                     currentReading,
                     bill.getRatePerUnit(),
-                    0,
+                    bill.getFixedCharge(),
                     bill.getTenantName(),
                     bill.getBillingDate(),
                     bill.getTotalAmount(),
