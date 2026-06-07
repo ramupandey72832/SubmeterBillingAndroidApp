@@ -18,4 +18,6 @@ public interface MeterBillingService {
     List<BillDTO> getAllPendingBills() throws SQLException;
 
     double getTotalUnit() throws SQLException;
+
+    BillDTO getBillById(int billId) throws SQLException;
 }

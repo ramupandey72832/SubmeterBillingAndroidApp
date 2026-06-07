@@ -3,13 +3,20 @@ package com.github.devfrogora.service.dto.reports;
 public class BillReportDto {
     private int billId;
     private String roomNumber;
+    private String meterSerialNumber;
+    private double previousReading;
+    private double currentReading;
+    private double ratePerUnit;
+    private double fixedCharge;
     private String tenantName;
     private String billingDate;
     private double totalAmount;
     private String paymentStatus; // e.g., "PAID" or "UNPAID"
 
     // Constructor, Getters, and Setters
-    public BillReportDto(int billId, String roomNumber, String tenantName, String billingDate, double totalAmount, String paymentStatus) {
+    public BillReportDto(int billId, String roomNumber, String meterSerialNumber, double previousReading,
+                         double currentReading, double ratePerUnit, double fixedCharge, String tenantName,
+                         String billingDate, double totalAmount, String paymentStatus) {
         this.billId = billId;
         this.roomNumber = roomNumber;
         this.tenantName = tenantName;
@@ -24,4 +31,44 @@ public class BillReportDto {
     public String getBillingDate() { return billingDate; }
     public double getTotalAmount() { return totalAmount; }
     public String getPaymentStatus() { return paymentStatus; }
+
+    public String getMeterSerialNumber() {
+        return meterSerialNumber;
+    }
+
+    public void setMeterSerialNumber(String meterSerialNumber) {
+        this.meterSerialNumber = meterSerialNumber;
+    }
+
+    public double getPreviousReading() {
+        return previousReading;
+    }
+
+    public void setPreviousReading(double previousReading) {
+        this.previousReading = previousReading;
+    }
+
+    public double getCurrentReading() {
+        return currentReading;
+    }
+
+    public void setCurrentReading(double currentReading) {
+        this.currentReading = currentReading;
+    }
+
+    public double getRatePerUnit() {
+        return ratePerUnit;
+    }
+
+    public void setRatePerUnit(double ratePerUnit) {
+        this.ratePerUnit = ratePerUnit;
+    }
+
+    public double getFixedCharge() {
+        return fixedCharge;
+    }
+
+    public void setFixedCharge(double fixedCharge) {
+        this.fixedCharge = fixedCharge;
+    }
 }

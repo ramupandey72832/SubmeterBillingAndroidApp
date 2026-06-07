@@ -1,5 +1,6 @@
 package com.application.bottomnavigationbarui.adapters;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.bottomnavigationbarui.databinding.BillingItemBillBinding;
+import com.application.bottomnavigationbarui.utils.PdfGenerator;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 
 import java.util.List;
@@ -51,21 +53,28 @@ public class BillingBillsAdapter extends RecyclerView.Adapter<BillingBillsAdapte
         holder.binding.tvRoomAndName.setText("(Room " + currentBill.getRoomNumber() + ", " + currentBill.getTenantName() + ")");
         holder.binding.tvDate.setText(currentBill.getBillingDate());
         holder.binding.tvAmount.setText("₹" + currentBill.getTotalAmount());
+        holder.binding.paymentStatus.setText(currentBill.getPaymentStatus());
+
 
         // UI Toggle logic for view receipt / large amount
-        if (currentBill.getPaymentStatus().equalsIgnoreCase("YES")) {
-            holder.binding.btnViewReceipt.setVisibility(View.VISIBLE);
-            holder.binding.tvLargeAmount.setVisibility(View.GONE);
+        if (currentBill.getPaymentStatus().equalsIgnoreCase("PAID")) {
+            // Light green highlight
+            holder.binding.paymentStatus.setBackgroundColor(Color.parseColor("#D4EDDA"));
         } else {
-            holder.binding.btnViewReceipt.setVisibility(View.GONE);
-            holder.binding.tvLargeAmount.setVisibility(View.VISIBLE);
-            holder.binding.tvLargeAmount.setText("₹" + currentBill.getTotalAmount());
+            // Light red/pink highlight
+            holder.binding.paymentStatus.setBackgroundColor(Color.parseColor("#F8D7DA"));
         }
+
+
 
         // Action listeners
         holder.binding.btnViewReceipt.setOnClickListener(v -> {
+
             if (clickListener != null) clickListener.onReceiptClick(currentBill);
+            //Todo generate Bill PDF
+
         });
+
 
         holder.binding.btnShare.setOnClickListener(v -> {
             if (clickListener != null) clickListener.onShareClick(currentBill);

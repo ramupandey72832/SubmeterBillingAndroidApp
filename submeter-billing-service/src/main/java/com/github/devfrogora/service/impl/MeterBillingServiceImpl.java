@@ -217,9 +217,10 @@ public class MeterBillingServiceImpl implements MeterBillingService {
             String roomNumber = "Unknown";
 
             // Stitch database relations safely in the business layer
+            Optional<Submeter> submeter = null;
             Optional<MeterReading> reading = DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId());
             if (reading.isPresent()) {
-                Optional<Submeter> submeter = DaoManager.getSubmeterDao().getSubmeterById(reading.get().getMeterId());
+                 submeter = DaoManager.getSubmeterDao().getSubmeterById(reading.get().getMeterId());
                 if (submeter.isPresent()) {
                     Optional<Room> room = DaoManager.getRoomDao().getRoomById(submeter.get().getRoomId());
                     if (room.isPresent()) {
@@ -228,9 +229,18 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 }
             }
 
+            double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
+                    submeter.get().getInitialReading();
+            double currentReading = getLatestReading(submeter.get().getMeterSerialNumber());
+
             reportList.add(new BillReportDto(
                     bill.getBillId(),
                     roomNumber,
+                    bill.getMeterSerialNumber(),
+                    previousReading,
+                    currentReading,
+                    bill.getRatePerUnit(),
+                    0,
                     bill.getTenantName(),
                     bill.getBillingDate(),
                     bill.getTotalAmount(),
@@ -280,5 +290,13 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 .mapToDouble(Bill::getUnitsConsumed)
                 .sum();
         return totalUnits;
+    }
+
+    @Override
+    public BillDTO getBillById(int billId) throws SQLException {
+        Bill bill = DaoManager.getBillDao().getBillById(billId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bill ID " + billId + " not found."));
+        return new BillDTO(bill.getBillId(),bill.getBillingDate(),bill.getUnitsConsumed(),
+                bill.getRatePerUnit(),bill.getTotalAmount(),bill.isPaid());
     }
 }

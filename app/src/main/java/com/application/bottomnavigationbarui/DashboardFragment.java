@@ -48,13 +48,13 @@ public class DashboardFragment extends Fragment {
 
         // 2. Mock a list of data mixing Paid and Unpaid states
         List<BillReportDto> demoBills = new ArrayList<>();
-        demoBills.add(new BillReportDto(1, "105", "Alex", "01 Apr 2026",2.5, "YES"));
-        demoBills.add(new BillReportDto(2, "104", "Sarah", "01 Apr 2026",8.5, "NO"));
-        demoBills.add(new BillReportDto(3, "103", "Alex", "01 Mar 2026", 7.5, "YES"));
-        demoBills.add(new BillReportDto(4, "102",  "Alex", "01 Mar 2026",5 ,"NO"));
-        demoBills.add(new BillReportDto(5, "101",  "Ramu", "01 Mar 2026", 6,"YES"));
-        demoBills.add(new BillReportDto(6, "100",  "Alex", "01 Mar 2026", 10,"NO"));
-        demoBills.add(new BillReportDto(7, "109",  "Ramu", "01 Mar 2026", 15,"Yes" ));
+//        demoBills.add(new BillReportDto(1, "105", "Alex", "01 Apr 2026",2.5, "YES"));
+//        demoBills.add(new BillReportDto(2, "104", "Sarah", "01 Apr 2026",8.5, "NO"));
+//        demoBills.add(new BillReportDto(3, "103", "Alex", "01 Mar 2026", 7.5, "YES"));
+//        demoBills.add(new BillReportDto(4, "102",  "Alex", "01 Mar 2026",5 ,"NO"));
+//        demoBills.add(new BillReportDto(5, "101",  "Ramu", "01 Mar 2026", 6,"YES"));
+//        demoBills.add(new BillReportDto(6, "100",  "Alex", "01 Mar 2026", 10,"NO"));
+//        demoBills.add(new BillReportDto(7, "109",  "Ramu", "01 Mar 2026", 15,"Yes" ));
 
 
         // 3. Initialize your updated adapter with the sample list

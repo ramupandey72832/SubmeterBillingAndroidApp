@@ -88,14 +88,14 @@
                 android:textStyle="bold"/>
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/tvLargeAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="₹680"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:visibility="gone"/>
+<!--            <TextView-->
+<!--                android:id="@+id/tvLargeAmount"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="₹680"-->
+<!--                android:textSize="18sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:visibility="gone"/>-->
         </FrameLayout>
 
         <View
@@ -105,6 +105,15 @@
             android:layout_marginTop="12dp"
             android:background="#E0E0E0"
             app:layout_constraintTop_toBottomOf="@id/tvAmount"/>
+
+        <TextView
+            android:id="@+id/paymentStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="paid"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
 
         <ImageView
             android:id="@+id/btnShare"
