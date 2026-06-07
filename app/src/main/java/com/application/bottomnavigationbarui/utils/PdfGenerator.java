@@ -77,7 +77,6 @@ public class PdfGenerator {
             paint.setTextSize(titleTextSize);
             paint.setTextAlign(Paint.Align.CENTER);
             paint.setColor(Color.BLACK);
-
             canvas.drawText("Room Number: " + bill.getRoomNumber(), offsetX + (SLOT_WIDTH / 2f), currentY, paint);
 
             // Reset typography to enlarged regular scale
@@ -86,7 +85,12 @@ public class PdfGenerator {
             paint.setTextSize(regularTextSize);
 
             currentY += leading + 3;
-            canvas.drawText("Bill Date  : " + bill.getBillingDate(), offsetX + indent, currentY, paint);
+            canvas.drawText("Bill Date: " + bill.getBillingDate(), offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText("Bill id:#"+bill.getBillId(), rightMarginEdge, currentY, paint);
+//            canvas.drawText(, offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.LEFT);
+
             currentY += leading + 2;
 
             // --- TENANT BLOCK ---
@@ -177,6 +181,7 @@ public class PdfGenerator {
 
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
             canvas.drawText(bill.getPaymentStatus() != null ? bill.getPaymentStatus().toUpperCase() : "UNPAID", offsetX + indent + 50, currentY, paint);
+
 
             // Revert settings for the next slot
             paint.setColor(Color.BLACK);
