@@ -83,6 +83,8 @@ public class PdfGenerator {
             paint.setTextAlign(Paint.Align.LEFT);
             paint.setTypeface(Typeface.MONOSPACE);
             paint.setTextSize(regularTextSize);
+            currentY += leading + 3;
+            canvas.drawText("Meter No.: " + bill.getMeterSerialNumber(), offsetX + indent, currentY, paint);
 
             currentY += leading + 3;
             canvas.drawText("Bill Date: " + bill.getBillingDate(), offsetX + indent, currentY, paint);

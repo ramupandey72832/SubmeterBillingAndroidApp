@@ -107,7 +107,7 @@ public class MeterReadingFragment extends Fragment {
               double fixedCharge = Double.parseDouble(binding.etFixedCharge.getText().toString());
               double ratePerUnit = Double.parseDouble(binding.etRatePerUnit.getText().toString());
 
-              if(roomNumber.isEmpty() || submeterSerialNumber.isEmpty() || currentMeterReading == 0 || fixedCharge == 0 || ratePerUnit == 0){
+              if(roomNumber.isEmpty() || submeterSerialNumber.isEmpty() || currentMeterReading == 0 || fixedCharge < 0 || ratePerUnit == 0){
                   return;
               }
 
