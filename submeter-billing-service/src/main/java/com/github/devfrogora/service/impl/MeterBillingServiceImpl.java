@@ -272,24 +272,28 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
-    public List<BillDTO> getAllPendingBills() throws SQLException {
+    public List<BillReportDto> getAllPendingBills() throws SQLException {
         List<Bill> bills = DaoManager.getBillDao().getAllBills();
 
         long pendingCount = bills.stream().filter(b -> !b.isPaid()).count();
         if (pendingCount == 0) {
             return null;
         }
-
         // Change .toList() to .collect(Collectors.toList())
         return bills.stream()
                 .filter(b -> !b.isPaid())
-                .map(b -> new BillDTO(
+                .map(b -> new BillReportDto(
                         b.getBillId(),
-                        b.getBillingDate(),
-                        b.getUnitsConsumed(),
+                        b.getRoomNumber(),
+                        b.getMeterSerialNumber(),
+                        b.getPreviousReadingId(),
+                        b.getCurrentReadingId(),
                         b.getRatePerUnit(),
+                        b.getFixedCharge(),
+                        b.getTenantName(),
+                        b.getBillingDate(),
                         b.getTotalAmount(),
-                        b.isPaid()
+                        b.isPaid() ? "PAID" : "UNPAID"
                 ))
                 .collect(Collectors.toList());
     }

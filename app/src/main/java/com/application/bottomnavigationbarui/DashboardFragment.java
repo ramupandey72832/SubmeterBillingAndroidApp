@@ -21,14 +21,20 @@ import com.application.bottomnavigationbarui.fragments.EndRoomTenancyFragment;
 import com.application.bottomnavigationbarui.fragments.MeterReadingFragment;
 import com.application.bottomnavigationbarui.fragments.ReplaceSubmeterFragment;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
+import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
+import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
+import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class DashboardFragment extends Fragment {
+    private UiHelper ui;
     private FragmentDashboardBinding binding;
 
     @Nullable
@@ -42,24 +48,34 @@ public class DashboardFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
+        ui = new UiHelper(getContext());
         // 1. Configure LayoutManager for the RecyclerView
         binding.rvPendingBills.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        // 2. Mock a list of data mixing Paid and Unpaid states
-        List<BillReportDto> demoBills = new ArrayList<>();
-//        demoBills.add(new BillReportDto(1, "105", "Alex", "01 Apr 2026",2.5, "YES"));
-//        demoBills.add(new BillReportDto(2, "104", "Sarah", "01 Apr 2026",8.5, "NO"));
-//        demoBills.add(new BillReportDto(3, "103", "Alex", "01 Mar 2026", 7.5, "YES"));
-//        demoBills.add(new BillReportDto(4, "102",  "Alex", "01 Mar 2026",5 ,"NO"));
-//        demoBills.add(new BillReportDto(5, "101",  "Ramu", "01 Mar 2026", 6,"YES"));
-//        demoBills.add(new BillReportDto(6, "100",  "Alex", "01 Mar 2026", 10,"NO"));
-//        demoBills.add(new BillReportDto(7, "109",  "Ramu", "01 Mar 2026", 15,"Yes" ));
+        MeterBillingService meterBillingService = new MeterBillingServiceImpl();
+        List<BillReportDto> allBills = new ArrayList<>();
+        List<BillReportDto> pendingBills = new ArrayList<>();
+        double totalUnits = 0;
+        double totalRevenue = 0;
+        try {
+            allBills = meterBillingService.getAllBillsReport();
 
+            if (allBills != null) {
+                for (BillReportDto bill : allBills) {
+                    totalUnits += (bill.getCurrentReading() - bill.getPreviousReading());
+                    totalRevenue += bill.getTotalAmount();
+                }
+            }
+            pendingBills = meterBillingService.getAllPendingBills();
+        } catch (Exception e) {
+            ErrorUtils.handleDatabaseException("Error fetching pending bills", e, ui);
+        }
 
-        // 3. Initialize your updated adapter with the sample list
-        DashboardBillsAdapter adapter = new DashboardBillsAdapter(demoBills);
+        binding.totalUnits.setText(String.format("%.2f", totalUnits));
+        binding.totalBills.setText(String.format("%d", allBills.size()));
+        binding.totalRevenue.setText(String.format("%.2f", totalRevenue));
 
+        DashboardBillsAdapter adapter = new DashboardBillsAdapter(pendingBills);
         // 4. Bind the adapter to your RecyclerView
         binding.rvPendingBills.setAdapter(adapter);
 

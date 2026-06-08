@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 
 import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
@@ -51,7 +53,16 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         startingDataPickerUI();
 
         demoTenant();
+        String[] roomNumbers = {"101", "102", "103", "201", "202"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, roomNumbers);
 
+        AutoCompleteTextView roomDropdown = binding.layoutAddTenant.actvRoomDropdown;
+        roomDropdown.setOnItemClickListener((parent, view1, position, id) -> {
+            String selectedRoom = parent.getItemAtPosition(position).toString();
+            binding.layoutAddTenant.etRoomNumber.setText(selectedRoom);
+        });
+
+        roomDropdown.setAdapter(adapter);
 
         binding.layoutAddTenant.btnAddTenant.setOnClickListener(view1 -> {
             String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
