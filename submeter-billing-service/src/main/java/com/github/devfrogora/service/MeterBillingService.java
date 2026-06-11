@@ -16,6 +16,7 @@ public interface MeterBillingService {
     BillReportDto getLatestBill(String roomNumber) throws SQLException;
     List<BillReportDto> getAllBillsReport() throws SQLException;
     public double getLatestReading(String submeterSerialNumber) throws SQLException;
+    public List<BillReportDto> getLatestThreeMonthBills() throws SQLException;
     // Replace Bill entities with BillDTOs
     List<BillReportDto> getAllPendingBills() throws SQLException;
 

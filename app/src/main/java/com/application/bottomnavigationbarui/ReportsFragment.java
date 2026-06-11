@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.application.bottomnavigationbarui.adapters.ReportAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentReportsBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.ExcelGenerator;
@@ -69,6 +70,20 @@ public class ReportsFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(getContext());
 
+        RoomMeterService roomMeterService = new RoomMeterServiceImpl();
+        MeterBillingService meterBillingService = new MeterBillingServiceImpl();
+
+        List<BillReportDto> historyList = new ArrayList<>();
+        try {
+            // Replace with your actual method that retrieves historical data
+            historyList = meterBillingService.getLatestThreeMonthBills();
+        } catch (Exception e) {
+            ErrorUtils.handleDatabaseException("error: ", e, ui);
+        }
+        // 2. Set up the RecyclerView with your custom adapter
+        ReportAdapter adapter = new ReportAdapter(historyList);
+        binding.rvPreviousReports.setAdapter(adapter);
+
 
 // Initialize default dates into views matching your XML defaults
         binding.tvStartDate.setText(dateFormat.format(startCalendar.getTime()));
@@ -112,8 +127,6 @@ public class ReportsFragment extends Fragment {
 
 
         binding.btnGenerateLatestMonthlyBillsReport.setOnClickListener(view1 -> {
-            RoomMeterService roomMeterService = new RoomMeterServiceImpl();
-            MeterBillingService meterBillingService = new MeterBillingServiceImpl();
             List<RoomRegistryDto> rooms = roomMeterService.getAllRoomReport();
             List<BillReportDto> bills = new ArrayList<>();
             rooms.forEach(room -> {

@@ -8,7 +8,7 @@
     android:paddingVertical="14dp">
 
     <TextView
-        android:id="@+id/tvReportName"
+        android:id="@+id/tvBillMonthName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="March 2026_Report.csv"
@@ -28,11 +28,11 @@
         app:tint="#126650"
         android:layout_marginEnd="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/btnEmail"
+        app:layout_constraintEnd_toStartOf="@id/btnShare"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/btnEmail"
+        android:id="@+id/btnShare"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:src="@drawable/ic_share"

@@ -20,6 +20,7 @@ public interface BillDao {
     List<Bill> getAllBills() throws SQLException;
 
     public List<Bill> getBillsByRange(String start, String end) throws SQLException;
+    public List<Bill> getLatestThreeMonthBills() throws SQLException;
 
     // Update
     boolean updateBill(Bill bill)throws SQLException;

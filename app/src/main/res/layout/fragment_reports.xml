@@ -117,21 +117,13 @@
             app:cardElevation="2dp"
             android:layout_marginBottom="28dp">
 
-            <LinearLayout
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvPreviousReports"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingVertical="8dp">
+                android:paddingVertical="8dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                <include layout="@layout/report_item_previous_report" />
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginHorizontal="16dp" />
-
-                <include layout="@layout/report_item_previous_report" />
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E0E0" android:layout_marginHorizontal="16dp" />
-
-                <include layout="@layout/report_item_previous_report" />
-
-            </LinearLayout>
         </androidx.cardview.widget.CardView>
 
         <TextView

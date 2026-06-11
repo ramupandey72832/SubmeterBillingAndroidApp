@@ -89,6 +89,13 @@ public class SQLiteBillDao implements BillDao {
     }
 
     @Override
+    public List<Bill> getLatestThreeMonthBills() throws SQLException {
+        String sql = SqlLoader.get("bill.get_latest_three_month");
+        return DbUtils.executeQueryList(sql, this::mapResultSetToBill);
+    }
+
+
+    @Override
     public boolean updateBill(Bill bill) throws SQLException {
         String sql = SqlLoader.get("bill.update");
         // FIXED: Added missing parameters to line up perfectly with updated query values list
