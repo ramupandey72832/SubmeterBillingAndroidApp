@@ -31,8 +31,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 public class ReportsFragment extends Fragment {
@@ -73,15 +76,23 @@ public class ReportsFragment extends Fragment {
         RoomMeterService roomMeterService = new RoomMeterServiceImpl();
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
 
-        List<BillReportDto> historyList = new ArrayList<>();
+        List<BillReportDto> lastThreeMonthBills = new ArrayList<>();
         try {
             // Replace with your actual method that retrieves historical data
-            historyList = meterBillingService.getLatestThreeMonthBills();
+            lastThreeMonthBills = meterBillingService.getLatestThreeMonthBills();
         } catch (Exception e) {
             ErrorUtils.handleDatabaseException("error: ", e, ui);
         }
-        // 2. Set up the RecyclerView with your custom adapter
-        ReportAdapter adapter = new ReportAdapter(historyList);
+// 2. Group them chronologically ("yyyy-MM" -> List of bills)
+        Map<String, List<BillReportDto>> billsGroupedByMonth = lastThreeMonthBills.stream()
+                .collect(Collectors.groupingBy(
+                        bill -> bill.getBillingDate().substring(0, 7), // Extracts "2026-03", "2026-04", etc.
+                        LinkedHashMap::new,
+                        Collectors.toList()
+                ));
+
+// 3. Send the grouped data directly to your Adapter
+        ReportAdapter adapter = new ReportAdapter(getContext(), billsGroupedByMonth);
         binding.rvPreviousReports.setAdapter(adapter);
 
 

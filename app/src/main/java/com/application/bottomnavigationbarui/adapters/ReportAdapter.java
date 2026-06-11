@@ -1,5 +1,6 @@
 package com.application.bottomnavigationbarui.adapters;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,22 +9,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.DashboardItemBillBinding;
 import com.application.bottomnavigationbarui.databinding.ReportItemPreviousReportBinding;
+import com.application.bottomnavigationbarui.utils.ExcelGenerator;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportViewHolder> {
 
-    private final List<BillReportDto> reportList;
+    private final Context context;
+    private final List<String> monthKeys;
+    private final Map<String, List<BillReportDto>> groupedData;
 
-    public ReportAdapter(List<BillReportDto> reportList) {
-        this.reportList = reportList;
+    public ReportAdapter(Context context, Map<String, List<BillReportDto>> groupedData) {
+        this.context = context;
+        this.groupedData = groupedData;
+        // Convert map keys to a list so RecyclerView can index them (0, 1, 2)
+        this.monthKeys = new ArrayList<>(groupedData.keySet());
     }
 
     @NonNull
     @Override
     public ReportViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
-
         ReportItemPreviousReportBinding binding = ReportItemPreviousReportBinding.inflate(
                 LayoutInflater.from(parent.getContext()),
                 parent,
@@ -34,18 +45,42 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
 
     @Override
     public void onBindViewHolder(@NonNull ReportViewHolder holder, int position) {
-        BillReportDto report = reportList.get(position);
+        String monthKey = monthKeys.get(position); // e.g., "2026-03"
+        List<BillReportDto> monthBills = groupedData.get(monthKey);
 
-        // TODO: Bind your data to your report_item layout elements here
-        // Example: holder.tvDate.setText(report.getBillingDate());
-        holder.binding.tvBillMonthName.setText(report.getRoomNumber() + "_Report.csv");
+        // Convert "2026-03" to a clean title like "March 2026_Report.csv"
+        String cleanDisplayTitle = formatMonthTitle(monthKey) + "_Report.pdf";
+        holder.binding.tvBillMonthName.setText(cleanDisplayTitle);
+
+        // Click listener for the Download action button
+        holder.binding.btnDownload.setOnClickListener(v -> {
+            // Call your export helper, sending ONLY this month's bills
+            ExcelGenerator.generateBillReport(context, monthBills, monthKey, monthKey);
+        });
+
+        // Click listener for the Share action button
+        holder.binding.btnShare.setOnClickListener(v -> {
+            // TODO: Optional share logic implementation
+        });
+
 
     }
 
     @Override
     public int getItemCount() {
-        // Force the list to show a MAXIMUM of 3 items
-        return Math.min(reportList.size(), 3);
+        return monthKeys.size(); // Will show exactly 3 rows if 3 months of data exist
+    }
+
+    // Helper to format "2026-03" into "March 2026"
+    private String formatMonthTitle(String monthKey) {
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
+            Date date = inputFormat.parse(monthKey);
+            return date != null ? outputFormat.format(date) : monthKey;
+        } catch (Exception e) {
+            return monthKey; // Fallback to raw string if parsing fails
+        }
     }
 
     static class ReportViewHolder extends RecyclerView.ViewHolder {
