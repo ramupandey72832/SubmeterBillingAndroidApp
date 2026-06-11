@@ -50,6 +50,11 @@ android {
 
 dependencies {
     implementation(project(":submeter-billing-service"))
+    implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'
+
+    // Lightweight, open-source PDF generator for tables and documents
+//    implementation 'com.github.librepdf:openpdf:1.3.30'  // it is for desktop
+    implementation 'com.itextpdf:itextg:5.5.10'
 
     implementation libs.appcompat
     implementation libs.material

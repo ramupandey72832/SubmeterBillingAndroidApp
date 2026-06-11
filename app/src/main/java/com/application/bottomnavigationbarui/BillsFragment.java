@@ -25,6 +25,8 @@ import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -59,14 +61,14 @@ public class BillsFragment extends Fragment {
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
         try {
             fullBillList =  meterBillingService.getAllBillsReport();
-            fullBillList.forEach( System.out::println );
+            if (fullBillList != null) {
+                Collections.sort(fullBillList, Comparator.comparing(BillReportDto::getBillId).reversed());
+            }
+
         } catch (SQLException e) {
             ErrorUtils.handleDatabaseException("Error : ", e, ui);
         }
 
-//        // Create dummy list data
-//        fullBillList = new ArrayList<>();
-//        fullBillList.add(new BillReportDto(1, "105", "Alex", "01 Apr 2026",2.5, "YES"));
 
         binding.recyclerViewBilling.setLayoutManager(new LinearLayoutManager(getContext()));
 

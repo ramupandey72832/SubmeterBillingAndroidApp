@@ -21,5 +21,7 @@ public interface MeterBillingService {
 
     double getTotalUnit() throws SQLException;
 
+    List<BillReportDto> getBillsByRange(String start,String end) throws SQLException;
+
     BillDTO getBillById(int billId) throws SQLException;
 }

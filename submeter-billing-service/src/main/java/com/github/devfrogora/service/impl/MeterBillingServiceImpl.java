@@ -318,6 +318,35 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
+    public List<BillReportDto> getBillsByRange(String start, String end) throws SQLException{
+        List<Bill> bills = DaoManager.getBillDao().getBillsByRange(DateUtils.validateDate(start),
+                DateUtils.validateDate(end));
+        List<BillReportDto> reportList = new ArrayList<>();
+        for( Bill bill : bills) {
+
+            double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
+                    0;
+
+            double currentReading = bill.getCurrentReadingId() > 0 ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
+            reportList.add(new BillReportDto(
+                    bill.getBillId(),
+                    bill.getRoomNumber(),
+                    bill.getMeterSerialNumber(),
+                    previousReading,
+                    currentReading,
+                    bill.getRatePerUnit(),
+                    bill.getFixedCharge(),
+                    bill.getTenantName(),
+                    bill.getBillingDate(),
+                    bill.getTotalAmount(),
+                    bill.isPaid() ? "PAID" : "UNPAID"
+            ));
+        }
+
+        return reportList;
+    }
+
+    @Override
     public BillDTO getBillById(int billId) throws SQLException {
         Bill bill = DaoManager.getBillDao().getBillById(billId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bill ID " + billId + " not found."));

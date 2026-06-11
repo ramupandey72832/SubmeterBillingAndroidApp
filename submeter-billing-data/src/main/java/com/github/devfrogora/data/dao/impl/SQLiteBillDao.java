@@ -81,6 +81,13 @@ public class SQLiteBillDao implements BillDao {
         return DbUtils.executeQueryList(sql, this::mapResultSetToBill);
     }
 
+
+    @Override
+    public List<Bill> getBillsByRange(String start, String end) throws SQLException {
+        String sql = SqlLoader.get("bill.get_by_range");
+        return DbUtils.executeQueryList(sql, this::mapResultSetToBill, start, end);
+    }
+
     @Override
     public boolean updateBill(Bill bill) throws SQLException {
         String sql = SqlLoader.get("bill.update");
