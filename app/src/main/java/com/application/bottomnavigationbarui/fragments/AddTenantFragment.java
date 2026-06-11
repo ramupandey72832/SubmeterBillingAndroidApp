@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
 import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
@@ -135,6 +136,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             tenantDTO.setAddress(tenantAddress);
 
             tenancyManagementService.addTenantWithTenancy(tenantDTO, roomNumber, startDate);
+            Toast.makeText(getContext(), "Tenant : "+tenantName+" added successfully", Toast.LENGTH_SHORT).show();
         } catch(Exception e){
             ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
         }

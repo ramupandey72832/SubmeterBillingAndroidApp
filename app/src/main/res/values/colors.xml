@@ -13,4 +13,9 @@
     <color name="ui_outline_divider">#E5E5E5</color>
 
     <color name="status_success">#34A853</color> <color name="status_error">#BA1A1A</color>
+
+    <color name="green_text">#0A5C36</color>
+    <color name="green_background">#E1F5FE</color>
+    <color name="red_text">#B71C1C</color>
+    <color name="red_background">#FFEBEE</color>
 </resources>

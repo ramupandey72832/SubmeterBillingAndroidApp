@@ -69,7 +69,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <include  android:id="@+id/dashboardSection" layout="@layout/dashboard_manipulate_section" />
+            <include android:id="@+id/dashboardSection" layout="@layout/dashboard_manipulate_section" />
 
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
@@ -175,6 +175,32 @@
                 android:text="Pending Bills"
                 android:textSize="22sp"
                 android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/searchBillsLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxStrokeColor="#00796B"
+                app:hintTextColor="#00796B"
+                app:startIconDrawable="@android:drawable/ic_menu_search"
+                app:startIconTint="#555555"
+                app:endIconMode="clear_text">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSearchBills"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Search by room, tenant, or bill ID..."
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:textSize="14sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvPendingBills"

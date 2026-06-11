@@ -36,9 +36,21 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:layout_marginBottom="24dp"
-            android:text="Please type your 4-digit MPIN to confirm deleting this room record."
+            android:text="Please type your 4-digit MPIN to confirm"
             android:textColor="#666666"
             android:textSize="14sp"
+            android:gravity="center" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginBottom="24dp"
+            android:id="@+id/message"
+            android:text=" Message for user"
+            android:textColor="#666666"
+            android:textSize="18sp"
+            android:textStyle="bold"
             android:gravity="center" />
 
         <!-- 4-Digit Grid Input Box Fields Row -->

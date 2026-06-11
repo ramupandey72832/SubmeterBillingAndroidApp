@@ -24,6 +24,11 @@ public class VerifyMpinDialogFragment extends DialogFragment {
     private static final String PREFS_NAME = "SecurityPrefs";
     private static final String KEY_MPIN = "user_mpin";
 
+
+    // 1. Define keys for your arguments
+    private static final String ARG_MESSAGE = "arg1";
+    private String message;
+
     // Interface to send the result back to DeleteRoomFragment
     public interface MpinVerificationListener {
         void onMpinVerified(boolean isSuccess);
@@ -33,6 +38,23 @@ public class VerifyMpinDialogFragment extends DialogFragment {
 
     public VerifyMpinDialogFragment() {
         // Required empty public constructor
+    }
+
+    // 2. Create the static factory method
+    public static VerifyMpinDialogFragment newInstance(String message) {
+        VerifyMpinDialogFragment fragment = new VerifyMpinDialogFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_MESSAGE, message);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            message = getArguments().getString(ARG_MESSAGE);
+        }
     }
 
     @Override
@@ -60,7 +82,7 @@ public class VerifyMpinDialogFragment extends DialogFragment {
 
         // Setup text watchers to jump from box to box smoothly
         setupAutoAdvance();
-
+        binding.message.setText(message);
         // Handle Cancel Button Click
         binding.btnCancelMpinVerify.setOnClickListener(v -> dismiss());
 
