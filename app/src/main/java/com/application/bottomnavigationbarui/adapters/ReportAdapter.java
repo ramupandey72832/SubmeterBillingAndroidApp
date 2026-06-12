@@ -1,17 +1,25 @@
 package com.application.bottomnavigationbarui.adapters;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.DashboardItemBillBinding;
 import com.application.bottomnavigationbarui.databinding.ReportItemPreviousReportBinding;
 import com.application.bottomnavigationbarui.utils.ExcelGenerator;
+import com.application.bottomnavigationbarui.utils.SimplePdfGenerator;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,9 +33,13 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
     private final List<String> monthKeys;
     private final Map<String, List<BillReportDto>> groupedData;
 
+
+
     public ReportAdapter(Context context, Map<String, List<BillReportDto>> groupedData) {
         this.context = context;
+
         this.groupedData = groupedData;
+
         // Convert map keys to a list so RecyclerView can index them (0, 1, 2)
         this.monthKeys = new ArrayList<>(groupedData.keySet());
     }
@@ -55,15 +67,55 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
         // Click listener for the Download action button
         holder.binding.btnDownload.setOnClickListener(v -> {
             // Call your export helper, sending ONLY this month's bills
-            ExcelGenerator.generateBillReport(context, monthBills, monthKey, monthKey);
+            SimplePdfGenerator.generateBillReport(context, monthBills, monthKey, monthKey);
         });
 
         // Click listener for the Share action button
         holder.binding.btnShare.setOnClickListener(v -> {
             // TODO: Optional share logic implementation
+
+
+            SimplePdfGenerator.generateBillReport(context, monthBills, monthKey, monthKey);
+
+            // 2. Locate the generated file inside the public Downloads directory
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            String filename = "Billing_Report_" + monthKey + "_to_" + monthKey + ".pdf"; // match your generator output extension
+            File sharedFile = new File(downloadsDir, filename);
+
+            if (!sharedFile.exists()) {
+                Toast.makeText(context, "Error: Reference file could not be found to share.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 3. Convert the File reference to a secure Content URI
+            // Inside your adapter click listener, ensure this maps perfectly:
+            String authority = context.getPackageName() + ".fileprovider";
+            Uri fileUri = FileProvider.getUriForFile(context, authority, sharedFile);
+
+            // 4. Construct the Standard Android Send Intent Channel
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("application/pdf"); // FIX: Changed from text/csv to application/pdf
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Billing Report: " + formatMonthTitle(monthKey));
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "Attached is the monthly utility billing report for " + formatMonthTitle(monthKey));
+
+// --- CRITICAL PERMISSION SECURING STEPS ---
+            // A. Explicitly set ClipData so the Android Chooser knows exactly what file is being bound
+            shareIntent.setClipData(android.content.ClipData.newRawUri("", fileUri));
+
+            // B. Add the standard flags to the main intent stream
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            // ------------------------------------------
+
+            // 5. Create the Chooser Intent
+            Intent chooserIntent = Intent.createChooser(shareIntent, "Share Monthly PDF Via:");
+
+            // C. Grant read permissions directly to the chooser lifecycle container
+            chooserIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // 6. Fire the intent sheet UI
+            context.startActivity(chooserIntent);
         });
-
-
     }
 
     @Override
