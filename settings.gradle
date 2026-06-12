@@ -34,3 +34,4 @@ rootProject.name = "BottomNavigationBarUI"
 include ':app'
 include ':submeter-billing-service'
 include ':submeter-billing-data'
+include ':BaseLibrary'
