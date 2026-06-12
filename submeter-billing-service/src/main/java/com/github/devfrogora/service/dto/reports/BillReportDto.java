@@ -77,6 +77,10 @@ public class BillReportDto {
         this.fixedCharge = fixedCharge;
     }
 
+    public void setPaymentStatus(String paymentStatus) {
+        this.paymentStatus = paymentStatus;
+    }
+
     @Override
     public String toString() {
         return "BillReportDto{" +

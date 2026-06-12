@@ -49,7 +49,9 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
         binding = FragmentDashboardBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
+    List<BillReportDto> allBills = new ArrayList<>();
 
+    List<BillReportDto> pendingBills = new ArrayList<>();
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -58,8 +60,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
         binding.rvPendingBills.setLayoutManager(new LinearLayoutManager(getContext()));
 
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
-        List<BillReportDto> allBills = new ArrayList<>();
-        List<BillReportDto> pendingBills = new ArrayList<>();
+
         double totalUnits = 0;
         double totalRevenue = 0;
         try {
@@ -184,14 +185,44 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
     }
 
     private void executeStatusUpdate(BillReportDto bill) {
-        // Show a progress loader if needed
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
-        // Make your service call safely inside the Fragment context
-        boolean isPaid = bill.getPaymentStatus().equalsIgnoreCase("PAID") ? true : false;
+
+        // Determine target status. (If it's currently "UNPAID" or "NO", we are setting it to true/PAID)
+        boolean currentIsPaid = bill.getPaymentStatus().equalsIgnoreCase("YES") ||
+                bill.getPaymentStatus().equalsIgnoreCase("PAID");
+        boolean targetStatus = !currentIsPaid;
+
         try {
-            meterBillingService.updateBillPaymentStatus(bill.getBillId(), !isPaid);
+            // 1. Execute database/service update operation
+            meterBillingService.updateBillPaymentStatus(bill.getBillId(), targetStatus);
+
+            // 2. Update the string state inside our local object model
+            bill.setPaymentStatus(targetStatus ? "PAID" : "UNPAID");
+
+            // 3. Since this is a "Pending Bills" list, if it's now paid, remove it from the view!
+            if (targetStatus) {
+                // Get the current lists from your adapter to safely modify data inside memory
+                if (binding.rvPendingBills.getAdapter() instanceof DashboardBillsAdapter) {
+                    DashboardBillsAdapter billAdapter = (DashboardBillsAdapter) binding.rvPendingBills.getAdapter();
+
+                    // Get the active mutable collection from the adapter's master records
+                    List<BillReportDto> ongoingPendingList = new ArrayList<>(pendingBills);
+
+                    // Find and remove matching bill entry safely via lambda or explicit loop
+                    ongoingPendingList.removeIf(item -> item.getBillId() == (bill.getBillId()));
+
+                    // Re-sync local master arrays
+                    this.pendingBills = ongoingPendingList;
+
+                    // 4. Force UI refresh via your custom adapter sync tool
+                    billAdapter.updateData(ongoingPendingList);
+                }
+            }
+
+            Toast.makeText(getContext(), "Payment status updated successfully!", Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
-            ErrorUtils.handleDatabaseException("Error updating payment status ", e, ui);
+            ErrorUtils.handleDatabaseException("Error updating payment status", e, ui);
         }
     }
 
@@ -207,7 +238,6 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
 
             // Proceed with your action safely using the selected bill!
             executeStatusUpdate(selectedBillForProcessing);
-
             // Clear the variable when done to prevent duplicate actions
             selectedBillForProcessing = null;
         } else {
