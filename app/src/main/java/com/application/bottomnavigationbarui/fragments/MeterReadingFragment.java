@@ -41,9 +41,7 @@ public class MeterReadingFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
 
-        }
     }
 
     @Override
@@ -59,9 +57,18 @@ public class MeterReadingFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(this.getContext());
-        binding.etSubmeterSerialNumber.setEnabled(false);
+
+        if (getArguments() != null) {
+            if(getArguments().containsKey("ARG_QR_DATA")){
+                String qrData = getArguments().getString("ARG_QR_DATA");
+                binding.etRoomNumber.setText(qrData);
+            }
+        }
         binding.etSubmeterSerialNumber.setEnabled(false);
         binding.etPreviousMeterReading.setEnabled(false);
+        binding.etRatePerUnit.setEnabled(false);
+        binding.etFixedCharge.setEnabled(false);
+        binding.btnNext.setEnabled(false);
 
         RoomMeterService roomMeterService = new RoomMeterServiceImpl();
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
@@ -86,6 +93,9 @@ public class MeterReadingFragment extends Fragment {
                 double findPreviousReading = meterBillingService.getLatestReading(submeterDTO.getMeterSerialNumber());
 
                 binding.etPreviousMeterReading.setText(Double.toString(findPreviousReading));
+                binding.etRatePerUnit.setEnabled(true);
+                binding.etFixedCharge.setEnabled(true);
+                binding.btnNext.setEnabled(true);
             } catch (Exception e) {
                 ErrorUtils.handleDatabaseException("Error : ", e, ui);
             }

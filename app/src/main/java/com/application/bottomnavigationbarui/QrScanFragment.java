@@ -10,51 +10,87 @@ import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.camera.view.PreviewView;
 import androidx.fragment.app.Fragment;
 
 import com.application.bottomnavigationbarui.camera.CameraHelper;
+import com.application.bottomnavigationbarui.databinding.FragmentQrScanBinding;
 import com.application.bottomnavigationbarui.fragments.MeterReadingFragment;
+import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.LocalPermissionHelper;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
+import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.github.devfrogora.service.RoomMeterService;
+import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public class QrScanFragment extends Fragment {
 
     private static final String TAG = "QrScanFragment";
-
-    private LocalPermissionHelper localPermissionHelper;
+    private UiHelper ui;
+    FragmentQrScanBinding binding;
     private CameraHelper cameraHelper;
     private ImageButton btnFlashlight;
 
-    // Keep constructors completely empty for Fragments
     public QrScanFragment() {}
+
+    // 1. INITIALIZE HERE instead of onViewCreated
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // This is safe because requireActivity() is available here,
+        // and the Activity lifecycle state is still early enough.
+    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_qr_scan, container, false);
+        binding = FragmentQrScanBinding.inflate(inflater, container, false);
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        RoomMeterService roomMeterService = new RoomMeterServiceImpl();
 
-        // 1. Initialize CameraHelper safely after view creation
+        // Initialize CameraHelper safely after view creation
         cameraHelper = new CameraHelper(new CameraHelper.QrResultListener() {
             @Override
             public void onQrDetected(String data, Uri uri) {
-                sendToResultFragment(data, uri);
+                // Check if the string contains the specific substring
+                if (data != null && data.contains("ROOM_NUMBER_")) {
+                    // True: The data contains the substring
+                    Log.d("SCAN_CHECK", "Valid room data found!");
+                    // Optional: Extract just the number (301) by removing the prefix
+                    String roomNumber = data.replace("ROOM_NUMBER_", "");
+                    try {
+                        if(roomMeterService.isRoomExist(roomNumber)){
+                            sendToResultFragment(roomNumber, uri);
+                            Log.d("SCAN_CHECK", "Extracted Number: " + roomNumber);
+                        }else{
+                            ErrorUtils.handleDatabaseException("Room not found", new SQLException(), ui);
+                        }
+                    } catch (Exception e) {
+                        ErrorUtils.handleDatabaseException("Error: ", e, ui);
+                    }
+                } else {
+                    // False: Substring not found
+                    Log.w("SCAN_CHECK", "Invalid data format.");
+                }
+//                System.out.println("Data: "+data);
             }
         });
 
-        // 2. Bind top bar views
-        ImageButton btnBack = view.findViewById(R.id.btnBack);
-        btnFlashlight = view.findViewById(R.id.btnFlashlight);
-        ImageButton btnRefresh = view.findViewById(R.id.btnRefresh);
+        setupCameraPreview(view);
 
-        // 3. Set click listeners
+        // Bind toolbar UI views
+        ImageButton btnBack = binding.btnBack;
+        btnFlashlight = binding.btnFlashlight;
+        ImageButton btnRefresh = binding.btnRefresh;
+
         if (btnBack != null) {
             btnBack.setOnClickListener(v -> {
                 if (getActivity() != null) {
@@ -62,52 +98,30 @@ public class QrScanFragment extends Fragment {
                 }
             });
         }
+        if (btnFlashlight != null) btnFlashlight.setOnClickListener(v -> onFlashClicked());
+        if (btnRefresh != null) btnRefresh.setOnClickListener(this::refreshCamera);
 
-        if (btnFlashlight != null) {
-            btnFlashlight.setOnClickListener(v -> onFlashClicked());
-        }
-
-        if (btnRefresh != null) {
-            btnRefresh.setOnClickListener(this::refreshCamera);
-        }
-
-        // 4. Set up permissions helper
-        localPermissionHelper = new LocalPermissionHelper(requireActivity(), new LocalPermissionHelper.OnPermissionsListener() {
-            @Override
-            public void onAllPermissionsGranted() {
-                // If permissions are granted mid-session, safely start camera setup
-                setupCameraPreview(view);
-            }
-
-            @Override
-            public void onPermissionsDenied(List<String> deniedPermissions) {
-                new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                        .setTitle("Camera Permission Required")
-                        .setMessage("This application cannot run because it does not have the camera permission required for scanning. Please enable the permission.")
-                        .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
-                        .setNegativeButton("CANCEL", (dialog, which) -> dialog.dismiss())
-                        .show();
-            }
-        });
-
-        // 5. Trigger automated permission verification pipeline
-        localPermissionHelper.checkForPermissions();
+        // 2. CHECK PERMISSIONS HERE
+        // The helper was already safely registered in onCreate, now we just fire the check logic
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        View view = getView();
-        if (view != null && localPermissionHelper != null && localPermissionHelper.hasAllPermissions()) {
-            setupCameraPreview(view);
+        if (getActivity() instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            View view = getView();
+            if (view != null && mainActivity.localPermissionHelper != null && mainActivity.localPermissionHelper.hasAllPermissions()) {
+                setupCameraPreview(view);
+            }
         }
     }
 
+
     private void setupCameraPreview(@NonNull View view) {
-        // Use a small delay to allow transition animations to complete smoothly
         view.postDelayed(() -> {
             if (isAdded() && getContext() != null) {
-                PreviewView previewView = view.findViewById(R.id.previewView);
+                androidx.camera.view.PreviewView previewView = binding.previewView;
                 if (previewView != null) {
                     cameraHelper.startCamera(requireContext(), previewView, this);
                 }
@@ -117,16 +131,9 @@ public class QrScanFragment extends Fragment {
 
     private void onFlashClicked() {
         if (cameraHelper == null) return;
-
         boolean isNowOn = cameraHelper.toggleTorch();
-
-        // Update the flashlight UI button look based on state
         if (btnFlashlight != null) {
-            if (isNowOn) {
-                btnFlashlight.setColorFilter(android.graphics.Color.YELLOW);
-            } else {
-                btnFlashlight.setColorFilter(android.graphics.Color.WHITE);
-            }
+            btnFlashlight.setColorFilter(isNowOn ? android.graphics.Color.YELLOW : android.graphics.Color.WHITE);
         }
     }
 
@@ -134,13 +141,10 @@ public class QrScanFragment extends Fragment {
         View root = getView();
         if (root == null || cameraHelper == null || getContext() == null) return;
 
-        PreviewView previewView = root.findViewById(R.id.previewView);
+        androidx.camera.view.PreviewView previewView = root.findViewById(R.id.previewView);
         if (previewView != null) {
             cameraHelper.restartCamera(requireContext(), previewView, this);
-
-            // Nice 360-degree rotation animation on the refresh icon
             v.animate().rotationBy(360).setDuration(500).start();
-            Log.d(TAG, "Refresh button triggered successfully");
         }
     }
 
@@ -149,7 +153,6 @@ public class QrScanFragment extends Fragment {
 
         Bundle bundle = new Bundle();
         bundle.putString("ARG_QR_DATA", result);
-        bundle.putString("ARG_IMAGE_URI", uri.toString());
 
         MeterReadingFragment resultFragment = new MeterReadingFragment();
         NavigationUtils.navigateTo(getActivity(), resultFragment, bundle);

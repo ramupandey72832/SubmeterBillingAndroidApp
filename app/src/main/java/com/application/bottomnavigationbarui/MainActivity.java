@@ -16,6 +16,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.application.bottomnavigationbarui.databinding.ActivityMainBinding;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.LocalPermissionHelper;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.DatabaseSetup;
 import com.github.devfrogora.service.exception.BusinessRuleException;
@@ -23,17 +24,36 @@ import com.github.devfrogora.service.exception.ResourceNotFoundException;
 import com.github.devfrogora.service.exception.RoomOccupiedException;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private UiHelper ui;
     ActivityMainBinding binding;
     private static final String PREFS_NAME = "SecurityPrefs";
     private static final String KEY_MPIN = "user_mpin";
+    public LocalPermissionHelper localPermissionHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        EdgeToEdge.enable(this);
         ui = new UiHelper(this);
+
+        // Initialize it immediately while MainActivity is INITIALIZING
+        localPermissionHelper = new LocalPermissionHelper(this, new LocalPermissionHelper.OnPermissionsListener() {
+            @Override
+            public void onAllPermissionsGranted() {
+                // Find your active QrScanFragment and let it know
+                System.out.println("Permission Granted");
+            }
+
+            @Override
+            public void onPermissionsDenied(List<String> deniedPermissions) {
+                // Show Dialog
+                System.out.println("Permission not Granted");
+            }
+        });
+
+        localPermissionHelper.checkForPermissions();
 
         try{
 //            DatabaseSetup.initializeDb("jdbc:sqlite:submeter_bill.db", null, null, "org.sqlite.JDBC"); // Desktop
@@ -81,6 +101,11 @@ public class MainActivity extends AppCompatActivity {
                 return false;
             });
         }
+
+        binding.scanMeter.setOnClickListener(view -> {
+            replaceFragment(new QrScanFragment());
+        });
+
     }
 
     private boolean isMpinConfigured() {

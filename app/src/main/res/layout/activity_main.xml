@@ -20,7 +20,8 @@
         android:id="@+id/bottomAppBar"
         android:layout_gravity="bottom"
         app:fabCradleMargin="10dp"
-        app:fabCradleRoundedCornerRadius="50dp">
+        app:fabCradleRoundedCornerRadius="50dp"
+        app:fabAlignmentMode="center">
 
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="wrap_content"
@@ -31,8 +32,19 @@
             android:background="@android:color/transparent"
             app:menu="@menu/nav_menu_items"/>
 
+
     </com.google.android.material.bottomappbar.BottomAppBar>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/scanMeter"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_qr_scan"
+        android:layout_marginBottom="20dp"
+        app:layout_anchor="@id/bottomAppBar"
+        >
+
+    </com.google.android.material.floatingactionbutton.FloatingActionButton>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
-
