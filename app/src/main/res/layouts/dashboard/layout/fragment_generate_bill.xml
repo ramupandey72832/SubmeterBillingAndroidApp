@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#D2EBE9"> <!-- Light teal background tint matching the image -->
+    android:background="?attr/colorSurfaceVariant">
 
     <!-- Custom Top Action Bar / Header -->
     <RelativeLayout
@@ -19,7 +20,7 @@
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
             android:src="@android:drawable/ic_menu_revert"
-            app:tint="#212121"
+            app:tint="?attr/colorOnSurface"
             android:contentDescription="Back" />
 
         <TextView
@@ -29,24 +30,21 @@
             android:layout_toEndOf="@id/btnBack"
             android:layout_centerVertical="true"
             android:layout_marginStart="24dp"
-            android:text="Generate Bill for Room 101"
-            android:textColor="#212121"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            tools:text="Generate Bill for Room 101" />
     </RelativeLayout>
 
     <!-- Main Card Body Container -->
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewStyle"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:layout_marginHorizontal="12dp"
-        android:layout_marginBottom="16dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="0dp"
-        app:cardBackgroundColor="#F7FCFC">
+        android:layout_marginBottom="16dp">
 
-        <ScrollView
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true">
@@ -61,39 +59,39 @@
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Tenant:"
-                    android:textColor="#666666"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.App.LabelBody"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="14sp"
+                    android:text="Tenant:" />
 
                 <TextView
                     android:id="@+id/tvTenantName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Alex Johnson"
-                    android:textColor="#212121"
+                    android:textAppearance="@style/TextAppearance.App.LabelTitle"
                     android:textSize="24sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="2dp" />
+                    android:layout_marginTop="2dp"
+                    tools:text="Alex Johnson" />
 
                 <TextView
                     android:id="@+id/tvRoomNumberLabel"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Room 101"
-                    android:textColor="#444444"
+                    android:textAppearance="@style/TextAppearance.App.LabelBody"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp"
-                    android:layout_marginTop="2dp" />
+                    android:layout_marginTop="2dp"
+                    tools:text="Room 101" />
 
                 <!-- Scan Subtitle Header -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Pre-filled Readings (detected from scan)"
-                    android:textColor="#212121"
+                    android:textAppearance="@style/TextAppearance.App.LabelTitle"
                     android:textSize="14sp"
-                    android:textStyle="bold"
                     android:layout_marginTop="32dp"
-                    android:layout_marginBottom="16dp" />
+                    android:layout_marginBottom="16dp"
+                    android:text="Pre-filled Readings (detected from scan)" />
 
                 <!-- Initial Reading Block -->
                 <RelativeLayout
@@ -103,18 +101,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Previous Reading :"
-                        android:textColor="#444444"
-                        android:textSize="15sp" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:text="Previous Reading :" />
                     <TextView
                         android:id="@+id/tvPreviousReading"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="110.1 kWh"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="15sp"
-                        android:textStyle="bold" />
+                        tools:text="110.1 kWh" />
                 </RelativeLayout>
 
                 <!-- Final Reading Block -->
@@ -125,18 +123,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Current Reading :"
-                        android:textColor="#444444"
-                        android:textSize="15sp" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:text="Current Reading :" />
                     <TextView
                         android:id="@+id/tvCurrentReading"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="123.4 kWh"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="15sp"
-                        android:textStyle="bold" />
+                        tools:text="123.4 kWh" />
                 </RelativeLayout>
 
                 <!-- View OCR Link Button -->
@@ -145,13 +143,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
-                    android:text="View OCR Image"
-                    android:textColor="#1A7F75"
+                    android:textAppearance="@style/TextAppearance.App.LabelTitle"
+                    android:textColor="?attr/colorPrimary"
                     android:textSize="13sp"
-                    android:textStyle="bold"
                     android:layout_marginBottom="12dp"
                     android:clickable="true"
-                    android:focusable="true"/>
+                    android:focusable="true"
+                    android:text="View OCR Image" />
 
                 <!-- Units Consumed Block -->
                 <RelativeLayout
@@ -161,18 +159,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Units Consumed"
-                        android:textColor="#444444"
-                        android:textSize="15sp" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:text="Units Consumed" />
                     <TextView
                         android:id="@+id/tvUnitsConsumed"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="13.3 kWh"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="15sp"
-                        android:textStyle="bold" />
+                        tools:text="13.3 kWh" />
                 </RelativeLayout>
 
                 <!-- Unit Rate Block -->
@@ -183,18 +181,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Unit Rate"
-                        android:textColor="#444444"
-                        android:textSize="15sp" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:text="Unit Rate" />
                     <TextView
                         android:id="@+id/tvUnitRate"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="₹10/kWh"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="15sp"
-                        android:textStyle="bold" />
+                        tools:text="₹10/kWh" />
                 </RelativeLayout>
 
                 <!-- Calculation Block -->
@@ -205,18 +203,18 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Calculation"
-                        android:textColor="#444444"
-                        android:textSize="15sp" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:text="Calculation" />
                     <TextView
                         android:id="@+id/tvCalculation"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="13.3 * 10 = ₹133"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="15sp"
-                        android:textStyle="bold" />
+                        tools:text="13.3 * 10 = ₹133" />
                 </RelativeLayout>
 
                 <!-- Fixed Charges Block -->
@@ -227,25 +225,25 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Plus Fixed Charges"
-                        android:textColor="#444444"
-                        android:textSize="15sp" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:text="Plus Fixed Charges" />
                     <TextView
                         android:id="@+id/tvFixedCharges"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="₹100"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="15sp"
-                        android:textStyle="bold" />
+                        tools:text="₹100" />
                 </RelativeLayout>
 
                 <!-- Horizontal Separator Line -->
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="#E5EAEB"
+                    android:background="?attr/colorSurfaceVariant"
                     android:layout_marginBottom="16dp" />
 
                 <!-- Total Bill Block -->
@@ -256,33 +254,31 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Total Bill Amount"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        android:text="Total Bill Amount" />
                     <TextView
                         android:id="@+id/tvTotalAmount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
-                        android:text="₹233"
-                        android:textColor="#212121"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
+                        android:textColor="?attr/colorPrimary"
                         android:textSize="16sp"
-                        android:textStyle="bold" />
+                        tools:text="₹233" />
                 </RelativeLayout>
 
                 <!-- Bottom Action Button -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnGenerateSendBill"
+                    style="?attr/materialButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="54dp"
                     android:text="Generate &amp; Send Bill"
-                    android:textSize="16sp"
                     android:textAllCaps="false"
-                    app:backgroundTint="#0C8276"
-                    app:cornerRadius="26dp" />
+                    android:textSize="16sp" />
 
             </LinearLayout>
-        </ScrollView>
-    </androidx.cardview.widget.CardView>
+        </androidx.core.widget.NestedScrollView>
+    </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

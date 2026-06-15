@@ -4,37 +4,32 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorSurfaceVariant"
     android:orientation="vertical">
-    <LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginTop="16dp"
-    android:layout_marginBottom="8dp"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingHorizontal="16dp"
-    android:paddingVertical="10dp">
 
-    <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/ic_search" />
-
-    <EditText
-        android:id="@+id/etSearch"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/searchBillsLayout"
+        style="?attr/textInputStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:background="@android:color/transparent"
-        android:hint="Search room number or name"
-        android:textColor="?attr/colorOnSurface"
-        android:textColorHint="?attr/colorOnSurfaceVariant"
-        android:textSize="16sp"
-        android:importantForAutofill="no"
-        android:inputType="text" />
+        android:layout_marginHorizontal="16dp" android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        app:startIconDrawable="@drawable/ic_search"
+        app:startIconTint="?attr/colorOnSurfaceVariant"
+        app:endIconMode="clear_text"
+        app:endIconTint="?attr/colorOnSurfaceVariant"
+        app:hintEnabled="false">
 
-</LinearLayout>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etSearch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Search room number or name"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingVertical="12dp"
+            android:textSize="16sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewBilling"

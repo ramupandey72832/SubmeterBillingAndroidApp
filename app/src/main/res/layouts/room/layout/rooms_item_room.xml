@@ -3,13 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="?attr/materialCardViewStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="24dp"
-    app:cardElevation="2dp"
-    app:strokeWidth="0dp">
+    android:layout_marginVertical="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,12 +19,15 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
-            <ImageView
+            <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/ivBuildingIcon"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
                 android:padding="10dp"
                 android:src="@drawable/ic_building"
+                android:background="?attr/colorSurfaceVariant"
+                app:tint="?attr/colorPrimary"
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Material3.Corner.Full"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:ignore="ContentDescription" />
@@ -37,8 +38,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="12dp"
+                android:textAppearance="@style/TextAppearance.App.LabelTitle"
                 android:textSize="22sp"
-                android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="@+id/ivBuildingIcon"
                 app:layout_constraintEnd_toStartOf="@+id/btnQuickEdit"
                 app:layout_constraintStart_toEndOf="@+id/ivBuildingIcon"
@@ -50,6 +51,10 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:src="@drawable/ic_edit"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                app:tint="?attr/colorOnSurfaceVariant"
                 app:layout_constraintBottom_toBottomOf="@+id/ivBuildingIcon"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/ivBuildingIcon"
@@ -60,6 +65,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:textAppearance="@style/TextAppearance.App.LabelBody"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="16sp"
                 app:layout_constraintTop_toBottomOf="@+id/ivBuildingIcon"
                 tools:text="Tenant: Alex Johnson" />
@@ -69,19 +76,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
+                android:textAppearance="@style/TextAppearance.App.LabelBody"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="16sp"
                 app:layout_constraintTop_toBottomOf="@+id/tvTenantName"
                 tools:text="Submeter Serial: MM101A" />
 
-            <TextView
+            <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tvStatusBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="4dp"
-                android:textColor="@android:color/white"
-                android:background="?attr/colorOnSurface"
+                android:background="?attr/colorPrimaryContainer"
+                android:textColor="?attr/colorOnPrimaryContainer"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
@@ -90,16 +99,19 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!-- Themed Divider -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#E5E5E5" />
+            android:background="?attr/colorSurfaceVariant" />
 
+        <!-- Bottom Action Row Container -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="52dp"
             android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:gravity="center_vertical"
+            android:background="?attr/colorSurface">
 
             <ImageView
                 android:id="@+id/btnActionEdit"
@@ -107,6 +119,10 @@
                 android:layout_height="24dp"
                 android:layout_weight="1"
                 android:src="@drawable/ic_edit"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                app:tint="?attr/colorPrimary"
                 tools:ignore="ContentDescription" />
 
             <ImageView
@@ -115,6 +131,10 @@
                 android:layout_height="24dp"
                 android:layout_weight="1"
                 android:src="@drawable/ic_delete"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                app:tint="?attr/colorError"
                 tools:ignore="ContentDescription" />
 
             <ImageView
@@ -123,19 +143,13 @@
                 android:layout_height="24dp"
                 android:layout_weight="1"
                 android:src="@drawable/ic_person_edit"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground"
+                app:tint="?attr/colorPrimary"
                 tools:ignore="ContentDescription" />
-
-<!--            <ImageView-->
-<!--                android:id="@+id/btnActionLink"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_height="24dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:src="@drawable/ic_link"-->
-<!--                app:tint="#1E6B65"-->
-<!--                tools:ignore="ContentDescription" />-->
 
         </LinearLayout>
 
     </LinearLayout>
-
 </com.google.android.material.card.MaterialCardView>

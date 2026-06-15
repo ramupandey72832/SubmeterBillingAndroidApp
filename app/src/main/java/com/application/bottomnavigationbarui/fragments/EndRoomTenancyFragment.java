@@ -69,7 +69,7 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
         });
 
         // Initialize display container visibility conditions based on state default checks
-        binding.llTenantDetailsContainer.setVisibility(View.GONE);
+        binding.cvTenantDetailsContainer.setVisibility(View.GONE);
 
         binding.btnCheck.setOnClickListener(v -> {
             String roomNumber = binding.etRoomNumber.getText().toString().trim();
@@ -127,9 +127,9 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
             binding.tvMobileNumber.setText(tenant.getPhoneNumber());
             binding.tvLastMeterReading.setText(String.valueOf(viewModel.getLatestMeterReading()));
 
-            binding.llTenantDetailsContainer.setVisibility(View.VISIBLE);
+            binding.cvTenantDetailsContainer.setVisibility(View.VISIBLE);
         } else {
-            binding.llTenantDetailsContainer.setVisibility(View.GONE);
+            binding.cvTenantDetailsContainer.setVisibility(View.GONE);
         }
 
         // 4. Handle successful tenancy drop loops
@@ -142,7 +142,7 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
     private void clearFormFields() {
         binding.etRoomNumber.setText("");
         binding.etEndDate.setText("");
-        binding.llTenantDetailsContainer.setVisibility(View.GONE);
+        binding.cvTenantDetailsContainer.setVisibility(View.GONE);
     }
 
     void startingDataPickerUI() {

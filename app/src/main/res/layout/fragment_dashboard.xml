@@ -24,12 +24,10 @@
             android:padding="16dp">
 
             <com.google.android.material.card.MaterialCardView
+                style="?attr/materialCardViewStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardCornerRadius="24dp"
-                app:cardElevation="0dp"
-                app:cardBackgroundColor="?attr/colorSurface">
+                android:layout_marginBottom="16dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -40,32 +38,28 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="New Reading"
-                        android:textColor="?android:attr/textColorPrimary"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
                         android:textSize="22sp"
-                        android:textStyle="bold" />
+                        android:text="New Reading" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="Scan a submeter image to generate a bill"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:textSize="14sp" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="14sp"
+                        android:text="Scan a submeter image to generate a bill" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnScanMeter"
+                        style="?attr/materialButtonStyle"
                         android:layout_width="match_parent"
                         android:layout_height="56dp"
                         android:layout_marginTop="20dp"
                         android:text="Scan Meter"
                         android:textAllCaps="false"
                         android:textSize="16sp"
-                        android:textStyle="bold"
-                        app:backgroundTint="?attr/colorPrimary"
-                        app:iconTint="?attr/colorOnPrimary"
-                        android:textColor="?attr/colorOnPrimary"
-                        app:cornerRadius="28dp"
                         app:icon="@drawable/ic_camera"
                         app:iconGravity="textStart"
                         app:iconPadding="8dp" />
@@ -78,8 +72,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
-                app:cardCornerRadius="24dp"
+                app:cardCornerRadius="20dp"
                 app:cardElevation="0dp"
+                app:strokeWidth="0dp"
                 app:cardBackgroundColor="?attr/colorPrimaryContainer">
 
                 <LinearLayout
@@ -116,14 +111,14 @@
                                 android:alpha="0.8"
                                 android:textSize="13sp" />
                             <TextView
+                                android:id="@+id/totalUnits"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:id="@+id/totalUnits"
-                                android:text="450 kWh"
                                 android:textColor="?attr/colorOnPrimaryContainer"
                                 android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:text="450 kWh" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -140,14 +135,14 @@
                                 android:alpha="0.8"
                                 android:textSize="13sp" />
                             <TextView
+                                android:id="@+id/totalBills"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:id="@+id/totalBills"
-                                android:text="12"
                                 android:textColor="?attr/colorOnPrimaryContainer"
                                 android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:text="12" />
                         </LinearLayout>
 
                         <LinearLayout
@@ -164,14 +159,14 @@
                                 android:alpha="0.8"
                                 android:textSize="13sp" />
                             <TextView
+                                android:id="@+id/totalRevenue"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="4dp"
-                                android:id="@+id/totalRevenue"
-                                android:text="₹3150"
                                 android:textColor="?attr/colorOnPrimaryContainer"
                                 android:textSize="18sp"
-                                android:textStyle="bold" />
+                                android:textStyle="bold"
+                                tools:text="₹3,150" />
                         </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
@@ -181,26 +176,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
-                android:text="Pending Bills"
-                android:textColor="?android:attr/textColorPrimary"
+                android:textAppearance="@style/TextAppearance.App.LabelTitle"
                 android:textSize="22sp"
-                android:textStyle="bold" />
+                android:text="Pending Bills" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/searchBillsLayout"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="?attr/textInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                app:boxCornerRadiusBottomEnd="16dp"
-                app:boxCornerRadiusBottomStart="16dp"
-                app:boxCornerRadiusTopEnd="16dp"
-                app:boxCornerRadiusTopStart="16dp"
-                app:boxStrokeColor="?attr/colorPrimary"
-                app:hintTextColor="?attr/colorPrimary"
                 app:startIconDrawable="@android:drawable/ic_menu_search"
-                app:startIconTint="?android:attr/textColorSecondary"
-                app:endIconMode="clear_text">
+                app:startIconTint="?attr/colorOnSurfaceVariant"
+                app:endIconMode="clear_text"
+                app:endIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etSearchBills"
@@ -221,5 +210,4 @@
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

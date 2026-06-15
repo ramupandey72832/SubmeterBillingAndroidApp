@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="?attr/colorSurface"
+    android:background="?attr/colorSurfaceVariant"
     tools:context=".fragments.MeterReadingFragment">
 
     <LinearLayout
@@ -19,10 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="New Meter Reading"
-            android:textColor="?attr/colorOnSurface"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:text="New Meter Reading" />
 
         <TextView
             android:id="@+id/tvSubtitle"
@@ -30,9 +30,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="32dp"
-            android:text="Enter current usage and rate details to calculate the utility bill."
-            android:textColor="?attr/colorOnSurface"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.App.LabelBody"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            android:text="Enter current usage and rate details to calculate the utility bill." />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,12 +44,13 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilReadingRoomNumber"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="?attr/textInputStyle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:hint="Room Number"
-                app:startIconDrawable="@drawable/ic_menu_home">
+                app:startIconDrawable="@drawable/ic_menu_home"
+                app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRoomNumber"
@@ -60,40 +62,41 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCheck"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
-                android:layout_marginTop="4dp"
                 android:text="Check"
                 android:textSize="14sp" />
         </LinearLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSubmeterNumber"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="?attr/textInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:hint="Submeter Serial Number"
-            app:startIconDrawable="@android:drawable/ic_menu_compass">
+            app:startIconDrawable="@android:drawable/ic_menu_compass"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etSubmeterSerialNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="numberDecimal"
+                android:inputType="text"
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilPreviousMeterReading"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="?attr/textInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:hint="Previous Meter Reading"
-            app:startIconDrawable="@android:drawable/ic_menu_compass">
+            app:startIconDrawable="@android:drawable/ic_menu_compass"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etPreviousMeterReading"
@@ -103,15 +106,15 @@
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
-
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilCurrentMeterReading"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="?attr/textInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:hint="Current Meter Reading"
-            app:startIconDrawable="@android:drawable/ic_menu_compass">
+            app:startIconDrawable="@android:drawable/ic_menu_compass"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etCurrentMeterReading"
@@ -124,20 +127,20 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Billing Configuration"
-            android:textColor="?attr/colorOnSurface"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
+            android:layout_marginBottom="12dp"
+            android:text="Billing Configuration" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilRatePerUnit"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="?attr/textInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Rate per Unit"
-            app:startIconDrawable="@android:drawable/ic_menu_slideshow">
+            app:startIconDrawable="@android:drawable/ic_menu_slideshow"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etRatePerUnit"
@@ -149,12 +152,13 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilFixedCharge"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="?attr/textInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="40dp"
             android:hint="Fixed Base Charge"
-            app:startIconDrawable="@android:drawable/ic_menu_add">
+            app:startIconDrawable="@android:drawable/ic_menu_add"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etFixedCharge"
@@ -166,14 +170,13 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnNext"
+            style="?attr/materialButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="Next"
             android:textSize="16sp"
-            android:textStyle="bold"
-            app:cornerRadius="8dp"
             app:icon="@android:drawable/ic_media_next"
             app:iconGravity="textEnd" />
 
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://tools.tools/"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F8F9FA"
+    android:background="?attr/colorSurfaceVariant"
     tools:context=".fragments.DeleteRoomFragment">
 
     <LinearLayout
@@ -14,16 +15,15 @@
         android:orientation="vertical"
         android:padding="24dp">
 
-        <!-- Header Section -->
         <TextView
             android:id="@+id/tvTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="Delete Room"
-            android:textColor="#D32F2F"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
+            android:textColor="?attr/colorError"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:text="Delete Room" />
 
         <TextView
             android:id="@+id/tvSubtitle"
@@ -31,48 +31,56 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginBottom="24dp"
-            android:text="Removing a room will also detach any active submeters assigned to it. This action cannot be undone."
-            android:textColor="#666666"
-            android:textSize="14sp" />
+            android:textAppearance="@style/TextAppearance.App.LabelBody"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            android:text="Removing a room will also detach any active submeters assigned to it. This action cannot be undone." />
 
-        <!-- Warning Notice Box -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="#FFEBEE"
-            android:padding="12dp"
             android:layout_marginBottom="32dp"
-            android:gravity="center_vertical">
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:cardBackgroundColor="?attr/colorErrorContainer">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@android:drawable/ic_dialog_alert"
-                app:tint="#D32F2F"
-                android:layout_marginEnd="12dp"/>
-
-            <TextView
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Warning: Proceed with caution."
-                android:textColor="#C62828"
-                android:textSize="13sp"
-                android:textStyle="bold"/>
-        </LinearLayout>
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:gravity="center_vertical">
 
-        <!-- Room Number Input to Identify -->
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@android:drawable/ic_dialog_alert"
+                    app:tint="?attr/colorOnErrorContainer"
+                    android:layout_marginEnd="12dp"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textAppearance="@style/TextAppearance.App.LabelTitle"
+                    android:textColor="?attr/colorOnErrorContainer"
+                    android:textSize="13sp"
+                    android:text="Warning: Proceed with caution." />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilDeleteRoomNumber"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="?attr/textInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
             android:hint="Enter Room Number to Delete"
             app:startIconDrawable="@drawable/ic_menu_home"
-            app:boxStrokeColor="#D32F2F"
-            app:hintTextColor="#D32F2F">
+            app:startIconTint="?attr/colorOnSurfaceVariant"
+            app:boxStrokeErrorColor="?attr/colorError"
+            app:errorIconTint="?attr/colorError">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etDeleteRoomNumber"
@@ -82,15 +90,15 @@
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Safety Confirmation Input (Optional but recommended for UX) -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilConfirmDelete"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            style="?attr/textInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
             android:hint="Type 'DELETE' to confirm"
-            app:startIconDrawable="@android:drawable/ic_menu_edit">
+            app:startIconDrawable="@android:drawable/ic_menu_edit"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/etConfirmDelete"
@@ -100,34 +108,33 @@
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <!-- Action Buttons Layout -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Delete Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDeleteRoom"
+                style="@style/Widget.Material3.Button.ElevatedButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Permanently Delete Room"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                app:backgroundTint="#D32F2F"
-                app:cornerRadius="8dp"
+                android:textColor="?attr/colorOnError"
+                app:backgroundTint="?attr/colorError"
+                app:cornerRadius="24dp"
                 android:layout_marginBottom="12dp"/>
 
-            <!-- Cancel Button -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
-                style="@style/Widget.MaterialComponents.Button.TextButton"
+                style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:text="Cancel"
-                android:textColor="#666666"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="16sp" />
         </LinearLayout>
 
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

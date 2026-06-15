@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7F8"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="?attr/colorSurfaceVariant"
+    tools:context=".ReportsFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -12,15 +15,16 @@
         android:orientation="vertical"
         android:padding="16dp">
 
+        <!-- Section 1 Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Export data"
-            android:textColor="#000000"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="22sp"
-            android:textStyle="bold"
+            android:text="Export Data"
             android:layout_marginBottom="12dp" />
 
+        <!-- Date Range Picker Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -34,33 +38,38 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/bg_date_picker"
+                android:backgroundTint="?attr/colorSurface"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_calendar"
-                    app:tint="?attr/colorControlNormal" />
+                    app:tint="?attr/colorOnSurfaceVariant" />
 
                 <TextView
                     android:id="@+id/tvStartDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="01-01-2026"
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.App.LabelBody"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    tools:text="01-01-2026" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="to"
-                android:textColor="#333333"
+                android:textAppearance="@style/TextAppearance.App.LabelBody"
+                android:textColor="?attr/colorOnSurfaceVariant"
                 android:textSize="14sp"
-                android:layout_marginHorizontal="12dp" />
+                android:layout_marginHorizontal="12dp"
+                android:text="to" />
 
             <LinearLayout
                 android:id="@+id/btnEndDate"
@@ -68,53 +77,56 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:background="@drawable/bg_date_picker"
+                android:backgroundTint="?attr/colorSurface"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="12dp">
+                android:padding="12dp"
+                android:clickable="true"
+                android:focusable="true">
 
                 <ImageView
                     android:layout_width="20dp"
                     android:layout_height="20dp"
                     android:src="@drawable/ic_calendar"
-                    app:tint="#555555" />
+                    app:tint="?attr/colorOnSurfaceVariant" />
 
                 <TextView
                     android:id="@+id/tvEndDate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
-                    android:text="03-02-2026"
-                    android:textColor="#000000"
-                    android:textSize="14sp" />
+                    android:textAppearance="@style/TextAppearance.App.LabelBody"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    tools:text="03-02-2026" />
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Generate Report Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGenerateReport"
+            style="?attr/materialButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="Generate Monthly Excel/CSV\nReport"
             android:textAllCaps="false"
             android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            app:backgroundTint="#126650"
-            app:cornerRadius="30dp"
             android:layout_marginBottom="28dp" />
 
+        <!-- Section 2 Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Previous Reports"
-            android:textColor="#000000"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="22sp"
-            android:textStyle="bold"
+            android:text="Previous Reports"
             android:layout_marginBottom="12dp" />
 
-        <androidx.cardview.widget.CardView
+        <!-- Previous Reports List Container -->
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
             android:layout_marginBottom="28dp">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -124,23 +136,23 @@
                 android:paddingVertical="8dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
+        <!-- Section 3 Title -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="System Database Backup"
-            android:textColor="#000000"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="22sp"
-            android:textStyle="bold"
+            android:text="System Database Backup"
             android:layout_marginBottom="12dp" />
 
-        <androidx.cardview.widget.CardView
+        <!-- Backup Action Control Card -->
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp"
-            android:layout_marginBottom="16dp">
+            android:layout_marginBottom="28dp">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -152,7 +164,7 @@
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:src="@drawable/ic_database"
-                    app:tint="?attr/colorOnSurfaceVariant"
+                    app:tint="?attr/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -163,10 +175,9 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="12dp"
                     android:layout_marginEnd="12dp"
-                    android:text="System Database Backup"
-                    android:textColor="#000000"
+                    android:textAppearance="@style/TextAppearance.App.LabelTitle"
                     android:textSize="16sp"
-                    android:textStyle="bold"
+                    android:text="System Database Backup"
                     app:layout_constraintEnd_toStartOf="@id/btnDownloadBackup"
                     app:layout_constraintStart_toEndOf="@id/ivDatabaseIcon"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -174,9 +185,10 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text="Optiome Backup"
-                    android:textColor="#666666"
+                    android:textAppearance="@style/TextAppearance.App.LabelBody"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:textSize="14sp"
+                    android:text="Optimize Backup"
                     app:layout_constraintEnd_toEndOf="@id/tvBackupTitle"
                     app:layout_constraintStart_toStartOf="@id/tvBackupTitle"
                     app:layout_constraintTop_toBottomOf="@id/tvBackupTitle" />
@@ -186,24 +198,27 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_download"
-                    app:tint="?attr/colorControlNormal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    app:tint="?attr/colorPrimary"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Generate Latest Bills Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnGenerateLatestMonthlyBillsReport"
+            style="?attr/materialButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:text="Generate All ROOM Latest Monthly Bill"
             android:textAllCaps="false"
-            android:textSize="16sp"
-            android:textColor="#FFFFFF"
-            app:backgroundTint="#126650"
-            app:cornerRadius="30dp"
-            android:layout_marginBottom="28dp" />
+            android:textSize="16sp" />
+
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

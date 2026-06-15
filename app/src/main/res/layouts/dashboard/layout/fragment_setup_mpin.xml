@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="#F8F9FA">
+    android:background="?attr/colorSurfaceVariant"
+    tools:context=".fragments.SetupMpinFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,30 +20,29 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
-            android:text="Set Security MPIN"
-            android:textColor="#212121"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="24sp"
-            android:textStyle="bold" />
+            android:text="Set Security MPIN" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="32dp"
-            android:text="Create a 4-digit secure MPIN to authorize critical management actions."
-            android:textColor="#666666"
+            android:textAppearance="@style/TextAppearance.App.LabelBody"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="14sp"
-            android:gravity="center" />
+            android:gravity="center"
+            android:text="Create a 4-digit secure MPIN to authorize critical management actions." />
 
-        <!-- ================= ROW 1: ENTER NEW MPIN ================= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Enter New MPIN"
-            android:textColor="#444444"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            android:text="Enter New MPIN" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -49,64 +51,87 @@
             android:layout_marginBottom="24dp"
             android:gravity="center">
 
-            <EditText
-                android:id="@+id/etSetupPin1"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSetupPin1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/etSetupPin2"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSetupPin2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/etSetupPin3"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSetupPin3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <EditText
-                android:id="@+id/etSetupPin4"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etSetupPin4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- ================= ROW 2: CONFIRM NEW MPIN ================= -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Confirm New MPIN"
-            android:textColor="#444444"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="14sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:layout_marginBottom="8dp"
+            android:text="Confirm New MPIN" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -115,69 +140,86 @@
             android:layout_marginBottom="48dp"
             android:gravity="center">
 
-            <!-- Confirm Digit 1 -->
-            <EditText
-                android:id="@+id/etConfirmPin1"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPin1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Confirm Digit 2 -->
-            <EditText
-                android:id="@+id/etConfirmPin2"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPin2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Confirm Digit 3 -->
-            <EditText
-                android:id="@+id/etConfirmPin3"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPin3"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Confirm Digit 4 -->
-            <EditText
-                android:id="@+id/etConfirmPin4"
+            <com.google.android.material.textfield.TextInputLayout
+                style="?attr/textInputStyle"
                 android:layout_width="56dp"
-                android:layout_height="56dp"
-                android:layout_margin="6dp"
-                android:background="@android:drawable/edit_text"
-                android:gravity="center"
-                android:inputType="numberPassword"
-                android:maxLength="1"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:layout_height="64dp"
+                android:layout_margin="4dp"
+                app:hintEnabled="false">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etConfirmPin4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="0dp"
+                    android:inputType="numberPassword"
+                    android:maxLength="1"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+            </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
-        <!-- Save Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSaveMpin"
+            style="?attr/materialButtonStyle"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:text="Save &amp; Activate MPIN"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            app:backgroundTint="#1976D2"
-            app:cornerRadius="8dp" />
+            android:textSize="16sp" />
 
     </LinearLayout>
-</ScrollView>
+</androidx.core.widget.NestedScrollView>

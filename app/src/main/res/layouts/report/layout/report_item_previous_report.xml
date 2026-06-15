@@ -2,41 +2,57 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     android:paddingHorizontal="16dp"
     android:paddingVertical="14dp">
 
+    <!-- Report File Name Display -->
     <TextView
         android:id="@+id/tvBillMonthName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="March 2026_Report.csv"
-        android:textColor="#000000"
-        android:textSize="16sp"
         android:layout_marginEnd="16dp"
+        android:textAppearance="@style/TextAppearance.App.LabelBody"
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnDownload"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="March 2026_Report.csv" />
 
+    <!-- Download Action Button -->
     <ImageView
         android:id="@+id/btnDownload"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:src="@drawable/ic_download"
-        app:tint="#126650"
         android:layout_marginEnd="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="Download Report"
+        android:src="@drawable/ic_download"
+        app:tint="?attr/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnShare"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- Share Action Button -->
     <ImageView
         android:id="@+id/btnShare"
         android:layout_width="24dp"
         android:layout_height="24dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:focusable="true"
+        android:contentDescription="Share Report"
         android:src="@drawable/ic_share"
-        app:tint="#666666"
+        app:tint="?attr/colorOnSurfaceVariant"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
