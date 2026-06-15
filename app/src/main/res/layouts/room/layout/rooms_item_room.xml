@@ -81,6 +81,7 @@
                 android:paddingHorizontal="14dp"
                 android:paddingVertical="4dp"
                 android:textColor="@android:color/white"
+                android:background="?attr/colorOnSurface"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"

@@ -4,15 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
+    android:background="?attr/colorSurfaceVariant"
     android:padding="@dimen/card_padding_normal">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/colorSurface"
-        app:cardCornerRadius="@dimen/card_corner_radius"
-        app:cardElevation="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
@@ -25,7 +23,6 @@
             android:clipChildren="false"
             android:clipToPadding="false">
 
-            <!-- Header Section -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -35,10 +32,9 @@
                     android:id="@+id/tvHeader"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Submeter &amp; Tenancy"
-                    android:textColor="?attr/colorOnSurface"
+                    android:textAppearance="@style/TextAppearance.App.LabelTitle"
                     android:textSize="@dimen/text_size_header"
-                    android:textStyle="bold" />
+                    android:text="Submeter &amp; Tenancy" />
 
                 <LinearLayout
                     android:layout_width="wrap_content"
@@ -52,30 +48,29 @@
                         android:layout_width="@dimen/status_icon_size"
                         android:layout_height="@dimen/status_icon_size"
                         android:src="@android:drawable/ic_menu_info_details"
-                        app:tint="?android:attr/textColorSecondary" />
+                        app:tint="?attr/colorOnSurfaceVariant" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/status_text_margin"
-                        android:text="Active Overview"
-                        android:textColor="?android:attr/textColorSecondary"
-                        android:textSize="@dimen/text_size_caption" />
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="@dimen/text_size_caption"
+                        android:text="Active Overview" />
                 </LinearLayout>
             </RelativeLayout>
 
-            <!-- 2x2 Action Grid -->
             <GridLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:columnCount="3"
-                android:rowCount="2"
+                android:rowCount="3"
                 android:alignmentMode="alignBounds"
                 android:rowOrderPreserved="false"
                 android:clipChildren="false"
                 android:clipToPadding="false">
 
-                <!-- Action: Add Room -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -88,29 +83,29 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
+                        android:id="@+id/addRoom"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
-                        android:id="@+id/addRoom"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
                             android:layout_width="@dimen/action_icon_size"
                             android:layout_height="@dimen/action_icon_size"
                             android:layout_gravity="center"
-                            app:tint="?attr/colorPrimary"
-                            android:src="@android:drawable/ic_menu_add" />
+                            android:src="@android:drawable/ic_menu_add"
+                            app:tint="?attr/colorPrimary" />
                     </FrameLayout>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/label_margin_top"
                         android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
                         android:text="Add Room" />
                 </LinearLayout>
 
-                <!-- Action: Add Room -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -123,29 +118,29 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
+                        android:id="@+id/deleteRoom"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
-                        android:id="@+id/deleteRoom"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
                             android:layout_width="@dimen/action_icon_size"
                             android:layout_height="@dimen/action_icon_size"
                             android:layout_gravity="center"
-                            app:tint="?attr/colorError"
-                            android:src="@android:drawable/ic_menu_delete" />
+                            android:src="@android:drawable/ic_menu_delete"
+                            app:tint="?attr/colorError" />
                     </FrameLayout>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/label_margin_top"
                         android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
                         android:text="Delete Room" />
                 </LinearLayout>
 
-                <!-- Action: Add Tenant -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -158,29 +153,29 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
+                        android:id="@+id/addTenant"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
-                        android:id="@+id/addTenant"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
                             android:layout_width="@dimen/action_icon_size"
                             android:layout_height="@dimen/action_icon_size"
                             android:layout_gravity="center"
-                            app:tint="?attr/colorPrimary"
-                            android:src="@drawable/ic_menu_btn_add" />
+                            android:src="@drawable/ic_menu_btn_add"
+                            app:tint="?attr/colorPrimary" />
                     </FrameLayout>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/label_margin_top"
                         android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
                         android:text="Add Tenant" />
                 </LinearLayout>
 
-                <!-- Action: Delete Tenant -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -193,30 +188,29 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
+                        android:id="@+id/deleteTenant"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
-                        android:id="@+id/deleteTenant"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
                             android:layout_width="@dimen/action_icon_size"
                             android:layout_height="@dimen/action_icon_size"
                             android:layout_gravity="center"
-                            app:tint="?attr/colorError"
-                            android:src="@android:drawable/ic_menu_delete" />
+                            android:src="@android:drawable/ic_menu_delete"
+                            app:tint="?attr/colorError" />
                     </FrameLayout>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/label_margin_top"
                         android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
                         android:text="Delete Tenant" />
                 </LinearLayout>
 
-
-                <!-- Action: Replace Submeter -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -229,29 +223,29 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
+                        android:id="@+id/replaceSubmeter"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
-                        android:id="@+id/replaceSubmeter"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
                             android:layout_width="@dimen/action_icon_size"
                             android:layout_height="@dimen/action_icon_size"
                             android:layout_gravity="center"
-                            app:tint="?attr/colorPrimary"
-                            android:src="@android:drawable/ic_menu_delete" />
+                            android:src="@drawable/ic_refresh"
+                            app:tint="?attr/colorPrimary" />
                     </FrameLayout>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/label_margin_top"
                         android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
                         android:text="Replace Submeter" />
                 </LinearLayout>
 
-                <!-- Action: End Tenancy -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -264,30 +258,29 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
+                        android:id="@+id/endTenancy"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
-                        android:id="@+id/endTenancy"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
                             android:layout_width="@dimen/action_icon_size"
                             android:layout_height="@dimen/action_icon_size"
                             android:layout_gravity="center"
-                            app:tint="?attr/colorError"
-                            android:src="@android:drawable/ic_delete" />
+                            android:src="@drawable/ic_delete"
+                            app:tint="?attr/colorError" />
                     </FrameLayout>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/label_margin_top"
                         android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
                         android:text="End Tenancy" />
                 </LinearLayout>
 
-
-                <!-- Action: SET MPIN  -->
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
@@ -300,23 +293,24 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
+                        android:id="@+id/mpin"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
-                        android:id="@+id/mpin"
                         android:background="@drawable/bg_circle_icon"
                         android:layout_gravity="center_horizontal">
                         <ImageView
                             android:layout_width="@dimen/action_icon_size"
                             android:layout_height="@dimen/action_icon_size"
                             android:layout_gravity="center"
-                            app:tint="?attr/colorError"
-                            android:src="@android:drawable/ic_delete" />
+                            android:src="@drawable/ic_lock_idle_lock"
+                            app:tint="?attr/colorPrimary" />
                     </FrameLayout>
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/label_margin_top"
                         android:gravity="center"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
                         android:textColor="?attr/colorOnSurface"
                         android:textSize="@dimen/text_size_label"
                         android:text="SET MPIN" />
@@ -324,5 +318,5 @@
 
             </GridLayout>
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>

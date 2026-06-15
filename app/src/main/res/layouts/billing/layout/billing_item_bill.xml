@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
+<com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="?attr/materialCardViewStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    app:cardCornerRadius="16dp"
-    app:cardElevation="2dp">
+    android:layout_marginVertical="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -18,9 +17,9 @@
             android:id="@+id/tvBillNumber"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Bill #105"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="18sp"
-            android:textStyle="bold"
+            android:text="Bill #105"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -30,8 +29,9 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="(Room 101, Alex)"
+            android:textAppearance="@style/TextAppearance.App.LabelBody"
             android:textSize="16sp"
+            android:text="(Room 101, Alex)"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvBillNumber"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -41,8 +41,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:text="01 Apr 2026"
+            android:textAppearance="@style/TextAppearance.App.LabelBody"
+            android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="14sp"
+            android:text="01 Apr 2026"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvRoomAndName"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -52,9 +54,10 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="₹233"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
+            android:textColor="?attr/colorPrimary"
             android:textSize="16sp"
-            android:textStyle="bold"
+            android:text="₹233"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvDate"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -78,24 +81,17 @@
                 <ImageView
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_pdf" />
+                    android:src="@drawable/ic_pdf"
+                    app:tint="?attr/colorOnSurfaceVariant" />
 
                 <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="View Receipt"
-                android:textSize="12sp"
-                android:textStyle="bold"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.App.LabelBody"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:text="View Receipt"/>
             </LinearLayout>
-
-<!--            <TextView-->
-<!--                android:id="@+id/tvLargeAmount"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="₹680"-->
-<!--                android:textSize="18sp"-->
-<!--                android:textStyle="bold"-->
-<!--                android:visibility="gone"/>-->
         </FrameLayout>
 
         <View
@@ -103,17 +99,19 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginTop="12dp"
-            android:background="#E0E0E0"
+            android:background="?attr/colorSurfaceVariant"
             app:layout_constraintTop_toBottomOf="@id/tvAmount"/>
 
         <TextView
             android:id="@+id/paymentStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:text="paid"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@+id/divider" />
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@+id/divider"
+            app:layout_constraintStart_toStartOf="parent" />
 
         <ImageView
             android:id="@+id/btnShare"
@@ -122,8 +120,9 @@
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_share"
             android:contentDescription="Share Bill"
+            app:tint="?attr/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>

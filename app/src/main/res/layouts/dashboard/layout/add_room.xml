@@ -4,15 +4,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?android:attr/colorBackground"
+    android:background="?attr/colorSurfaceVariant"
     android:padding="@dimen/card_padding_normal">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
+        style="?attr/materialCardViewStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="?attr/colorSurface"
-        app:cardCornerRadius="@dimen/card_corner_radius"
-        app:cardElevation="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent">
@@ -23,105 +21,92 @@
             android:orientation="vertical"
             android:padding="@dimen/card_padding_large">
 
-            <!-- Title & Context Header -->
             <TextView
                 android:id="@+id/tvAddRoomTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add New Room"
-                android:textColor="?attr/colorOnSurface"
+                android:textAppearance="@style/TextAppearance.App.LabelTitle"
                 android:textSize="@dimen/text_size_header"
-                android:textStyle="bold"
+                android:text="Add New Room"
                 android:layout_marginBottom="4dp"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Configure room layout and initial submeter details."
-                android:textColor="?android:attr/textColorSecondary"
+                android:textAppearance="@style/TextAppearance.App.LabelBody"
                 android:textSize="@dimen/text_size_caption"
+                android:text="Configure room layout and initial submeter details."
                 android:layout_marginBottom="24dp"/>
 
-            <!-- Input 1: Room Number / Name -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilRoomNumber"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="?attr/textInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Room Number "
+                android:hint="Room Number"
                 app:startIconDrawable="@drawable/ic_menu_home"
-                app:startIconTint="?android:attr/textColorSecondary">
+                app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRoomNumber"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapCharacters"
-                    android:textColor="?attr/colorOnSurface"/>
+                    android:inputType="textCapCharacters" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Input 1: Room Number / Name -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilRoomType"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="?attr/textInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:hint="Room Type "
+                android:hint="Room Type"
                 app:startIconDrawable="@drawable/ic_menu_home"
-                app:startIconTint="?android:attr/textColorSecondary">
+                app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etRoomType"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapCharacters"
-                    android:textColor="?attr/colorOnSurface"/>
+                    android:inputType="textCapCharacters" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Input 2: Meter Serial Number -->
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilMeterSerial"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="?attr/textInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:hint="Meter Serial Number"
                 app:startIconDrawable="@android:drawable/ic_menu_preferences"
-                app:startIconTint="?android:attr/textColorSecondary">
+                app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etMeterSerial"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textVisiblePassword"
-                    android:textColor="?attr/colorOnSurface"/>
+                    android:inputType="textVisiblePassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/tilInitialReading"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                style="?attr/textInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="24dp"
                 android:hint="Initial Reading (kWh)"
                 app:startIconDrawable="@android:drawable/ic_menu_compass"
-                app:startIconTint="?android:attr/textColorSecondary">
+                app:startIconTint="?attr/colorOnSurfaceVariant">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etInitialReading"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:inputType="numberDecimal"
-                    android:textColor="?attr/colorOnSurface">
-
-                </com.google.android.material.textfield.TextInputEditText>
-
+                    android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Action Buttons Row -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -130,23 +115,21 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnCancel"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Cancel"
-                    android:textColor="?android:attr/textColorSecondary"
+                    android:textColor="?attr/colorOnSurfaceVariant"
                     android:layout_marginEnd="8dp"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddRoom"
-                    style="@style/Widget.MaterialComponents.Button"
+                    style="?attr/materialButtonStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="ADD Room"
-                    app:backgroundTint="?attr/colorPrimary"
-                    android:textColor="?attr/colorOnPrimary"/>
+                    android:text="ADD Room" />
             </LinearLayout>
 
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
+    </com.google.android.material.card.MaterialCardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
