@@ -1,4 +1,4 @@
-package com.github.devfrogora.service.dto.reports;
+package com.github.devfrogora.service.dto;
 
 public class SubmeterDTO {
 

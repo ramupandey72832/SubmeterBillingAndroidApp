@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,11 +18,7 @@ import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.LocalPermissionHelper;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.DatabaseSetup;
-import com.github.devfrogora.service.exception.BusinessRuleException;
-import com.github.devfrogora.service.exception.ResourceNotFoundException;
-import com.github.devfrogora.service.exception.RoomOccupiedException;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {

@@ -1,54 +1,38 @@
+// File: app/.../fragments/DeleteTenantFragment.java
 package com.application.bottomnavigationbarui.fragments;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.application.bottomnavigationbarui.R;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.application.bottomnavigationbarui.databinding.FragmentDeleteTenantBinding;
-import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
-import com.github.devfrogora.service.RoomMeterService;
-import com.github.devfrogora.service.TenancyManagementService;
-import com.github.devfrogora.service.dto.RoomDTO;
-import com.github.devfrogora.service.dto.TenancyDTO;
+import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
-
-import java.sql.SQLException;
-import java.util.Optional;
-
+import com.github.devfrogora.service.viewmodel.TenantViewModel;
 
 public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
-    private UiHelper ui;
 
-    FragmentDeleteTenantBinding binding;
+    private UiHelper ui;
+    private FragmentDeleteTenantBinding binding;
+
+    // Decoupled clean business layer coordinator
+    private TenantViewModel viewModel;
 
     public DeleteTenantFragment() {
         // Required empty public constructor
     }
 
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentDeleteTenantBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -58,61 +42,91 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(this.getContext());
 
+        // Instantiate components with explicit injection parameters
+        viewModel = new TenantViewModel(
+                new TenancyManagementServiceImpl(),
+                new RoomMeterServiceImpl(new MeterBillingServiceImpl())
+        );
+
+        // Track and render states synchronously
+        viewModel.setStateListener(new TenantViewModel.StateListener() {
+            @Override
+            public void onStateChanged() {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> renderUiState());
+                }
+            }
+        });
+
         binding.btnDeleteTenant.setOnClickListener(view1 -> {
+            String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString().trim();
+            String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString().trim();
 
-            String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString();
-            String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString();
-
-            if(tenantAadhaarNumber.isEmpty() || tenantRoomNumber.isEmpty()){
+            if (tenantAadhaarNumber.isEmpty() || tenantRoomNumber.isEmpty()) {
+                Toast.makeText(getContext(), "Please fill in all mandatory field strings.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // luanch MPIN verification dialog
-
-            // 3. LAUNCH THE POPUP DIALOG GATE HERE
+            // LAUNCH THE POPUP GATE DIALOG HERE
             VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
 
         binding.btnCancel.setOnClickListener(view1 -> {
-            binding.etTenantAadhaarNumber.setText("");
-            binding.etTenantRoomNumber.setText("");
+            clearInputs();
         });
     }
 
     @Override
     public void onMpinVerified(boolean isSuccess) {
-        if(isSuccess){
+        if (isSuccess) {
             executeDeleteTenantLogic();
         }
     }
 
     private void executeDeleteTenantLogic() {
-        String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString();
-        String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString();
+        String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString().trim();
+        String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString().trim();
 
+        // Forward deletion actions over to ViewModel operations
+        viewModel.deleteTenant(tenantAadhaarNumber, tenantRoomNumber);
+    }
 
-        TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
-        RoomMeterService roomMeterService = new RoomMeterServiceImpl();
-        try {
-            boolean isRoomExist = roomMeterService.isRoomExist(tenantRoomNumber);
-            if(isRoomExist){
+    /**
+     * Re-evaluates primitive flags on updates and updates UI elements.
+     */
+    private void renderUiState() {
+        // 1. Manage layout click handling criteria when processing actions
+        binding.btnDeleteTenant.setEnabled(!viewModel.isLoading());
+        binding.btnCancel.setEnabled(!viewModel.isLoading());
 
-                TenancyDTO tenancyDTO = tenancyManagementService.findActiveTenancyByTenantAadhar(tenantAadhaarNumber);
-
-                if(tenancyDTO != null){
-                    Toast.makeText(getContext(), "Tenant is using room " + tenancyDTO.getRoomNumber(), Toast.LENGTH_SHORT).show();
-                }else{
-                    if(tenancyDTO.getRoomNumber().equals(tenantRoomNumber)){
-                        tenancyManagementService.deleteTenantIfNoActiveTenancy(tenantAadhaarNumber);
-                        Toast.makeText(getContext(), "Tenant successfully removed", Toast.LENGTH_SHORT).show();
-                    }else{
-                        Toast.makeText(getContext(), "Tenant have Active Tenancy but not this room: " + tenancyDTO.getRoomNumber(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        } catch(Exception e){
-            ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+        // 2. Intercept structural failures and project them using ErrorUtils layout mechanics
+        if (viewModel.getErrorMessage() != null) {
+            ErrorUtils.handleDatabaseException(
+                    "Removal Action Intercepted",
+                    new Exception(viewModel.getErrorMessage()),
+                    ui
+            );
         }
+
+        // 3. Clear data fields exclusively on confirmation from data tables
+        if (viewModel.isOperationSuccess()) {
+            if (viewModel.getFeedbackMessage() != null) {
+                Toast.makeText(getContext(), viewModel.getFeedbackMessage(), Toast.LENGTH_SHORT).show();
+            }
+            clearInputs();
+        }
+    }
+
+    private void clearInputs() {
+        binding.etTenantAadhaarNumber.setText("");
+        binding.etTenantRoomNumber.setText("");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        viewModel.setStateListener(null); // Evict callback listener pointers to prevent leaks
+        binding = null;
     }
 }

@@ -5,7 +5,6 @@ import com.github.devfrogora.data.entities.*;
 import com.github.devfrogora.data.utils.DateUtils;
 import com.github.devfrogora.service.dto.BillDTO;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
-import com.github.devfrogora.service.dto.reports.SubmeterDTO;
 import com.github.devfrogora.service.exception.*;
 import com.github.devfrogora.service.MeterBillingService;
 

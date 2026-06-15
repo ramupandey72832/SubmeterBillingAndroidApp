@@ -1,3 +1,4 @@
+// File: app/.../fragments/QrScanFragment.java
 package com.application.bottomnavigationbarui;
 
 import android.net.Uri;
@@ -16,37 +17,30 @@ import com.application.bottomnavigationbarui.camera.CameraHelper;
 import com.application.bottomnavigationbarui.databinding.FragmentQrScanBinding;
 import com.application.bottomnavigationbarui.fragments.MeterReadingFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.LocalPermissionHelper;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
-import com.github.devfrogora.service.RoomMeterService;
+import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
-
-import java.sql.SQLException;
-import java.util.List;
+import com.github.devfrogora.service.viewmodel.QrScanViewModel;
 
 public class QrScanFragment extends Fragment {
 
     private static final String TAG = "QrScanFragment";
     private UiHelper ui;
-    FragmentQrScanBinding binding;
+    private FragmentQrScanBinding binding;
     private CameraHelper cameraHelper;
     private ImageButton btnFlashlight;
 
+    // Decoupled Business Presentation core coordinator
+    private QrScanViewModel viewModel;
+
+    // Keep a temporary reference to the latest image URI for fragment forwarding
+    private Uri temporaryImageUri;
+
     public QrScanFragment() {}
 
-    // 1. INITIALIZE HERE instead of onViewCreated
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        // This is safe because requireActivity() is available here,
-        // and the Activity lifecycle state is still early enough.
-    }
-
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentQrScanBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -54,33 +48,30 @@ public class QrScanFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RoomMeterService roomMeterService = new RoomMeterServiceImpl();
+        ui = new UiHelper(getContext());
+
+        // Initialize pure ViewModel with the service and its required dependency chain
+        RoomMeterServiceImpl service = new RoomMeterServiceImpl(new MeterBillingServiceImpl());
+        viewModel = new QrScanViewModel(service);
+
+        // Bind layout views directly to ViewModel state change listeners
+        viewModel.setStateListener(new QrScanViewModel.StateListener() {
+            @Override
+            public void onStateChanged() {
+                // Background operations must modify layout states on Android's Main Thread
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> renderUiState());
+                }
+            }
+        });
 
         // Initialize CameraHelper safely after view creation
         cameraHelper = new CameraHelper(new CameraHelper.QrResultListener() {
             @Override
             public void onQrDetected(String data, Uri uri) {
-                // Check if the string contains the specific substring
-                if (data != null && data.contains("ROOM_NUMBER_")) {
-                    // True: The data contains the substring
-                    Log.d("SCAN_CHECK", "Valid room data found!");
-                    // Optional: Extract just the number (301) by removing the prefix
-                    String roomNumber = data.replace("ROOM_NUMBER_", "");
-                    try {
-                        if(roomMeterService.isRoomExist(roomNumber)){
-                            sendToResultFragment(roomNumber, uri);
-                            Log.d("SCAN_CHECK", "Extracted Number: " + roomNumber);
-                        }else{
-                            ErrorUtils.handleDatabaseException("Room not found", new SQLException(), ui);
-                        }
-                    } catch (Exception e) {
-                        ErrorUtils.handleDatabaseException("Error: ", e, ui);
-                    }
-                } else {
-                    // False: Substring not found
-                    Log.w("SCAN_CHECK", "Invalid data format.");
-                }
-//                System.out.println("Data: "+data);
+                temporaryImageUri = uri;
+                // Forward raw scan text directly to the ViewModel state machine
+                viewModel.processScannedData(data);
             }
         });
 
@@ -100,9 +91,41 @@ public class QrScanFragment extends Fragment {
         }
         if (btnFlashlight != null) btnFlashlight.setOnClickListener(v -> onFlashClicked());
         if (btnRefresh != null) btnRefresh.setOnClickListener(this::refreshCamera);
+    }
 
-        // 2. CHECK PERMISSIONS HERE
-        // The helper was already safely registered in onCreate, now we just fire the check logic
+    /**
+     * Inspects current state properties inside the ViewModel and handles updates safely.
+     */
+    private void renderUiState() {
+        // 1. Toggle progress indicator or custom views during active background threads
+        if (viewModel.isLoading()) {
+            // binding.scanProgress.setVisibility(View.VISIBLE);
+        } else {
+            // binding.scanProgress.setVisibility(View.GONE);
+        }
+
+        // 2. Intercept verification exceptions or format complaints via system ErrorUtils mechanics
+        if (viewModel.getErrorMessage() != null) {
+            ErrorUtils.handleDatabaseException(
+                    "Scan Verification Aborted",
+                    new Exception(viewModel.getErrorMessage()),
+                    ui
+            );
+            // Reset the verification state so user can tap refresh and scan another asset
+            viewModel.resetVerificationState();
+        }
+
+        // 3. Navigate away exclusively on successful database/asset verification confirmation
+        if (viewModel.getVerifiedRoomNumber() != null && temporaryImageUri != null) {
+            String targetRoom = viewModel.getVerifiedRoomNumber();
+            Uri targetUri = temporaryImageUri;
+
+            // Clear tracking variables before leaving the fragment instance context
+            viewModel.resetVerificationState();
+            temporaryImageUri = null;
+
+            sendToResultFragment(targetRoom, targetUri);
+        }
     }
 
     @Override
@@ -116,7 +139,6 @@ public class QrScanFragment extends Fragment {
             }
         }
     }
-
 
     private void setupCameraPreview(@NonNull View view) {
         view.postDelayed(() -> {
@@ -143,6 +165,7 @@ public class QrScanFragment extends Fragment {
 
         androidx.camera.view.PreviewView previewView = root.findViewById(R.id.previewView);
         if (previewView != null) {
+            viewModel.resetVerificationState();
             cameraHelper.restartCamera(requireContext(), previewView, this);
             v.animate().rotationBy(360).setDuration(500).start();
         }
@@ -156,5 +179,13 @@ public class QrScanFragment extends Fragment {
 
         MeterReadingFragment resultFragment = new MeterReadingFragment();
         NavigationUtils.navigateTo(getActivity(), resultFragment, bundle);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Prevent background updates from causing crashes when switching fragments
+        viewModel.setStateListener(null);
+        binding = null;
     }
 }

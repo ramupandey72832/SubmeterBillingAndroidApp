@@ -1,11 +1,7 @@
+// File: app/.../fragments/AddTenantFragment.java
 package com.application.bottomnavigationbarui.fragments;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,12 +9,17 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
-import com.github.devfrogora.service.TenancyManagementService;
-import com.github.devfrogora.service.dto.TenantDTO;
+import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
+import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
+import com.github.devfrogora.service.viewmodel.TenantViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -26,23 +27,16 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-
 public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
     private UiHelper ui;
     private FragmentAddTenantBinding binding;
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
 
-        }
-    }
+    // Decoupled presentation core coordinator
+    private TenantViewModel viewModel;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentAddTenantBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -53,8 +47,22 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         ui = new UiHelper(this.getContext());
         startingDataPickerUI();
 
+        // Initialize pure business layer states
+        viewModel = new TenantViewModel(new TenancyManagementServiceImpl(),new RoomMeterServiceImpl(new MeterBillingServiceImpl()));
+
+        // Attach listener for processing visual recalculations safely
+        viewModel.setStateListener(new TenantViewModel.StateListener() {
+            @Override
+            public void onStateChanged() {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> renderUiState());
+                }
+            }
+        });
+
         demoTenant();
-        String[] roomNumbers = {"101", "102", "103", "201", "202"};
+
+        String[] roomNumbers = {"101", "102", "103", "201", "202"}; // fetch room Number from Data layer
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, roomNumbers);
 
         AutoCompleteTextView roomDropdown = binding.layoutAddTenant.actvRoomDropdown;
@@ -62,7 +70,6 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             String selectedRoom = parent.getItemAtPosition(position).toString();
             binding.layoutAddTenant.etRoomNumber.setText(selectedRoom);
         });
-
         roomDropdown.setAdapter(adapter);
 
         binding.layoutAddTenant.btnAddTenant.setOnClickListener(view1 -> {
@@ -74,38 +81,15 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             String roomNumber = binding.layoutAddTenant.etRoomNumber.getText().toString();
             String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
 
-            if(tenantName.isEmpty() || aadharNumber.isEmpty() || tenantMobile.isEmpty() || tenantParentMobile.isEmpty() || tenantAddress.isEmpty() || roomNumber.isEmpty() || startDate.isEmpty())
-            {
+            if (tenantName.isEmpty() || aadharNumber.isEmpty() || tenantMobile.isEmpty() ||
+                    tenantParentMobile.isEmpty() || tenantAddress.isEmpty() || roomNumber.isEmpty() || startDate.isEmpty()) {
+                Toast.makeText(getContext(), "Please complete all field requirements.", Toast.LENGTH_SHORT).show();
                 return;
             }
-            // Perform validation and save logic here
 
-            // 3. LAUNCH THE POPUP DIALOG GATE HERE
+            // LAUNCH THE SECURITY GATE DIALOG HERE
             VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
-
-        });
-    }
-
-    void startingDataPickerUI(){
-        TextInputEditText etStartDate = binding.layoutAddTenant.etStartDate;
-
-// 1. Create the Material Date Picker instance
-        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Tenant Start Date")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
-
-// 2. Open the picker when clicking the field
-        etStartDate.setOnClickListener(v -> {
-            datePicker.show(getParentFragmentManager(), "TENANT_DATE_PICKER");
-        });
-
-// 3. Format selected timestamp back to the text field
-        datePicker.addOnPositiveButtonClickListener(selectionTimestamp -> {
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            String dateString = formatter.format(new Date(selectionTimestamp));
-            etStartDate.setText(dateString);
         });
     }
 
@@ -125,31 +109,73 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         String roomNumber = binding.layoutAddTenant.etRoomNumber.getText().toString();
         String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
 
+        // Forward arguments over to ViewModel controls
+        viewModel.onboardNewTenant(tenantName, aadharNumber, tenantMobile, tenantParentMobile, tenantAddress, roomNumber, startDate);
+    }
 
-        TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
-        try {
-            TenantDTO tenantDTO = new TenantDTO();
-            tenantDTO.setName(tenantName);
-            tenantDTO.setAadharNumber(aadharNumber);
-            tenantDTO.setPhoneNumber(tenantMobile);
-            tenantDTO.setParentPhoneNumber(tenantParentMobile);
-            tenantDTO.setAddress(tenantAddress);
+    /**
+     * Evaluates state tracking updates inside the ViewModel and renders layout states
+     */
+    private void renderUiState() {
+        // 1. Toggle loading interaction gates during async routines
+        binding.layoutAddTenant.btnAddTenant.setEnabled(!viewModel.isLoading());
 
-            tenancyManagementService.addTenantWithTenancy(tenantDTO, roomNumber, startDate);
-            Toast.makeText(getContext(), "Tenant : "+tenantName+" added successfully", Toast.LENGTH_SHORT).show();
-        } catch(Exception e){
-            ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
+        // 2. Intercept engine failures and map them via central ErrorUtils helpers
+        if (viewModel.getErrorMessage() != null) {
+            ErrorUtils.handleDatabaseException("Tenancy Creation Aborted", new Exception(viewModel.getErrorMessage()), ui);
+        }
+
+        // 3. Wring out inputs exclusively upon structural commitment confirmations
+        if (viewModel.isOperationSuccess()) {
+            String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
+            Toast.makeText(getContext(), "Tenant : " + tenantName + " added successfully", Toast.LENGTH_SHORT).show();
+            clearInputs();
         }
     }
 
-    void demoTenant(){
+    private void clearInputs() {
+        binding.layoutAddTenant.etTenantName.setText("");
+        binding.layoutAddTenant.etAadharNumber.setText("");
+        binding.layoutAddTenant.etTenantMobile.setText("");
+        binding.layoutAddTenant.etTenantParentMobile.setText("");
+        binding.layoutAddTenant.etTenantAddress.setText("");
+        binding.layoutAddTenant.etRoomNumber.setText("");
+        binding.layoutAddTenant.etStartDate.setText("");
+        binding.layoutAddTenant.actvRoomDropdown.setText("", false);
+    }
+
+    void startingDataPickerUI() {
+        TextInputEditText etStartDate = binding.layoutAddTenant.etStartDate;
+
+        MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select Tenant Start Date")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build();
+
+        etStartDate.setOnClickListener(v -> {
+            datePicker.show(getChildFragmentManager(), "TENANT_DATE_PICKER");
+        });
+
+        datePicker.addOnPositiveButtonClickListener(selectionTimestamp -> {
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            String dateString = formatter.format(new Date(selectionTimestamp));
+            etStartDate.setText(dateString);
+        });
+    }
+
+    void demoTenant() {
         binding.layoutAddTenant.etTenantName.setText("Himadari");
         binding.layoutAddTenant.etAadharNumber.setText("123456789012");
         binding.layoutAddTenant.etTenantMobile.setText("1234567890");
         binding.layoutAddTenant.etTenantParentMobile.setText("9876543210");
         binding.layoutAddTenant.etTenantAddress.setText("123 Main Street");
         binding.layoutAddTenant.etRoomNumber.setText("301");
-
     }
 
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        viewModel.setStateListener(null); // Evict background updates to prevent layout memory context leaks
+        binding = null;
+    }
 }

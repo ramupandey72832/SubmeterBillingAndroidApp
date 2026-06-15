@@ -1,72 +1,46 @@
+// File: app/.../fragments/EndRoomTenancyFragment.java
 package com.application.bottomnavigationbarui.fragments;
 
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentEndRoomTenancyBinding;
-import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
-import com.github.devfrogora.service.MeterBillingService;
-import com.github.devfrogora.service.RoomMeterService;
-import com.github.devfrogora.service.TenancyManagementService;
-import com.github.devfrogora.service.dto.TenancyDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
-import com.github.devfrogora.service.dto.reports.MeterReadingDTO;
-import com.github.devfrogora.service.dto.reports.SubmeterDTO;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
+import com.github.devfrogora.service.viewmodel.TenancyViewModel;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 
-import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-/**
- * How to handle this in your Backend/Database:
- * To properly execute this function without losing data, do not run a DELETE query. Instead, update your database logic using these guidelines:
- *
- * Step 1: Update the Tenant Status: Add an is_active boolean or a status text column to your Tenant table. When this form is submitted, switch their status from Active to Archived (or Past Tenant).
- *
- * Step 2: Unlink the Room: Clear the tenant_id column from that particular Room row so the room shows up as vacant and ready for a new occupant.
- *
- * Step 3: Save the Move-Out Date: Record the date from etMoveOutDate into a lease_end_date column in your history files for future financial reporting.
- *
- * Step 4: Use a Date Picker: In your Java/Kotlin activity code, attach a MaterialDatePicker to the etMoveOutDate input field. Setting android:focusable="false" ensures the keyboard won't pop up and annoy the user when they tap the date field to open the calendar picker.
- */
-public class EndRoomTenancyFragment extends Fragment  implements VerifyMpinDialogFragment.MpinVerificationListener {
+public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
-    FragmentEndRoomTenancyBinding binding;
+    private FragmentEndRoomTenancyBinding binding;
     private UiHelper ui;
+
+    // Decoupled Business Presentation layer
+    private TenancyViewModel viewModel;
 
     public EndRoomTenancyFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-
-        }
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentEndRoomTenancyBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
@@ -77,97 +51,123 @@ public class EndRoomTenancyFragment extends Fragment  implements VerifyMpinDialo
         ui = new UiHelper(this.getContext());
         startingDataPickerUI();
 
-        binding.llTenantDetailsContainer.setVisibility(View.GONE);
-        // TODO Show Caution to user: please check latest Reading Before Terminating Tenancy ;
-       // and Remove Final Reading from here
+        // 1. Initialize ViewModel with its required operational services injected
+        viewModel = new TenancyViewModel(
+                new TenancyManagementServiceImpl(),
+                new RoomMeterServiceImpl(new MeterBillingServiceImpl()),
+                new MeterBillingServiceImpl()
+        );
 
-
-        binding.btnCheck.setOnClickListener(view1 -> {
-            String roomNumber =  binding.etRoomNumber.getText().toString();
-            if(roomNumber.isEmpty()){
-                //TODO show empty error
-
-                return;
-            }
-            TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
-            try {
-                binding.llTenantDetailsContainer.setVisibility(View.VISIBLE);
-                TenancyDTO tenancyDTO = tenancyManagementService.findActiveTenancyByRoomNumber(roomNumber);
-                if(tenancyDTO == null){
-                    return;
+        // 2. Wire up state tracking listener
+        viewModel.setStateListener(new TenancyViewModel.StateListener() {
+            @Override
+            public void onStateChanged() {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> renderUiState());
                 }
-                tenancyManagementService.findTenantByAadhar(tenancyDTO.getTenantAaddhar()).ifPresentOrElse(tenantDTO -> {
-                            binding.tvTenantName.setText(tenantDTO.getName());
-                            binding.tvAadhaarNumber.setText(tenantDTO.getAadharNumber());
-                            binding.tvMobileNumber.setText(tenantDTO.getPhoneNumber());
-                        }, () -> {
-                        // show error , not tenant is present in that room
-                    Toast.makeText(getContext(), "Tenant not found", Toast.LENGTH_SHORT).show();
-
-                });
-                MeterBillingService meterReadingService = new MeterBillingServiceImpl();
-                RoomMeterService roomMeterService = new RoomMeterServiceImpl();
-                SubmeterDTO submeterDTO= roomMeterService.getSubmeterByRoomNumber(roomNumber);
-                double latestReading = meterReadingService.getLatestReading(submeterDTO.getMeterSerialNumber());
-
-                binding.tvLastMeterReading.setText(String.valueOf(latestReading));
-            }catch (Exception e){}
+            }
         });
 
+        // Initialize display container visibility conditions based on state default checks
+        binding.llTenantDetailsContainer.setVisibility(View.GONE);
 
-        binding.btnEndTenancy.setOnClickListener(view1 -> {
-            String roomNumber =  binding.etRoomNumber.getText().toString();
-            String endDate = binding.etEndDate.getText().toString();
-            if(roomNumber.isEmpty() || endDate.isEmpty()){
+        binding.btnCheck.setOnClickListener(v -> {
+            String roomNumber = binding.etRoomNumber.getText().toString().trim();
+            viewModel.verifyAndFetchActiveTenant(roomNumber);
+        });
+
+        binding.btnEndTenancy.setOnClickListener(v -> {
+            String roomNumber = binding.etRoomNumber.getText().toString().trim();
+            String endDate = binding.etEndDate.getText().toString().trim();
+
+            if (roomNumber.isEmpty() || endDate.isEmpty()) {
+                Toast.makeText(getContext(), "Room number and End date are required.", Toast.LENGTH_SHORT).show();
                 return;
             }
-//            binding.etFinalReading.getText().toString();
 
-            // 3. LAUNCH THE POPUP DIALOG GATE HERE
+            // LAUNCH THE SECURITY DIALOG GATE HERE
             VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
-
-            // Crucial: UsegetChildFragmentManager() because it is being popped up from WITHIN a fragment
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
-
-
         });
     }
 
     @Override
     public void onMpinVerified(boolean isSuccess) {
         if (isSuccess) {
-            TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
-            try {
+            String roomNumber = binding.etRoomNumber.getText().toString().trim();
+            String endDate = binding.etEndDate.getText().toString().trim();
 
-                String roomNumber =  binding.etRoomNumber.getText().toString();
-                String endDate = binding.etEndDate.getText().toString();
-                tenancyManagementService.terminateTenancyOfRoom(roomNumber,endDate);
-
-            } catch (Exception e) {
-                ErrorUtils.handleDatabaseException("Error : ", e, ui);
-            }
+            // Forward execution request down to business state machine safely
+            viewModel.terminateTenancy(roomNumber, endDate);
         }
     }
 
-    void startingDataPickerUI(){
-        TextInputEditText etStartDate = binding.etEndDate;
+    /**
+     * Single source of truth rendering procedure for this layout screen.
+     */
+    private void renderUiState() {
+        // 1. Toggle interaction lock state during async actions
+        binding.btnCheck.setEnabled(!viewModel.isLoading());
+        binding.btnEndTenancy.setEnabled(!viewModel.isLoading());
 
-// 1. Create the Material Date Picker instance
+        // 2. Capture and route any service layer exceptions safely through your system ErrorUtils helper
+        if (viewModel.getErrorMessage() != null) {
+            ErrorUtils.handleDatabaseException(
+                    "Operation Error",
+                    new Exception(viewModel.getErrorMessage()),
+                    ui
+            );
+        }
+
+        // 3. Populate container details if valid tenant configurations are present
+        if (viewModel.areDetailsLoaded() && viewModel.getLoadedTenant() != null) {
+            TenantDTO tenant = viewModel.getLoadedTenant();
+            binding.tvTenantName.setText(tenant.getName());
+            binding.tvAadhaarNumber.setText(tenant.getAadharNumber());
+            binding.tvMobileNumber.setText(tenant.getPhoneNumber());
+            binding.tvLastMeterReading.setText(String.valueOf(viewModel.getLatestMeterReading()));
+
+            binding.llTenantDetailsContainer.setVisibility(View.VISIBLE);
+        } else {
+            binding.llTenantDetailsContainer.setVisibility(View.GONE);
+        }
+
+        // 4. Handle successful tenancy drop loops
+        if (viewModel.isTerminationSuccess()) {
+            Toast.makeText(getContext(), "Tenancy successfully terminated.", Toast.LENGTH_LONG).show();
+            clearFormFields();
+        }
+    }
+
+    private void clearFormFields() {
+        binding.etRoomNumber.setText("");
+        binding.etEndDate.setText("");
+        binding.llTenantDetailsContainer.setVisibility(View.GONE);
+    }
+
+    void startingDataPickerUI() {
+        TextInputEditText etEndDate = binding.etEndDate;
+
         MaterialDatePicker<Long> datePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Select Tenant Start Date")
+                .setTitleText("Select Termination End Date")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build();
 
-// 2. Open the picker when clicking the field
-        etStartDate.setOnClickListener(v -> {
-            datePicker.show(getParentFragmentManager(), "TENANT_DATE_PICKER");
+        etEndDate.setOnClickListener(v -> {
+            datePicker.show(getChildFragmentManager(), "TENANT_DATE_PICKER");
         });
 
-// 3. Format selected timestamp back to the text field
         datePicker.addOnPositiveButtonClickListener(selectionTimestamp -> {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
             String dateString = formatter.format(new Date(selectionTimestamp));
-            etStartDate.setText(dateString);
+            etEndDate.setText(dateString);
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        viewModel.setStateListener(null); // Prevent leaks
+        binding = null;
     }
 }

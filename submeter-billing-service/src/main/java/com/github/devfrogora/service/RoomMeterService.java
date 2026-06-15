@@ -2,24 +2,58 @@ package com.github.devfrogora.service;
 
 import com.github.devfrogora.service.dto.RoomDTO;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
-import com.github.devfrogora.service.dto.reports.SubmeterDTO;
+import com.github.devfrogora.service.dto.SubmeterDTO;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+import com.github.devfrogora.service.utils.OperationResult;
+
+
 public interface RoomMeterService {
-    void addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, double meterInitialReading) throws SQLException;
-    public boolean isRoomExist(String roomNumber) throws SQLException;
-    Optional<RoomDTO> findByRoomNumber(String roomNumber) throws SQLException;
 
-    boolean isRoomVacant(String roomNumber ) throws SQLException ;
+    /**
+     * Provisions a room asset and attaches a submeter to it atomically.
+     * Reports an OperationResult containing the verified room number back to the ViewModel.
+     */
+    OperationResult<String> addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, double meterInitialReading);
 
-    public void deleteRoomIfVacant(String roomNumber) throws SQLException;
+    /**
+     * Modifies the hardware submeter serial numbers.
+     * Reports an OperationResult confirming execution status back to the ViewModel.
+     */
+    OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber);
 
+    /**
+     * Safely tears down room assets if they are currently unrented.
+     * Reports an OperationResult confirming cleanup status back to the ViewModel.
+     */
+    OperationResult<Void> deleteRoomIfVacant(String roomNumber);
+
+    /**
+     * Generates a structural room report matrix.
+     * Pure read query: exceptions are caught internally and logged/handled, returning a safe list.
+     */
     List<RoomRegistryDto> getAllRoomReport();
 
-    SubmeterDTO getSubmeterByRoomNumber(String roomNumber) throws SQLException;
+    /**
+     * Queries for a dynamic submeter payload map.
+     * Returns an empty Optional if the target database pointer is missing.
+     */
+    Optional<SubmeterDTO> getSubmeterByRoomNumber(String roomNumber);
 
-    public void updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber) throws SQLException;
+    /**
+     * Checks if a target room asset is tracked on the disk.
+     */
+    boolean isRoomExist(String roomNumber);
+
+    /**
+     * Locates a mapped Room model configuration.
+     */
+    Optional<RoomDTO> findByRoomNumber(String roomNumber);
+
+    /**
+     * Verifies lease status flags across active constraints.
+     */
+    boolean isRoomVacant(String roomNumber);
 }

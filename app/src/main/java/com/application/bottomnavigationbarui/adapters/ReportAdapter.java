@@ -12,10 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
-import com.application.bottomnavigationbarui.R;
-import com.application.bottomnavigationbarui.databinding.DashboardItemBillBinding;
 import com.application.bottomnavigationbarui.databinding.ReportItemPreviousReportBinding;
-import com.application.bottomnavigationbarui.utils.ExcelGenerator;
 import com.application.bottomnavigationbarui.utils.SimplePdfGenerator;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 

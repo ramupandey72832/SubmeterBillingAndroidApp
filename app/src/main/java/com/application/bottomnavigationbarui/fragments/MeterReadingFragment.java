@@ -1,132 +1,156 @@
+// File: app/.../fragments/MeterReadingFragment.java
 package com.application.bottomnavigationbarui.fragments;
 
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
-import com.application.bottomnavigationbarui.R;
-import com.application.bottomnavigationbarui.databinding.FragmentGenerateBillBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
-import com.github.devfrogora.service.MeterBillingService;
-import com.github.devfrogora.service.RoomMeterService;
-import com.github.devfrogora.service.TenancyManagementService;
-import com.github.devfrogora.service.dto.TenancyDTO;
-import com.github.devfrogora.service.dto.TenantDTO;
-import com.github.devfrogora.service.dto.reports.SubmeterDTO;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
-
-import java.sql.SQLException;
-import java.util.Optional;
-
+import com.github.devfrogora.service.viewmodel.MeterReadingViewModel;
 
 public class MeterReadingFragment extends Fragment {
+
     private UiHelper ui;
-    FragmentMeterReadingBinding binding;
+    private FragmentMeterReadingBinding binding;
+
+    // Pure business presentation layer coordinator
+    private MeterReadingViewModel viewModel;
 
     public MeterReadingFragment() {
         // Required empty public constructor
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentMeterReadingBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
-    private String tenantName;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(this.getContext());
 
+        // Initialize our isolated ViewModel with its background dependencies explicitly injected
+        viewModel = new MeterReadingViewModel(
+                new RoomMeterServiceImpl(new MeterBillingServiceImpl()),
+                new MeterBillingServiceImpl(),
+                new TenancyManagementServiceImpl()
+        );
+
+        // Bind layout behaviors down to structural updates
+        viewModel.setStateListener(new MeterReadingViewModel.StateListener() {
+            @Override
+            public void onStateChanged() {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> renderUiState());
+                }
+            }
+        });
+
+        // Parse explicit scanning arguments forwarded down from barcode layouts
         if (getArguments() != null) {
-            if(getArguments().containsKey("ARG_QR_DATA")){
+            if (getArguments().containsKey("ARG_QR_DATA")) {
                 String qrData = getArguments().getString("ARG_QR_DATA");
                 binding.etRoomNumber.setText(qrData);
             }
         }
+
+        // Initialize immutable visual states on loading profiles
         binding.etSubmeterSerialNumber.setEnabled(false);
         binding.etPreviousMeterReading.setEnabled(false);
         binding.etRatePerUnit.setEnabled(false);
         binding.etFixedCharge.setEnabled(false);
         binding.btnNext.setEnabled(false);
+        binding.etSubmeterSerialNumber.setText("");
 
-        RoomMeterService roomMeterService = new RoomMeterServiceImpl();
-        MeterBillingService meterBillingService = new MeterBillingServiceImpl();
-        TenancyManagementService tenancyManagementService = new TenancyManagementServiceImpl();
         binding.btnCheck.setOnClickListener(view1 -> {
-            String roomNumber = binding.etRoomNumber.getText().toString();
-            if(roomNumber.isEmpty()){
-                return;
-            }
-            try {
-                SubmeterDTO submeterDTO = roomMeterService.getSubmeterByRoomNumber(roomNumber);
-                binding.etSubmeterSerialNumber.setText(submeterDTO.getMeterSerialNumber());
-                TenancyDTO tenancyDTO = tenancyManagementService.findActiveTenancyByRoomNumber(roomNumber);
-                tenancyDTO.getTenantAaddhar();
+            String roomNumber = binding.etRoomNumber.getText().toString().trim();
+            viewModel.checkRoomDetails(roomNumber);
+        });
 
-                Optional<TenantDTO> tenantDTO = tenancyManagementService.findTenantByAadhar(tenancyDTO.getTenantAaddhar());
-                if(tenantDTO.isEmpty()){
+        binding.btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String roomNumber = binding.etRoomNumber.getText().toString().trim();
+                String submeterSerialNumber = binding.etSubmeterSerialNumber.getText().toString().trim();
+                String currentStr = binding.etCurrentMeterReading.getText().toString().trim();
+                String fixedStr = binding.etFixedCharge.getText().toString().trim();
+                String rateStr = binding.etRatePerUnit.getText().toString().trim();
+
+                if (roomNumber.isEmpty() || submeterSerialNumber.isEmpty() || currentStr.isEmpty() || fixedStr.isEmpty() || rateStr.isEmpty()) {
+                    Toast.makeText(getContext(), "Please populate all fields completely.", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                tenantName = tenantDTO.get().getName();
-                double findPreviousReading = meterBillingService.getLatestReading(submeterDTO.getMeterSerialNumber());
+                double currentMeterReading = Double.parseDouble(currentStr);
+                double previousMeterReading = viewModel.getPreviousReading(); // Read straight from state values
+                double fixedCharge = Double.parseDouble(fixedStr);
+                double ratePerUnit = Double.parseDouble(rateStr);
 
-                binding.etPreviousMeterReading.setText(Double.toString(findPreviousReading));
-                binding.etRatePerUnit.setEnabled(true);
-                binding.etFixedCharge.setEnabled(true);
-                binding.btnNext.setEnabled(true);
-            } catch (Exception e) {
-                ErrorUtils.handleDatabaseException("Error : ", e, ui);
-            }
+                // Quick client side sanity boundary check
+                if (currentMeterReading < previousMeterReading) {
+                    binding.etCurrentMeterReading.setError("Current reading cannot be lower than the previous reading!");
+                    return;
+                }
 
-        });
-        binding.etSubmeterSerialNumber.setText("");
-
-
-        binding.btnNext.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-               String roomNumber = binding.etRoomNumber.getText().toString();
-               String submeterSerialNumber = binding.etSubmeterSerialNumber.getText().toString();
-
-
-              double currentMeterReading = Double.parseDouble(binding.etCurrentMeterReading.getText().toString());
-              double previousMeterReading = Double.parseDouble(binding.etPreviousMeterReading.getText().toString());
-              double fixedCharge = Double.parseDouble(binding.etFixedCharge.getText().toString());
-              double ratePerUnit = Double.parseDouble(binding.etRatePerUnit.getText().toString());
-
-              if(roomNumber.isEmpty() || submeterSerialNumber.isEmpty() || currentMeterReading == 0 || fixedCharge < 0 || ratePerUnit == 0){
-                  return;
-              }
-
-                Fragment targetFragment =  GenerateBillFragment.newInstance(roomNumber, tenantName , submeterSerialNumber, currentMeterReading,
-                        previousMeterReading,  ratePerUnit, fixedCharge);
+                Fragment targetFragment = GenerateBillFragment.newInstance(
+                        roomNumber,
+                        viewModel.getTenantName(),
+                        submeterSerialNumber,
+                        currentMeterReading,
+                        previousMeterReading,
+                        ratePerUnit,
+                        fixedCharge
+                );
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
-
             }
         });
+    }
 
+    /**
+     * Inspects active state fields inside the ViewModel and renders matching visual components
+     */
+    private void renderUiState() {
+        // 1. Manage interactive locking schemas during background asynchronous sweeps
+        binding.btnCheck.setEnabled(!viewModel.isLoading());
+
+        // 2. Intercept and project exceptions using your central system ErrorUtils mechanics
+        if (viewModel.getErrorMessage() != null) {
+            ErrorUtils.handleDatabaseException("Verification Failure", new Exception(viewModel.getErrorMessage()), ui);
+        }
+
+        // 3. Unlock input variables if the data checks confirm success states
+        if (viewModel.isRoomVerified()) {
+            binding.etSubmeterSerialNumber.setText(viewModel.getMeterSerialNumber());
+            binding.etPreviousMeterReading.setText(String.valueOf(viewModel.getPreviousReading()));
+
+            binding.etRatePerUnit.setEnabled(true);
+            binding.etFixedCharge.setEnabled(true);
+            binding.btnNext.setEnabled(true);
+        } else {
+            binding.etRatePerUnit.setEnabled(false);
+            binding.etFixedCharge.setEnabled(false);
+            binding.btnNext.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        viewModel.setStateListener(null); // Terminate background listener bindings to dodge leaks
+        binding = null;
     }
 }

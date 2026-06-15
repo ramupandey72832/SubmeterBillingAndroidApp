@@ -30,7 +30,7 @@ public class Main {
         DatabaseSetup.initializeDb("jdbc:sqlite:submeter_bill.db", null, null, "org.sqlite.JDBC");
 
         // Instantiate segregated submeter tracking services
-         infraService = new RoomMeterServiceImpl();
+         infraService = new RoomMeterServiceImpl(new MeterBillingServiceImpl());
          tenantService = new TenancyManagementServiceImpl();
          billingService = new MeterBillingServiceImpl();
 
