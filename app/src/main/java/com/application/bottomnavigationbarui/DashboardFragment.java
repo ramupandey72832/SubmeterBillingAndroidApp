@@ -18,6 +18,7 @@ import com.application.bottomnavigationbarui.adapters.DashboardBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentDashboardBinding;
 import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.AddTenantFragment;
+import com.application.bottomnavigationbarui.fragments.DatabaseInspectorFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteRoomFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteTenantFragment;
 import com.application.bottomnavigationbarui.fragments.EndRoomTenancyFragment;
@@ -30,7 +31,9 @@ import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
+import com.github.devfrogora.service.utils.CryptoHelper;
 import com.github.devfrogora.service.viewmodel.DashboardViewModel;
+import com.github.devfrogora.service.viewmodel.QrScanViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,6 +113,33 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
 
         binding.dashboardSection.mpin.setOnClickListener(v ->
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new SetupMpinFragment()));
+
+         final String MY_CUSTOM_KEY = "MySecretPassphrase123!";
+
+        binding.dashboardSection.test.setOnClickListener(v -> {
+            try {
+//                // Run the cross-platform crypto helper
+//                List<String> rooms = new ArrayList<>();
+//                rooms.add("ROOM_NUMBER_301");
+//                rooms.add("ROOM_NUMBER_302");
+//                rooms.add("ROOM_NUMBER_101");
+//                rooms.add("ROOM_NUMBER_102");
+//                rooms.add("ROOM_NUMBER_103");
+//                rooms.add("ROOM_NUMBER_104");
+//                rooms.add("ROOM_NUMBER_G01");
+//                rooms.add("ROOM_NUMBER_G02");
+//
+//                for (String room : rooms) {
+//                    String encryptedBase64 = CryptoHelper.encryptToBase64(room, MY_CUSTOM_KEY);
+//                    android.util.Log.d("CryptoTest", "Encrypted string for QR: " + encryptedBase64);
+//                }
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseInspectorFragment());
+
+            } catch (Exception e) {
+                // Log the error instead of crashing the application
+                android.util.Log.e("CryptoTest", "Encryption failed", e);
+            }
+        });
 
         // Search text filtration listeners
         binding.etSearchBills.addTextChangedListener(new TextWatcher() {

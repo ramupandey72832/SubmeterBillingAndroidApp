@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/colorSurfaceVariant">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorSurface"
+        app:title="Database Inspector"
+        app:titleCentered="true"
+        app:titleTextAppearance="@style/TextAppearance.App.LabelTitle" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tableTabLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:tabMode="scrollable"
+        app:tabSelectedTextColor="?attr/colorPrimary"
+        app:tabIndicatorColor="?attr/colorPrimary"
+        app:tabTextColor="?attr/colorOnSurfaceVariant" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_margin="12dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvDatabaseTable"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:clipToPadding="false"
+                tools:listitem="@layout/item_database_row" />
+
+        </com.google.android.material.card.MaterialCardView>
+    </HorizontalScrollView>
+</LinearLayout>

@@ -2,6 +2,7 @@
 package com.github.devfrogora.service.viewmodel;
 
 import com.github.devfrogora.service.RoomMeterService;
+import com.github.devfrogora.service.utils.CryptoHelper;
 
 public class QrScanViewModel {
 
@@ -42,6 +43,9 @@ public class QrScanViewModel {
     /**
      * Parses the scanned payload and checks the database for room validity.
      */
+// Define your custom key here (Keep this exactly identical to the key used to generate the QR)
+    private static final String MY_CUSTOM_KEY = "MySecretPassphrase123!";
+
     public void processScannedData(String scannedPayload) {
         if (scannedPayload == null || scannedPayload.trim().isEmpty()) {
             this.errorMessage = "Scan Error: Empty barcode or QR code detected.";
@@ -49,25 +53,36 @@ public class QrScanViewModel {
             return;
         }
 
-        // 1. Enforce string formatting filters
-        if (!scannedPayload.contains("ROOM_NUMBER_")) {
-            this.errorMessage = "Invalid Format: Scanned code is not a valid room QR identifier.";
-            notifyUi();
-            return;
-        }
-
-        // Reset states and clear prior successful entries
         this.isLoading = true;
         this.errorMessage = null;
         this.verifiedRoomNumber = null;
         notifyUi();
 
-        // Extract raw target room number
-        String roomNumber = scannedPayload.replace("ROOM_NUMBER_", "").trim();
-
-        // 2. Perform validation and queries inside an isolated background thread
         new Thread(() -> {
             try {
+                // 1. Decode from Base64 & Decrypt using the Custom Key
+                String decryptedPayload;
+                try {
+                    decryptedPayload = CryptoHelper.decryptFromBase64(scannedPayload, MY_CUSTOM_KEY);
+                } catch (Exception e) {
+                    this.errorMessage = "Security Error: Unable to decrypt QR code data. Invalid Key or Data.";
+                    this.isLoading = false;
+                    notifyUi();
+                    return;
+                }
+
+                // 2. Validate the string formatting filters on the decrypted data
+                if (!decryptedPayload.contains("ROOM_NUMBER_")) {
+                    this.errorMessage = "Invalid Format: Scanned code is not a valid room QR identifier.";
+                    this.isLoading = false;
+                    notifyUi();
+                    return;
+                }
+
+                // Extract target room number
+                String roomNumber = decryptedPayload.replace("ROOM_NUMBER_", "").trim();
+
+                // 3. Query the room service
                 boolean isRoomExist = roomMeterService.isRoomExist(roomNumber);
 
                 if (isRoomExist) {
