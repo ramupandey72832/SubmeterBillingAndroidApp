@@ -71,9 +71,10 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
                     Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
+                String message = "Room: " + roomNumber + "\nRoom Type: " + roomType +
+                        "\nMeter Serial: " + meterSerial + "\nInitial Reading: " + initialReading;
                 // LAUNCH THE POPUP DIALOG GATE HERE
-                VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+                VerifyMpinDialogFragment dialog =  VerifyMpinDialogFragment.newInstance(message);
                 dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
             }
         });

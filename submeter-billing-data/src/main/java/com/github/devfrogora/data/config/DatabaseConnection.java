@@ -3,76 +3,81 @@ package com.github.devfrogora.data.config;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class DatabaseConnection {
-    private static DatabaseConfig activeConfig;
+    private static DatabaseConfig databaseConfig;
 
-    // A ThreadLocal wrapper ensures that every execution thread receives its own
-    // private transaction stream safely without thread racing or connection collision.
+    // ThreadLocal ensures thread-level transaction isolation during multi-statement writes
     private static final ThreadLocal<Connection> threadConnection = new ThreadLocal<>();
 
-    /**
-     * The UI layer calls this method exactly once during application startup
-     * to inject the chosen database settings.
-     */
+    // Core Fix: Maintain a singular cached reader connection to prevent raw file handle leaks
+    private static Connection sharedReaderConnection = null;
+
     public static synchronized void initialize(DatabaseConfig config) {
-        activeConfig = config;
+        databaseConfig = config;
     }
 
     /**
-     * Retrieves the database connection allocated to the current running thread.
-     * If a transaction is active, it returns the transaction connection wrapper.
+     * Safe Client-Side Connection Bridge
      */
     public static Connection getConnection() throws SQLException {
-        if (activeConfig == null) {
-            throw new IllegalStateException("Database Connection has not been initialized by the UI layer yet!");
+        if (databaseConfig == null) {
+            throw new IllegalStateException("Database Connection has not been initialized yet!");
         }
 
-        // If this thread already has an active, transactional connection, reuse it!
-        Connection conn = threadConnection.get();
-        if (conn != null && !conn.isClosed()) {
-            return conn;
+        // 1. If this thread has an active transaction open, reuse it exclusively
+        Connection transactionalConn = threadConnection.get();
+        if (transactionalConn != null && !transactionalConn.isClosed()) {
+            return transactionalConn;
         }
 
-        // Otherwise, spawn a fresh, non-transactional standalone connection
-        return createNewConnectionInstance();
+        // 2. Otherwise, route standard read actions through a single thread-safe connection instance
+        synchronized (DatabaseConnection.class) {
+            if (sharedReaderConnection == null || sharedReaderConnection.isClosed()) {
+                sharedReaderConnection = createNewConnectionInstance();
+            }
+            return sharedReaderConnection;
+        }
     }
 
     private static Connection createNewConnectionInstance() throws SQLException {
-        if (activeConfig.getDriverClassName() != null && !activeConfig.getDriverClassName().isEmpty()) {
+        if (databaseConfig.getDriverClassName() != null && !databaseConfig.getDriverClassName().isEmpty()) {
             try {
-                Class.forName(activeConfig.getDriverClassName());
+                Class.forName(databaseConfig.getDriverClassName());
             } catch (ClassNotFoundException e) {
-                throw new SQLException("Failed to find database driver: " + activeConfig.getDriverClassName(), e);
+                throw new SQLException("Failed to find database driver: " + databaseConfig.getDriverClassName(), e);
             }
         }
 
-        if (activeConfig.getUsername() != null && !activeConfig.getUsername().isEmpty()) {
-            return DriverManager.getConnection(
-                    activeConfig.getUrl(),
-                    activeConfig.getUsername(),
-                    activeConfig.getPassword()
-            );
+        Connection conn;
+        if (databaseConfig.getUsername() != null && !databaseConfig.getUsername().isEmpty()) {
+            conn = DriverManager.getConnection(databaseConfig.getUrl(), databaseConfig.getUsername(), databaseConfig.getPassword());
         } else {
-            return DriverManager.getConnection(activeConfig.getUrl());
+            conn = DriverManager.getConnection(databaseConfig.getUrl());
         }
+
+        // CRITICAL ADAPTATION STEP FOR CLIENT SYSTEMS (SQLite/SQLDroid)
+        if (databaseConfig.getUrl().contains("sqlite") || databaseConfig.getUrl().contains("sqldroid")) {
+            try (Statement stmt = conn.createStatement()) {
+                // WAL mode allows simultaneous background reads even during active transactions
+                stmt.execute("PRAGMA journal_mode=WAL;");
+                // Wait up to 5 seconds for lock releases before throwing an exception
+                stmt.execute("PRAGMA busy_timeout=5000;");
+            }
+        }
+        return conn;
     }
 
-    /**
-     * Starts an atomic transaction scope strictly tied to the calling execution thread.
-     */
     public static void beginTransaction() throws SQLException {
         Connection conn = threadConnection.get();
         if (conn == null || conn.isClosed()) {
             conn = createNewConnectionInstance();
             threadConnection.set(conn);
         }
-        conn.setAutoCommit(false); // Disables SQLite immediate auto-save processing
+        conn.setAutoCommit(false);
     }
 
-    /**
-     * Commits all modifications performed inside the current thread's transaction scope.
-     */
     public static void commitTransaction() throws SQLException {
         Connection conn = threadConnection.get();
         if (conn != null && !conn.isClosed()) {
@@ -80,15 +85,12 @@ public class DatabaseConnection {
                 conn.commit();
                 conn.setAutoCommit(true);
             } finally {
-                conn.close(); // Clean up hardware references back to OS limits
-                threadConnection.remove(); // Evict completely from Thread memory
+                conn.close();
+                threadConnection.remove(); // Evict completely from thread cache memory
             }
         }
     }
 
-    /**
-     * Discards any pending mutations safely if a business rule fails or crashes mid-flight.
-     */
     public static void rollbackTransaction() {
         Connection conn = threadConnection.get();
         try {
@@ -97,7 +99,7 @@ public class DatabaseConnection {
                 conn.setAutoCommit(true);
             }
         } catch (SQLException e) {
-            // Log rollback failure internally if required
+            // Suppressed or logged internally
         } finally {
             try {
                 if (conn != null && !conn.isClosed()) {
@@ -107,74 +109,16 @@ public class DatabaseConnection {
             threadConnection.remove(); // Safely clear out the dead thread data map
         }
     }
+
+    /**
+     * Call this inside your application's termination lifecycle hooks to release file locks cleanly
+     */
+    public static synchronized void shutdown() {
+        try {
+            if (sharedReaderConnection != null && !sharedReaderConnection.isClosed()) {
+                sharedReaderConnection.close();
+            }
+        } catch (SQLException ignored) {}
+        sharedReaderConnection = null;
+    }
 }
-
-//// Inside Desktop UI Startup Logic (e.g., JavaFX Main class)
-//
-//DatabaseConfig desktopConfig = new DatabaseConfig(
-//
-//        "jdbc:sqlite:rental_management.db",
-//
-//        null, // SQLite doesn't require a username
-//
-//        null, // SQLite doesn't require a password
-//
-//        "org.sqlite.JDBC"
-//
-//);
-//
-//
-//
-//// Inject into the data layer
-//
-//DatabaseConnection.initialize(desktopConfig);
-//
-//
-//
-//// Inside Android UI Startup Logic (e.g., MainActivity onCreate)
-//
-//String dbPath = context.getDatabasePath("rental_management.db").getAbsolutePath();
-//
-//String contextPath = context.getDatabasePath("rental_management.db").getAbsolutePath();
-//DatabaseConnection.setDatabaseUrl("jdbc:sqldroid:" + contextPath);
-//
-//DatabaseConfig androidConfig = new DatabaseConfig(
-//
-//        "jdbc:sqldroid:" + dbPath,
-//
-//        null,
-//
-//        null,
-//
-//        "org.sqldroid.SQLDroidDriver"
-//
-//);
-//
-//
-//
-//// Inject into the data layer
-//
-//DatabaseConnection.initialize(androidConfig);
-//
-//
-//
-//// Inside a Client UI setting panel connecting to a central office server
-//
-//DatabaseConfig serverConfig = new DatabaseConfig(
-//
-//        "jdbc:mysql://192.168.1.50:3306/rental_db",
-//
-//        "admin",
-//
-//        "securePassword123",
-//
-//        "com.mysql.cj.jdbc.Driver"
-//
-//);
-//
-//
-//
-//// Inject into the data layer
-//
-//DatabaseConnection.initialize(serverConfig);
-
