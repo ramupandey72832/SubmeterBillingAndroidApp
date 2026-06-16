@@ -124,8 +124,8 @@ public class Main {
         System.out.println("-----------------------------------------------------------------------------------------");
 
         // Fetch the pre-bundled data transfer collection
-        List<RoomRegistryDto> registry = infraService.getAllRoomReport();
-
+        List<RoomRegistryDto> registry = infraService.getAllRoomReport().isSuccess() ? infraService.getAllRoomReport().getData() : null;
+        if(registry == null){ return;}
         for (RoomRegistryDto dto : registry) {
             System.out.printf("%-12s | %-20s | %-20s | %-10s\n",
                     dto.getRoomNumber(), dto.getTenantName(),

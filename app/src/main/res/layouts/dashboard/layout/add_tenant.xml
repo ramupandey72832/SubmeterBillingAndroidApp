@@ -2,6 +2,7 @@
 <androidx.core.widget.NestedScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
@@ -27,7 +28,6 @@
                 android:orientation="vertical"
                 android:padding="@dimen/card_padding_large">
 
-                <!-- Header Title -->
                 <TextView
                     android:id="@+id/tvAddTenantTitle"
                     android:layout_width="wrap_content"
@@ -37,7 +37,6 @@
                     android:text="Add Tenant"
                     android:layout_marginBottom="4dp"/>
 
-                <!-- Header Subtitle / Caption -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -46,7 +45,6 @@
                     android:text="Register tenant identity details and assign room allocation."
                     android:layout_marginBottom="24dp"/>
 
-                <!-- Input: Full Name -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilTenantName"
                     style="?attr/textInputStyle"
@@ -64,7 +62,6 @@
                         android:inputType="textPersonName|textCapWords" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Input: Identification Number -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilAadharNumber"
                     style="?attr/textInputStyle"
@@ -85,7 +82,6 @@
                         android:maxLength="12" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Input: Mobile Number -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilTenantMobile"
                     style="?attr/textInputStyle"
@@ -103,25 +99,7 @@
                         android:inputType="phone" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Input: Guardian Mobile Number -->
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/tilTenantParentMobile"
-                    style="?attr/textInputStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:hint="Parent Mobile Number"
-                    app:startIconDrawable="@android:drawable/ic_menu_call"
-                    app:startIconTint="?attr/colorOnSurfaceVariant">
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etTenantParentMobile"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:inputType="phone" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <!-- Input: Permanent Address -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/tilTenantAddress"
                     style="?attr/textInputStyle"
@@ -140,7 +118,6 @@
                         android:maxLines="3" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Group Allocation Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -156,28 +133,13 @@
                         android:layout_marginEnd="8dp">
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilRoomNumber"
-                            style="?attr/textInputStyle"
+                            android:id="@+id/tilRoomDropdown"
+                            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="16dp"
                             android:hint="Room Number"
                             app:startIconDrawable="@drawable/ic_menu_home"
                             app:startIconTint="?attr/colorOnSurfaceVariant">
-
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etRoomNumber"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="textCapCharacters" />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilRoomDropdown"
-                            style="?attr/textInputStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Select Room">
 
                             <AutoCompleteTextView
                                 android:id="@+id/actvRoomDropdown"
@@ -210,7 +172,6 @@
                     </com.google.android.material.textfield.TextInputLayout>
                 </LinearLayout>
 
-                <!-- Actions Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

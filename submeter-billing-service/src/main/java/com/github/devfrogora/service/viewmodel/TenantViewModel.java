@@ -5,6 +5,10 @@ import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.TenancyManagementService;
 import com.github.devfrogora.service.dto.TenancyDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
+import com.github.devfrogora.service.utils.OperationResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TenantViewModel {
 
@@ -16,6 +20,8 @@ public class TenantViewModel {
     private String errorMessage = null;
     private boolean isOperationSuccess = false;
     private String feedbackMessage = null;
+    private List<String> roomNumbersList = new ArrayList<>();
+
 
 
     public TenantViewModel(TenancyManagementService tenancyManagementService, RoomMeterService roomMeterService) {
@@ -46,6 +52,8 @@ public class TenantViewModel {
     public String getErrorMessage() { return errorMessage; }
     public boolean isOperationSuccess() { return isOperationSuccess; }
     public String getFeedbackMessage() { return feedbackMessage; }
+    public List<String> getRoomNumbersList() { return roomNumbersList; }
+
 
     // --- UI Presentation Actions ---
 
@@ -146,6 +154,27 @@ public class TenantViewModel {
                 this.isLoading = false;
                 notifyUi();
             }
+        }).start();
+    }
+
+    public void loadAllRoomNumbers() {
+        this.isLoading = true;
+        this.errorMessage = null;
+        this.isOperationSuccess = false;
+        notifyUi();
+
+        new Thread(() -> {
+            // Invokes the service layer to get the bare list of room identifiers
+            OperationResult<List<String>> result = roomMeterService.getAllRoomNumbers();
+
+            if (result.isSuccess()) {
+                this.roomNumbersList = result.getData();
+                this.isOperationSuccess = true;
+            } else {
+                this.errorMessage = "Failed to load room numbers: " + result.getMessage();
+            }
+            this.isLoading = false;
+            notifyUi();
         }).start();
     }
 }

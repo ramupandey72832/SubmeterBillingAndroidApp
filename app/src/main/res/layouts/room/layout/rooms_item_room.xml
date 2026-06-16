@@ -119,6 +119,8 @@
                 android:layout_height="24dp"
                 android:layout_weight="1"
                 android:src="@drawable/ic_edit"
+                android:visibility="gone"
+
                 android:clickable="true"
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
@@ -135,6 +137,7 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
                 app:tint="?attr/colorError"
+                android:visibility="gone"
                 tools:ignore="ContentDescription" />
 
             <ImageView
@@ -147,6 +150,7 @@
                 android:focusable="true"
                 android:background="?attr/selectableItemBackground"
                 app:tint="?attr/colorPrimary"
+                android:visibility="gone"
                 tools:ignore="ContentDescription" />
 
         </LinearLayout>

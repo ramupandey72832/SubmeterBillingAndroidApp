@@ -34,13 +34,13 @@ public interface RoomMeterService {
      * Generates a structural room report matrix.
      * Pure read query: exceptions are caught internally and logged/handled, returning a safe list.
      */
-    List<RoomRegistryDto> getAllRoomReport();
-
+    OperationResult<List<RoomRegistryDto>> getAllRoomReport();
+    OperationResult<List<String>> getAllRoomNumbers();
     /**
      * Queries for a dynamic submeter payload map.
      * Returns an empty Optional if the target database pointer is missing.
      */
-    Optional<SubmeterDTO> getSubmeterByRoomNumber(String roomNumber);
+    OperationResult<SubmeterDTO> getSubmeterByRoomNumber(String roomNumber);
 
     /**
      * Checks if a target room asset is tracked on the disk.
@@ -50,7 +50,7 @@ public interface RoomMeterService {
     /**
      * Locates a mapped Room model configuration.
      */
-    Optional<RoomDTO> findByRoomNumber(String roomNumber);
+    OperationResult<RoomDTO> findByRoomNumber(String roomNumber);
 
     /**
      * Verifies lease status flags across active constraints.

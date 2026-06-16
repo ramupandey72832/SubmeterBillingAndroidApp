@@ -25,6 +25,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
@@ -62,13 +63,13 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
 
         demoTenant();
 
-        String[] roomNumbers = {"101", "102", "103", "201", "202"}; // fetch room Number from Data layer
+        List<String> roomNumbers = viewModel.getRoomNumbersList();  // fetch room Number from Data layer
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, roomNumbers);
 
         AutoCompleteTextView roomDropdown = binding.layoutAddTenant.actvRoomDropdown;
         roomDropdown.setOnItemClickListener((parent, view1, position, id) -> {
             String selectedRoom = parent.getItemAtPosition(position).toString();
-            binding.layoutAddTenant.etRoomNumber.setText(selectedRoom);
+            binding.layoutAddTenant.actvRoomDropdown.setText(selectedRoom);
         });
         roomDropdown.setAdapter(adapter);
 
@@ -76,13 +77,13 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
             String aadharNumber = binding.layoutAddTenant.etAadharNumber.getText().toString();
             String tenantMobile = binding.layoutAddTenant.etTenantMobile.getText().toString();
-            String tenantParentMobile = binding.layoutAddTenant.etTenantParentMobile.getText().toString();
+//            String tenantParentMobile = binding.layoutAddTenant.etTenantParentMobile.getText().toString();
             String tenantAddress = binding.layoutAddTenant.etTenantAddress.getText().toString();
-            String roomNumber = binding.layoutAddTenant.etRoomNumber.getText().toString();
+            String roomNumber = binding.layoutAddTenant.actvRoomDropdown.getText().toString();
             String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
 
-            if (tenantName.isEmpty() || aadharNumber.isEmpty() || tenantMobile.isEmpty() ||
-                    tenantParentMobile.isEmpty() || tenantAddress.isEmpty() || roomNumber.isEmpty() || startDate.isEmpty()) {
+            if (tenantName.isEmpty() || aadharNumber.isEmpty() || tenantMobile.isEmpty()
+                    || tenantAddress.isEmpty() || roomNumber.isEmpty() || startDate.isEmpty()) {
                 Toast.makeText(getContext(), "Please complete all field requirements.", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -104,13 +105,13 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
         String aadharNumber = binding.layoutAddTenant.etAadharNumber.getText().toString();
         String tenantMobile = binding.layoutAddTenant.etTenantMobile.getText().toString();
-        String tenantParentMobile = binding.layoutAddTenant.etTenantParentMobile.getText().toString();
+//        String tenantParentMobile = binding.layoutAddTenant.etTenantParentMobile.getText().toString();
         String tenantAddress = binding.layoutAddTenant.etTenantAddress.getText().toString();
-        String roomNumber = binding.layoutAddTenant.etRoomNumber.getText().toString();
+        String roomNumber = binding.layoutAddTenant.actvRoomDropdown.getText().toString();
         String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
 
         // Forward arguments over to ViewModel controls
-        viewModel.onboardNewTenant(tenantName, aadharNumber, tenantMobile, tenantParentMobile, tenantAddress, roomNumber, startDate);
+        viewModel.onboardNewTenant(tenantName, aadharNumber, tenantMobile, "tenantParentMobile", tenantAddress, roomNumber, startDate);
     }
 
     /**
@@ -137,9 +138,9 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         binding.layoutAddTenant.etTenantName.setText("");
         binding.layoutAddTenant.etAadharNumber.setText("");
         binding.layoutAddTenant.etTenantMobile.setText("");
-        binding.layoutAddTenant.etTenantParentMobile.setText("");
+//        binding.layoutAddTenant.etTenantParentMobile.setText("");
         binding.layoutAddTenant.etTenantAddress.setText("");
-        binding.layoutAddTenant.etRoomNumber.setText("");
+        binding.layoutAddTenant.actvRoomDropdown.setText("");
         binding.layoutAddTenant.etStartDate.setText("");
         binding.layoutAddTenant.actvRoomDropdown.setText("", false);
     }
@@ -167,9 +168,9 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         binding.layoutAddTenant.etTenantName.setText("Himadari");
         binding.layoutAddTenant.etAadharNumber.setText("123456789012");
         binding.layoutAddTenant.etTenantMobile.setText("1234567890");
-        binding.layoutAddTenant.etTenantParentMobile.setText("9876543210");
+//        binding.layoutAddTenant.etTenantParentMobile.setText("9876543210");
         binding.layoutAddTenant.etTenantAddress.setText("123 Main Street");
-        binding.layoutAddTenant.etRoomNumber.setText("301");
+        binding.layoutAddTenant.actvRoomDropdown.setText("301");
     }
 
     @Override

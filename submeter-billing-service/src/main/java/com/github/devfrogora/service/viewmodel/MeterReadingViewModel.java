@@ -7,6 +7,7 @@ import com.github.devfrogora.service.TenancyManagementService;
 import com.github.devfrogora.service.dto.TenancyDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.dto.SubmeterDTO;
+import com.github.devfrogora.service.utils.OperationResult;
 
 import java.util.Optional;
 
@@ -75,14 +76,14 @@ public class MeterReadingViewModel {
         new Thread(() -> {
             try {
                 // 1. Resolve hardware submeter registration payload using the Optional layout
-                Optional<SubmeterDTO> submeterOpt = roomMeterService.getSubmeterByRoomNumber(roomNumber.trim());
-                if (submeterOpt.isEmpty()) {
+                OperationResult<SubmeterDTO> submeterOpt = roomMeterService.getSubmeterByRoomNumber(roomNumber.trim());
+                if (!submeterOpt.isSuccess()) {
                     this.errorMessage = "Asset Error: No deployed submeter found for room " + roomNumber;
                     this.isLoading = false;
                     notifyUi();
                     return;
                 }
-                SubmeterDTO submeter = submeterOpt.get();
+                SubmeterDTO submeter = submeterOpt.getData();
 
                 // 2. Resolve active leasing bindings
                 TenancyDTO tenancy = tenancyManagementService.findActiveTenancyByRoomNumber(roomNumber.trim());

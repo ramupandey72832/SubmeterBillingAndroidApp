@@ -1,6 +1,10 @@
 // File: submeter-billing-service/.../service/viewmodel/TenancyViewModel.java
 package com.github.devfrogora.service.viewmodel;
 
+import com.github.devfrogora.data.dao.DaoManager;
+import com.github.devfrogora.data.entities.Room;
+import com.github.devfrogora.data.entities.Tenancy;
+import com.github.devfrogora.data.entities.Tenant;
 import com.github.devfrogora.service.TenancyManagementService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.MeterBillingService;
@@ -9,6 +13,7 @@ import com.github.devfrogora.service.dto.SubmeterDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.utils.OperationResult;
 
+import java.sql.SQLException;
 import java.util.Optional;
 
 public class TenancyViewModel {
@@ -20,6 +25,11 @@ public class TenancyViewModel {
     // Direct UI State Fields
     private boolean isLoading = false;
     private String errorMessage = null;
+
+    // Decoupled architecture data flags
+    private boolean isOperationSuccess = false;
+    private String feedbackMessage = null;
+
     private boolean isTerminationSuccess = false;
 
     // Fetched Detail Data Fields
@@ -27,11 +37,15 @@ public class TenancyViewModel {
     private double latestMeterReading = 0.0;
     private boolean detailsLoaded = false;
 
+    // Holds currently loaded tenant details for form binding
+    private TenantDTO currentEditingTenant = null;
+    private int internalTenantId = -1;
+
     public interface StateListener {
         void onStateChanged();
     }
 
-    private StateListener listener;
+    private StateListener stateListener;
 
     public TenancyViewModel(TenancyManagementService tenancyService, RoomMeterService roomMeterService, MeterBillingService meterService) {
         this.tenancyService = tenancyService;
@@ -40,12 +54,13 @@ public class TenancyViewModel {
     }
 
     public void setStateListener(StateListener listener) {
-        this.listener = listener;
+        this.stateListener = listener;
     }
 
-    private void notifyUi() {
-        if (listener != null) {
-            listener.onStateChanged();
+
+    private void notifyStateChanged() {
+        if (stateListener != null) {
+            stateListener.onStateChanged();
         }
     }
 
@@ -62,14 +77,14 @@ public class TenancyViewModel {
     public void verifyAndFetchActiveTenant(String roomNumber) {
         if (roomNumber == null || roomNumber.trim().isEmpty()) {
             this.errorMessage = "Please enter a valid room number.";
-            notifyUi();
+            notifyStateChanged();
             return;
         }
 
         this.isLoading = true;
         this.errorMessage = null;
         this.detailsLoaded = false;
-        notifyUi();
+        notifyStateChanged();
 
         new Thread(() -> {
             try {
@@ -77,7 +92,7 @@ public class TenancyViewModel {
                 if (tenancyDTO == null) {
                     this.errorMessage = "No active tenancy found for Room " + roomNumber;
                     this.isLoading = false;
-                    notifyUi();
+                    notifyStateChanged();
                     return;
                 }
 
@@ -85,14 +100,14 @@ public class TenancyViewModel {
                 if (tenantOpt.isEmpty()) {
                     this.errorMessage = "Active tenant records are missing for this tenancy profile.";
                     this.isLoading = false;
-                    notifyUi();
+                    notifyStateChanged();
                     return;
                 }
 
                 // Gather submeter details using the modern Optional signature
-                Optional<SubmeterDTO> submeterOpt = roomMeterService.getSubmeterByRoomNumber(roomNumber.trim());
-                if (submeterOpt.isPresent()) {
-                    this.latestMeterReading = meterService.getLatestReading(submeterOpt.get().getMeterSerialNumber());
+                OperationResult<SubmeterDTO> submeterOpt = roomMeterService.getSubmeterByRoomNumber(roomNumber.trim());
+                if (submeterOpt.isSuccess()) {
+                    this.latestMeterReading = meterService.getLatestReading(submeterOpt.getData().getMeterSerialNumber());
                 } else {
                     this.latestMeterReading = 0.0;
                 }
@@ -104,7 +119,7 @@ public class TenancyViewModel {
                 this.errorMessage = "Error querying tenant information: " + e.getMessage();
             } finally {
                 this.isLoading = false;
-                notifyUi();
+                notifyStateChanged();
             }
         }).start();
     }
@@ -112,14 +127,14 @@ public class TenancyViewModel {
     public void terminateTenancy(String roomNumber, String endDate) {
         if (roomNumber == null || roomNumber.trim().isEmpty() || endDate == null || endDate.trim().isEmpty()) {
             this.errorMessage = "Room number and end date are mandatory fields.";
-            notifyUi();
+            notifyStateChanged();
             return;
         }
 
         this.isLoading = true;
         this.errorMessage = null;
         this.isTerminationSuccess = false;
-        notifyUi();
+        notifyStateChanged();
 
         new Thread(() -> {
             try {
@@ -131,8 +146,98 @@ public class TenancyViewModel {
                 this.errorMessage = e.getMessage();
             } finally {
                 this.isLoading = false;
-                notifyUi();
+                notifyStateChanged();
             }
         }).start();
     }
+
+    /**
+     * Fetches current tenant profile details by Room Number asynchronously
+     */
+    public void loadTenantForRoom(String roomNumber) {
+        this.isLoading = true;
+        this.feedbackMessage = null;
+        this.currentEditingTenant = null;
+        this.internalTenantId = -1;
+        notifyStateChanged();
+
+        try {
+            Optional<Room> roomOpt = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
+            if (roomOpt.isPresent()) {
+                Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(roomOpt.get().getRoomId());
+                if (activeLease.isPresent()) {
+                    Optional<Tenant> tenantOpt = DaoManager.getTenantDao().getTenantById(activeLease.get().getTenantId());
+                    if (tenantOpt.isPresent()) {
+                        Tenant tenant = tenantOpt.get();
+                        this.internalTenantId = tenant.getTenantId();
+
+                        // Map the internal data entity cleanly into an app-visible DTO package
+                        this.currentEditingTenant = new TenantDTO(
+                                tenant.getName(),
+                                tenant.getAadharNumber(),
+                                tenant.getPhoneNumber()
+                        );
+                        this.isOperationSuccess = true;
+                    } else {
+                        this.feedbackMessage = "Tenant identity profile record missing.";
+                    }
+                } else {
+                    this.feedbackMessage = "No active occupancy found for Room " + roomNumber;
+                }
+            } else {
+                this.feedbackMessage = "Room details not found.";
+            }
+        } catch (SQLException e) {
+            this.feedbackMessage = "Database Fetch Failure: " + e.getMessage();
+        } finally {
+            this.isLoading = false;
+            notifyStateChanged();
+        }
+    }
+
+    /**
+     * Updates tenant profile data safely without breaking transactional keys
+     */
+    public void quickUpdateTenantProfile(String name, String mobile, String aaddharNumber, String address) {
+        if (internalTenantId == -1) {
+            this.feedbackMessage = "No active profile loaded to update.";
+            notifyStateChanged();
+            return;
+        }
+
+        this.isLoading = true;
+        this.isOperationSuccess = false;
+        this.feedbackMessage = null;
+        notifyStateChanged();
+
+        try {
+            Tenant tenant = DaoManager.getTenantDao().getTenantById(internalTenantId)
+                    .orElseThrow(() -> new SQLException("Tenant record mapping not found."));
+
+            // Safely mutate profile parameters
+            tenant.setName(name);
+            tenant.setPhoneNumber(mobile);
+            tenant.setAddress(address);
+            tenant.setAadharNumber(aaddharNumber);
+
+            boolean isUpdated = DaoManager.getTenantDao().updateTenant(tenant);
+            if (isUpdated) {
+                this.isOperationSuccess = true;
+                this.currentEditingTenant = null; // Clear out state payload upon processing loop completion
+                this.internalTenantId = -1;
+                this.feedbackMessage = "Tenant details updated successfully.";
+            } else {
+                this.feedbackMessage = "Storage mutation request rejected.";
+            }
+        } catch (SQLException e) {
+            this.feedbackMessage = "Database Write Failure: " + e.getMessage();
+        } finally {
+            this.isLoading = false;
+            notifyStateChanged();
+        }
+    }
+    // --- State Getters ---
+    public boolean isOperationSuccess() { return isOperationSuccess; }
+    public String getFeedbackMessage() { return feedbackMessage; }
+    public TenantDTO getCurrentEditingTenant() { return currentEditingTenant; }
 }

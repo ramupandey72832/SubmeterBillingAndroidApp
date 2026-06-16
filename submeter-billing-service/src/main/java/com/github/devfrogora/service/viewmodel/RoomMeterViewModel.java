@@ -17,6 +17,7 @@ public class RoomMeterViewModel {
     private String errorMessage = null;
     private boolean isOperationSuccess = false;
     private List<RoomRegistryDto> roomReportsList = new ArrayList<>();
+    private List<String> roomNumbersList = new ArrayList<>();
 
     // A simple, classic interface listener to notify the UI when fields change
     public interface StateListener {
@@ -44,6 +45,7 @@ public class RoomMeterViewModel {
     public String getErrorMessage() { return errorMessage; }
     public boolean isOperationSuccess() { return isOperationSuccess; }
     public List<RoomRegistryDto> getRoomReportsList() { return roomReportsList; }
+    public List<String> getRoomNumbersList() { return roomNumbersList; }
 
     // --- UI Actions ---
 
@@ -123,17 +125,40 @@ public class RoomMeterViewModel {
         this.errorMessage = null;
         notifyUi();
 
-        new Thread(() -> {
-            try {
-                // Read operations capture structural datasets safely via service handles
-                this.roomReportsList = service.getAllRoomReport();
+        new Thread(() ->  {
+            OperationResult<List<RoomRegistryDto>> result = service.getAllRoomReport();
+
+            if (result.isSuccess()) {
+                // Post payload cleanly to the main UI thread recycler data observers
+                this.roomReportsList = result.getData();
                 this.isOperationSuccess = true;
-            } catch (Exception e) {
-                this.errorMessage = "Failed to compile room inventory matrix: " + e.getMessage();
-            } {
-                this.isLoading = false;
-                notifyUi();
+            } else {
+                // Post error messages to a single-use action live event to display a Toast or Snackbar
+                this.errorMessage = "Failed to compile room inventory matrix: " + result.getMessage();
             }
+            this.isLoading = false;
+            notifyUi();
+        }).start();
+    }
+
+    public void loadAllRoomNumbers() {
+        this.isLoading = true;
+        this.errorMessage = null;
+        this.isOperationSuccess = false;
+        notifyUi();
+
+        new Thread(() -> {
+            // Invokes the service layer to get the bare list of room identifiers
+            OperationResult<List<String>> result = service.getAllRoomNumbers();
+
+            if (result.isSuccess()) {
+                this.roomNumbersList = result.getData();
+                this.isOperationSuccess = true;
+            } else {
+                this.errorMessage = "Failed to load room numbers: " + result.getMessage();
+            }
+            this.isLoading = false;
+            notifyUi();
         }).start();
     }
 }

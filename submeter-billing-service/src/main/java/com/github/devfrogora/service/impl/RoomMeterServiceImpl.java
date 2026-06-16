@@ -8,7 +8,6 @@ import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.dto.RoomDTO;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 import com.github.devfrogora.service.dto.SubmeterDTO;
-import com.github.devfrogora.service.exception.BusinessRuleException;
 import com.github.devfrogora.service.exception.ResourceNotFoundException;
 import com.github.devfrogora.service.exception.RoomOccupiedException;
 import com.github.devfrogora.service.utils.OperationResult;
@@ -17,6 +16,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class RoomMeterServiceImpl implements RoomMeterService {
 
@@ -30,7 +30,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
     @Override
     public OperationResult<String> addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, double meterInitialReading) {
         try {
-            // 1. Establish atomic transaction boundary
+            // Establish atomic transaction boundary
             DatabaseConnection.beginTransaction();
 
             Optional<Room> existingRoom = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
@@ -71,7 +71,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
                 meterBillingService.initialMeterReading(linkedMeters.get().getMeterId(), meterInitialReading, 50, 10);
             }
 
-            // 2. Commit transaction on clean processing execution loops
+            // Commit transaction on clean processing execution loops
             DatabaseConnection.commitTransaction();
             return OperationResult.success(roomNumber, "Room and Submeter successfully provisioned.");
 
@@ -80,7 +80,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
             return OperationResult.failure("Verification Failure: " + e.getMessage());
         } catch (SQLException e) {
             DatabaseConnection.rollbackTransaction();
-            return OperationResult.failure("Critical Database error occurred while creating asset structures: " + e.getMessage());
+            return OperationResult.failure("Critical Database error: " + e.getMessage());
         }
     }
 
@@ -89,26 +89,21 @@ public class RoomMeterServiceImpl implements RoomMeterService {
         try {
             DatabaseConnection.beginTransaction();
 
-            // 1. Check existence
             Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                     .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " does not exist."));
 
-            // 2. Structural Constraint Verification
             Optional<Tenancy> activeTenancy = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
             if (activeTenancy.isPresent()) {
                 DatabaseConnection.rollbackTransaction();
-                // Utilizes your custom RoomOccupiedException message layout parameters cleanly
                 RoomOccupiedException exception = new RoomOccupiedException(roomNumber, activeTenancy.get().getTenantId());
                 return OperationResult.failure(exception.getMessage());
             }
 
-            // 3. Cleanup associated assets
             Optional<Submeter> linkedMeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId());
             if (linkedMeter.isPresent()) {
                 DaoManager.getSubmeterDao().deleteSubmeter(linkedMeter.get().getMeterId());
             }
 
-            // 4. Safely drop the room asset records
             boolean isDeleted = DaoManager.getRoomDao().deleteRoom(room.getRoomId());
             if (!isDeleted) {
                 DatabaseConnection.rollbackTransaction();
@@ -146,7 +141,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
                 return OperationResult.success(null, "Submeter hardware registration code successfully reassigned.");
             } else {
                 DatabaseConnection.rollbackTransaction();
-                return OperationResult.failure(new ResourceNotFoundException("Meter " + oldMeterSerialNumber + " not found.").getMessage());
+                return OperationResult.failure("Meter " + oldMeterSerialNumber + " not found.");
             }
 
         } catch (ResourceNotFoundException e) {
@@ -158,10 +153,10 @@ public class RoomMeterServiceImpl implements RoomMeterService {
         }
     }
 
-    // --- Data Query Methods (Read Operations Return Safe Payload Packages without throw blocks) ---
+    // --- Data Query Methods (Refactored to cleanly pass structural anomalies back to the ViewModel) ---
 
     @Override
-    public List<RoomRegistryDto> getAllRoomReport() {
+    public OperationResult<List<RoomRegistryDto>> getAllRoomReport() {
         List<RoomRegistryDto> registryList = new ArrayList<>();
         try {
             List<Room> rooms = DaoManager.getRoomDao().getAllRooms();
@@ -182,43 +177,64 @@ public class RoomMeterServiceImpl implements RoomMeterService {
 
                 registryList.add(new RoomRegistryDto(room.getRoomNumber(), tenantName, serialNumber, isVacant));
             }
+            return OperationResult.success(registryList, "Report dataset loaded successfully.");
         } catch (SQLException e) {
-            // Logs the explicit trace context internally via BusinessRuleException mapping
-            System.err.println(new BusinessRuleException("Error generating room registry report: " + e).getMessage());
-            // Returns the processed/empty dataset safely to maintain layout render states without a UI crash
+            // Rather than a standard system break, pass structural anomalies up to the ViewModel to handle inside your LiveData streams
+            return OperationResult.failure("Failed to read database records while compiling the report: " + e.getMessage());
         }
-        return registryList;
     }
 
     @Override
-    public Optional<SubmeterDTO> getSubmeterByRoomNumber(String roomNumber) {
+    public OperationResult<List<String>> getAllRoomNumbers() {
+        try {
+            List<String> numbers = DaoManager.getRoomDao().getAllRooms().stream()
+                    .map(Room::getRoomNumber)
+                    .collect(Collectors.toList());
+            return OperationResult.success(numbers, "Room metrics collection verified.");
+        } catch (Exception e) {
+            return OperationResult.failure("Failed to fetch room records list: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public OperationResult<SubmeterDTO> getSubmeterByRoomNumber(String roomNumber) {
         try {
             Optional<Room> roomOpt = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
             if (roomOpt.isEmpty()) {
-                return Optional.empty();
+                return OperationResult.failure("Room " + roomNumber + " does not exist.");
             }
 
-            return DaoManager.getSubmeterDao().getSubmeterByRoomId(roomOpt.get().getRoomId())
+            Optional<SubmeterDTO> dtoOpt = DaoManager.getSubmeterDao().getSubmeterByRoomId(roomOpt.get().getRoomId())
                     .map(submeter -> new SubmeterDTO(
                             submeter.getMeterId(),
                             submeter.getRoomId(),
                             submeter.getMeterSerialNumber(),
                             submeter.getInitialReading()
                     ));
+
+            if (dtoOpt.isPresent()) {
+                return OperationResult.success(dtoOpt.get(), "Submeter identity metrics compiled.");
+            } else {
+                return OperationResult.failure("No active submeter hardware attached to room " + roomNumber);
+            }
         } catch (SQLException e) {
-            System.err.println("Query Error in getSubmeterByRoomNumber: " + e.getMessage());
-            return Optional.empty();
+            return OperationResult.failure("Database lookup operation failure details: " + e.getMessage());
         }
     }
 
     @Override
-    public Optional<RoomDTO> findByRoomNumber(String roomNumber) {
+    public OperationResult<RoomDTO> findByRoomNumber(String roomNumber) {
         try {
-            return DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+            Optional<RoomDTO> roomDto = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                     .map(room -> new RoomDTO(room.getRoomNumber(), room.getRentAmount()));
+
+            if (roomDto.isPresent()) {
+                return OperationResult.success(roomDto.get(), "Room payload generated.");
+            } else {
+                return OperationResult.failure("Room number " + roomNumber + " was not found in the database system.");
+            }
         } catch (SQLException e) {
-            System.err.println("Query Error in findByRoomNumber: " + e.getMessage());
-            return Optional.empty();
+            return OperationResult.failure("Infrastructure connectivity error reading room records: " + e.getMessage());
         }
     }
 
@@ -238,7 +254,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
             if (room.isEmpty()) return true;
             return DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.get().getRoomId()).isEmpty();
         } catch (SQLException e) {
-            return true; // Safe fallback configuration on infrastructure drops
+            return true; // Fallback configuration on infrastructure drops
         }
     }
 }

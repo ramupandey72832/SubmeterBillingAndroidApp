@@ -5,6 +5,7 @@ import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
+import com.github.devfrogora.service.utils.OperationResult;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -123,8 +124,18 @@ public class ReportsViewModel {
 
         new Thread(() -> {
             try {
-                List<RoomRegistryDto> rooms = roomMeterService.getAllRoomReport();
+                List<RoomRegistryDto> rooms = null;
                 List<BillReportDto> bills = new ArrayList<>();
+                OperationResult<List<RoomRegistryDto>> result = roomMeterService.getAllRoomReport();
+
+                if (result.isSuccess()) {
+                    // Post payload cleanly to the main UI thread recycler data observers
+                    rooms = result.getData();
+                } else {
+                    // Post error messages to a single-use action live event to display a Toast or Snackbar
+                    errorMessage = result.getMessage();
+                }
+
 
                 if (rooms != null) {
                     for (RoomRegistryDto room : rooms) {
