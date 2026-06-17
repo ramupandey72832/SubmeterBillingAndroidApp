@@ -158,7 +158,8 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
                 .map(entity -> new TenantDTO(
                         entity.getName(),
                         entity.getAadharNumber(),
-                        entity.getPhoneNumber()
+                        entity.getPhoneNumber(),
+                        entity.getAddress()
                 ));
     }
 }

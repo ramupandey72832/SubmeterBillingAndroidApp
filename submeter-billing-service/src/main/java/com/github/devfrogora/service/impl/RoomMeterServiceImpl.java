@@ -226,7 +226,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
     public OperationResult<RoomDTO> findByRoomNumber(String roomNumber) {
         try {
             Optional<RoomDTO> roomDto = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
-                    .map(room -> new RoomDTO(room.getRoomNumber(), room.getRentAmount()));
+                    .map(room -> new RoomDTO(room.getRoomNumber(), room.getRentAmount(),room.getRoomType()));
 
             if (roomDto.isPresent()) {
                 return OperationResult.success(roomDto.get(), "Room payload generated.");

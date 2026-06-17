@@ -15,10 +15,11 @@ public class TenantDTO {
     // Constructors
     public TenantDTO() {}
 
-    public TenantDTO(String name, String aadharNumber, String phoneNumber) {
+    public TenantDTO(String name, String aadharNumber, String phoneNumber,String address) {
         this.name = name;
         this.aadharNumber = aadharNumber;
         this.phoneNumber = phoneNumber;
+        this.address = address;
     }
 
     // Getters and Setters

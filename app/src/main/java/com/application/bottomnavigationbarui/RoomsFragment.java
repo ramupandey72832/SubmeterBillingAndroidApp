@@ -16,7 +16,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.application.bottomnavigationbarui.adapters.RoomsAdapter;
 import com.application.bottomnavigationbarui.databinding.DialogQuickEditTenantBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentRoomsBinding;
+import com.application.bottomnavigationbarui.fragments.EditRoomAssetFragment;
+import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
@@ -126,43 +129,7 @@ public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomAction
 
     @Override
     public void onQuickEdit(RoomRegistryDto room) {
-        if (room.isVacant() || room.getTenantName().equalsIgnoreCase("N/A")) {
-            Toast.makeText(getContext(), "Cannot edit details: Room is currently vacant.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        dialogBinding = DialogQuickEditTenantBinding.inflate(LayoutInflater.from(getContext()));
-
-        editDialog = new com.google.android.material.dialog.MaterialAlertDialogBuilder(getContext())
-                .setView(dialogBinding.getRoot())
-                .create();
-
-        if (editDialog.getWindow() != null) {
-            editDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
-
-        dialogBinding.tvRoomSubtitle.setText("Room " + room.getRoomNumber() + " • Profile Lock Active");
-
-        // Ask the ViewModel to load the current details from the database safely
-        tenancyViewModel.loadTenantForRoom(room.getRoomNumber());
-
-        dialogBinding.btnSaveTenantChanges.setOnClickListener(v -> {
-            String name = dialogBinding.etEditName.getText().toString().trim();
-            String mobile = dialogBinding.etEditMobile.getText().toString().trim();
-            String aadhaarNumber = dialogBinding.etEditAadhaar.getText().toString().trim();
-            String address = dialogBinding.etEditAddress.getText().toString().trim();
-
-            if (name.isEmpty() || mobile.isEmpty()) {
-                Toast.makeText(getContext(), "Name and Mobile fields are required.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Command invocation down the lifecycle flow pipeline
-            tenancyViewModel.quickUpdateTenantProfile(name, mobile, aadhaarNumber, address);
-        });
-
-        dialogBinding.btnCancelEdit.setOnClickListener(v -> editDialog.dismiss());
-        editDialog.show();
+        NavigationUtils.replaceFragmentWithBackStack(requireActivity(), EditRoomAssetFragment.newInstance(room.getRoomNumber()));
     }
 
     @Override public void onActionEdit(RoomRegistryDto room) {}

@@ -6,10 +6,10 @@ public class RoomDTO {
     private String roomType; // e.g., "2BHK", "1RK"
     private double rentAmount;
 
-    public RoomDTO(String roomNumber, double rentAmount) {
+    public RoomDTO(String roomNumber, double rentAmount, String roomType) {
         this.roomNumber = roomNumber;
         this.rentAmount = rentAmount;
-        this.roomType = rentAmount > 10000 ? "2BHK" : "1RK"; // Logic helper
+        this.roomType = roomType;
     }
 
     // Getters and Setters
