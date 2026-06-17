@@ -19,7 +19,6 @@ import java.util.Locale;
 
 public class PdfGenerator {
 
-    // Enhanced single thermal bill dimensions (scaled slightly up for readability)
     private static final int PAGE_WIDTH = 220;
     private static final int PAGE_HEIGHT = 340;
 
@@ -28,8 +27,8 @@ public class PdfGenerator {
     private static final int A4_HEIGHT = 842;
 
     /**
-     * Generates a single A4 PDF containing up to 8 bills organized in a 2x4 grid.
-     * Typography sizes and vertical paddings have been increased significantly.
+     * Generates an A4 PDF Document with dynamic pagination,
+     * organizing exactly 8 bills per page in a 2x4 grid arrangement.
      */
     public static void generateMultipleBillsPdf(Context context, List<BillReportDto> bills) {
         if (bills == null || bills.isEmpty()) {
@@ -38,39 +37,50 @@ public class PdfGenerator {
         }
 
         PdfDocument pdfDocument = new PdfDocument();
-        PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(A4_WIDTH, A4_HEIGHT, 1).create();
-        PdfDocument.Page page = pdfDocument.startPage(pageInfo);
 
-        Canvas canvas = page.getCanvas();
-        Paint paint = new Paint();
-        paint.setAntiAlias(true);
-
-        // Grid parameters for 2 Columns x 4 Rows
+        // Grid structural tracking variables
         final int COLUMNS = 2;
-
-        // Size allocation per bill block within the A4 container
+        final int MAX_BILLS_PER_PAGE = 8;
         final int SLOT_WIDTH = A4_WIDTH / COLUMNS;  // ~297 pixels
         final int SLOT_HEIGHT = A4_HEIGHT / 4;      // ~210 pixels
 
-        // --- ENLARGED TYPOGRAPHY CONFIGURATION ---
-        final float titleTextSize = 12.0f;   // Increased from 9.5f
-        final float regularTextSize = 9.5f;  // Increased from 7.5f
-        final int leading = 11;              // Increased from 8 to support larger fonts
+        // Typography settings
+        final float titleTextSize = 12.0f;
+        final float regularTextSize = 9.5f;
+        final int leading = 11;
         final int indent = 16;
 
-        int totalBillsToPrint = Math.min(bills.size(), 8);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
 
-        for (int i = 0; i < totalBillsToPrint; i++) {
+        PdfDocument.Page currentPage = null;
+        Canvas canvas = null;
+        int pageNumber = 0;
+
+        for (int i = 0; i < bills.size(); i++) {
+            // FIXED: Dynamically instantiate a fresh page every time index strikes a multiple of 8
+            if (i % MAX_BILLS_PER_PAGE == 0) {
+                if (currentPage != null) {
+                    pdfDocument.finishPage(currentPage);
+                }
+                pageNumber++;
+                PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(A4_WIDTH, A4_HEIGHT, pageNumber).create();
+                currentPage = pdfDocument.startPage(pageInfo);
+                canvas = currentPage.getCanvas();
+            }
+
             BillReportDto bill = bills.get(i);
 
-            int col = i % COLUMNS;
-            int row = i / COLUMNS;
+            // Calculate item placement position relative to the local page index layout
+            int localIndex = i % MAX_BILLS_PER_PAGE;
+            int col = localIndex % COLUMNS;
+            int row = localIndex / COLUMNS;
 
             int offsetX = col * SLOT_WIDTH;
             int offsetY = row * SLOT_HEIGHT;
 
             int rightMarginEdge = offsetX + SLOT_WIDTH - indent;
-            int currentY = offsetY + 16; // Top margin padding
+            int currentY = offsetY + 16;
 
             // --- METADATA HEADER ---
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
@@ -79,7 +89,6 @@ public class PdfGenerator {
             paint.setColor(Color.BLACK);
             canvas.drawText("Room Number: " + bill.getRoomNumber(), offsetX + (SLOT_WIDTH / 2f), currentY, paint);
 
-            // Reset typography to enlarged regular scale
             paint.setTextAlign(Paint.Align.LEFT);
             paint.setTypeface(Typeface.MONOSPACE);
             paint.setTextSize(regularTextSize);
@@ -89,8 +98,7 @@ public class PdfGenerator {
             currentY += leading + 3;
             canvas.drawText("Bill Date: " + bill.getBillingDate(), offsetX + indent, currentY, paint);
             paint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText("Bill id:#"+bill.getBillId(), rightMarginEdge, currentY, paint);
-//            canvas.drawText(, offsetX + indent, currentY, paint);
+            canvas.drawText("Bill id:#" + bill.getBillId(), rightMarginEdge, currentY, paint);
             paint.setTextAlign(Paint.Align.LEFT);
 
             currentY += leading + 2;
@@ -143,11 +151,11 @@ public class PdfGenerator {
             currentY += leading + 3;
 
             paint.setTextAlign(Paint.Align.LEFT);
-            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD)); // Bold section total
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
             canvas.drawText("Bill Amount", offsetX + indent, currentY, paint);
             paint.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
-            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL)); // Revert
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
             currentY += 5;
 
             canvas.drawLine(offsetX + indent, currentY, rightMarginEdge, currentY, paint);
@@ -184,12 +192,11 @@ public class PdfGenerator {
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
             canvas.drawText(bill.getPaymentStatus() != null ? bill.getPaymentStatus().toUpperCase() : "UNPAID", offsetX + indent + 50, currentY, paint);
 
-
-            // Revert settings for the next slot
+            // Revert basic settings
             paint.setColor(Color.BLACK);
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
 
-            // Structural cutting lines
+            // Structural layout cutting grid lines
             paint.setColor(Color.LTGRAY);
             paint.setStrokeWidth(0.5f);
             canvas.drawLine(offsetX, offsetY + SLOT_HEIGHT, offsetX + SLOT_WIDTH, offsetY + SLOT_HEIGHT, paint);
@@ -197,16 +204,19 @@ public class PdfGenerator {
             paint.setColor(Color.BLACK);
         }
 
-        pdfDocument.finishPage(page);
+        // Close out the final remaining active page tracking container
+        if (currentPage != null) {
+            pdfDocument.finishPage(currentPage);
+        }
 
         // Save File Block
-        String fileName = "A4_Combined_8_Bills.pdf";
+        String fileName = "A4_All_Combined_Bills.pdf";
         File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File pdfFile = new File(downloadsDir, fileName);
 
         try {
             pdfDocument.writeTo(new FileOutputStream(pdfFile));
-            Toast.makeText(context, "8-Grid A4 Document Saved Successfully", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Multi-page A4 Document Saved Successfully (" + pageNumber + " Pages)", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(context, "Save Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -217,7 +227,6 @@ public class PdfGenerator {
 
     /**
      * Generates a single dedicated layout slip.
-     * All typography and visual structure components have been scaled up.
      */
     public static void generateBillPdf(Context context, BillReportDto bill) {
         PdfDocument pdfDocument = new PdfDocument();
@@ -228,23 +237,20 @@ public class PdfGenerator {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
 
-        // --- ENLARGED SINGLE SLIP TYPOGRAPHY ---
-        final float titleTextSize = 13.0f;   // Increased from 10.5f
-        final float regularTextSize = 10.0f; // Increased from 8.5f
-        final int leading = 13;              // Increased from 10
+        final float titleTextSize = 13.0f;
+        final float regularTextSize = 10.0f;
+        final int leading = 13;
         final int indent = 10;
         final int rightMarginEdge = PAGE_WIDTH - indent;
 
         int currentY = 22;
 
-        // Header Title
         paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
         paint.setTextSize(titleTextSize);
         paint.setTextAlign(Paint.Align.CENTER);
         paint.setColor(Color.BLACK);
         canvas.drawText("Room Number: " + bill.getRoomNumber(), PAGE_WIDTH / 2f, currentY, paint);
 
-        // Restoring Body configuration attributes
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.MONOSPACE);
         paint.setTextSize(regularTextSize);
@@ -262,7 +268,6 @@ public class PdfGenerator {
 
         double unitConsumed = bill.getCurrentReading() - bill.getPreviousReading();
 
-        // Calculations Data Map
         canvas.drawText("Current Reading", indent, currentY, paint);
         paint.setTextAlign(Paint.Align.RIGHT);
         canvas.drawText(String.valueOf((int)bill.getCurrentReading()), rightMarginEdge, currentY, paint);

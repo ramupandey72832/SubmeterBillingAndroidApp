@@ -1,6 +1,11 @@
 // File: submeter-billing-service/.../service/viewmodel/BillingViewModel.java
 package com.github.devfrogora.service.viewmodel;
 
+import com.github.devfrogora.data.config.DatabaseConnection;
+import com.github.devfrogora.data.dao.DaoManager;
+import com.github.devfrogora.data.dao.DbUtils;
+import com.github.devfrogora.data.entities.Bill;
+import com.github.devfrogora.data.entities.MeterReading;
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 
@@ -104,5 +109,56 @@ public class BillingViewModel {
 
         this.filteredBillList = tempFilteredList;
         notifyUi();
+    }
+
+    /**
+     * Directly pushes adjusted calculations into storage cleanly inside background execution pools
+     */
+    /**
+     * Pushes adjusted calculations into storage cleanly using inline database updates.
+     */
+    public void updateExistingBillMetrics(int billId, double currentReading, double rate, double fixed, double total) {
+        this.isLoading = true;
+        this.isOperationSuccess = false;
+        this.errorMessage = null;
+        notifyUi();
+
+        new Thread(() -> {
+            try {
+                // Open transaction boundary
+                DatabaseConnection.beginTransaction();
+
+                // 1. Fetch and update the Bill Aggregate entry
+                Bill bill =DaoManager.getBillDao().getBillById(billId)
+                        .orElseThrow(() -> new java.sql.SQLException("Bill target entity reference point missing."));
+
+                bill.setTotalAmount(total);
+                bill.setRatePerUnit(rate);
+                bill.setFixedCharge(fixed);
+                DaoManager.getBillDao().updateBill(bill);
+
+                // 2. FIX: Direct transaction update to bypass missing DAO interface methods completely
+                String sqlUpdateReading = "UPDATE MeterReading SET reading_value = ? WHERE reading_id = ?";
+                boolean readingUpdated = DbUtils.executeUpdate(
+                        sqlUpdateReading,
+                        currentReading,
+                        bill.getCurrentReadingId()
+                );
+
+                if (!readingUpdated) {
+                    throw new java.sql.SQLException("Meter reading row failed to update in database mapping.");
+                }
+
+                // Secure persist down to disk
+                DatabaseConnection.commitTransaction();
+                this.isOperationSuccess = true;
+            } catch (java.sql.SQLException e) {
+                DatabaseConnection.rollbackTransaction();
+                this.errorMessage = "Failed to modify utility parameters: " + e.getMessage();
+            } finally {
+                this.isLoading = false;
+                notifyUi();
+            }
+        }).start();
     }
 }

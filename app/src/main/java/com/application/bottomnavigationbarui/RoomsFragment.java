@@ -61,6 +61,9 @@ public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomAction
         binding.rvRooms.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new RoomsAdapter(roomList, this);
         binding.rvRooms.setAdapter(adapter);
+        binding.btnBack.setOnClickListener(view1 -> {
+            closeFragment();
+        });
 
         // Initialize Room Metrics ViewModel
         RoomMeterServiceImpl roomService = new RoomMeterServiceImpl(new MeterBillingServiceImpl());
@@ -82,6 +85,12 @@ public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomAction
 
         // Load dataset
         roomMeterViewModel.loadRoomReports();
+    }
+
+    private void closeFragment() {
+        if (getParentFragmentManager() != null) {
+            getParentFragmentManager().popBackStack(); // Clean exit animation hook
+        }
     }
 
     private void renderRoomListState() {

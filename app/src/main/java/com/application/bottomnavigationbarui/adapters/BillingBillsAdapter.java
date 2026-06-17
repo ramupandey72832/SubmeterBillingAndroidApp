@@ -20,6 +20,7 @@ public class BillingBillsAdapter extends RecyclerView.Adapter<BillingBillsAdapte
     public interface OnBillClickListener {
         void onReceiptClick(BillReportDto bill);
         void onShareClick(BillReportDto bill);
+        void onBillEditClick(BillReportDto bill);
     }
     public BillingBillsAdapter(List<BillReportDto> billList, OnBillClickListener clickListener) {
         this.billList = billList;
@@ -72,6 +73,10 @@ public class BillingBillsAdapter extends RecyclerView.Adapter<BillingBillsAdapte
             if (clickListener != null) clickListener.onReceiptClick(currentBill);
             //Todo generate Bill PDF
 
+        });
+
+        holder.binding.btnEditBill.setOnClickListener(view -> {
+            if (clickListener != null) clickListener.onBillEditClick(currentBill);
         });
 
 

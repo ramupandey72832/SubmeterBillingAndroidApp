@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentBillsBinding;
+import com.application.bottomnavigationbarui.fragments.EditBillFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.PdfGenerator;
 import com.application.bottomnavigationbarui.utils.UiHelper;
@@ -104,6 +105,23 @@ public class BillsFragment extends Fragment {
                 } catch (Exception e) {
                     ErrorUtils.handleDatabaseException("Share Command Failure", e, ui);
                 }
+            }
+
+            @Override
+            public void onBillEditClick(BillReportDto bill) {
+                // Replaced inline placeholder comment with structured safe transaction navigation sequence
+                Fragment editBillFragment = EditBillFragment.newInstance(bill);
+
+                getParentFragmentManager().beginTransaction()
+                        .setCustomAnimations(
+                                android.R.anim.fade_in,
+                                android.R.anim.fade_out,
+                                android.R.anim.slide_in_left,
+                                android.R.anim.slide_out_right
+                        )
+                        .replace(R.id.frame_layout, editBillFragment) // Maps over layout screen viewport
+                        .addToBackStack(null) // Restores back stack button navigation traces
+                        .commit();
             }
         });
 

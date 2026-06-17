@@ -2,7 +2,6 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorSurfaceVariant">
@@ -12,13 +11,14 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <!-- Unified Material 3 App Bar Navigation -->
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorSurface"
             android:elevation="0dp"
-            app:title="Edit Configuration"
+            app:title="Edit Bill Adjustments"
             app:titleCentered="true"
             app:titleTextAppearance="@style/TextAppearance.App.LabelTitle"
             app:navigationIcon="@drawable/ic_arrow_back"
@@ -36,6 +36,7 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
+                <!-- CARD 1: Core Bill Identity Details (Read-Only) -->
                 <com.google.android.material.card.MaterialCardView
                     style="?attr/materialCardViewStyle"
                     android:layout_width="match_parent"
@@ -52,92 +53,41 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.App.LabelTitle"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="?attr/colorPrimary"
-                            android:text="Room Specifications"
+                            android:text="Reference Metadata"
                             android:layout_marginBottom="12dp"/>
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilRoomNumber"
-                            style="?attr/textInputStyle"
+                        <TableLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp"
-                            android:hint="Room Number">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditRoomNumber"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="text" />
-                        </com.google.android.material.textfield.TextInputLayout>
+                            android:stretchColumns="1">
 
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilRoomType"
-                            style="?attr/textInputStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Room Type">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditRoomType"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="text" />
-                        </com.google.android.material.textfield.TextInputLayout>
+                            <TableRow android:paddingVertical="4dp">
+                                <TextView android:text="Bill Identity: " android:textStyle="bold" android:textAppearance="@style/TextAppearance.App.LabelBody"/>
+                                <TextView android:id="@+id/tvReadOnlyBillId" android:textAppearance="@style/TextAppearance.App.LabelBody" android:paddingStart="8dp"/>
+                            </TableRow>
+
+                            <TableRow android:paddingVertical="4dp">
+                                <TextView android:text="Tenant Name: " android:textStyle="bold" android:textAppearance="@style/TextAppearance.App.LabelBody"/>
+                                <TextView android:id="@+id/tvReadOnlyTenant" android:textAppearance="@style/TextAppearance.App.LabelBody" android:paddingStart="8dp"/>
+                            </TableRow>
+
+                            <TableRow android:paddingVertical="4dp">
+                                <TextView android:text="Meter Serial: " android:textStyle="bold" android:textAppearance="@style/TextAppearance.App.LabelBody"/>
+                                <TextView android:id="@+id/tvReadOnlyMeter" android:textAppearance="@style/TextAppearance.App.LabelBody" android:paddingStart="8dp"/>
+                            </TableRow>
+
+                            <TableRow android:paddingVertical="4dp">
+                                <TextView android:text="Prev Reading: " android:textStyle="bold" android:textAppearance="@style/TextAppearance.App.LabelBody"/>
+                                <TextView android:id="@+id/tvReadOnlyPrevReading" android:textAppearance="@style/TextAppearance.App.LabelBody" android:paddingStart="8dp"/>
+                            </TableRow>
+                        </TableLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- CARD 2: Interactive Financial Adjustments (Mutable) -->
                 <com.google.android.material.card.MaterialCardView
-                    style="?attr/materialCardViewStyle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textAppearance="@style/TextAppearance.App.LabelTitle"
-                            android:textSize="15sp"
-                            android:textColor="?attr/colorPrimary"
-                            android:text="Utility Submeter Asset"
-                            android:layout_marginBottom="12dp"/>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilMeterSerial"
-                            style="?attr/textInputStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp"
-                            android:hint="Meter Serial Number">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditMeterSerial"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="textCapCharacters" />
-                        </com.google.android.material.textfield.TextInputLayout>
-
-                        <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilInitialReading"
-                            style="?attr/textInputStyle"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Initial Meter Reading (kWh)">
-                            <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditInitialReading"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:inputType="numberDecimal" />
-                        </com.google.android.material.textfield.TextInputLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:id="@+id/cvTenantSection"
                     style="?attr/materialCardViewStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -153,75 +103,81 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textAppearance="@style/TextAppearance.App.LabelTitle"
-                            android:textSize="15sp"
+                            android:textSize="14sp"
                             android:textColor="?attr/colorPrimary"
-                            android:text="Occupant Information"
-                            android:layout_marginBottom="12dp"/>
+                            android:text="Mutable Computation Fields"
+                            android:layout_marginBottom="16dp"/>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilTenantName"
                             style="?attr/textInputStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="12dp"
-                            android:hint="Tenant Full Name">
+                            android:hint="Current Unit Reading (kWh)">
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditTenantName"
+                                android:id="@+id/etEditCurrentReading"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="textPersonName|textCapWords" />
+                                android:inputType="numberDecimal" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilTenantMobile"
                             style="?attr/textInputStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginBottom="12dp"
-                            android:hint="Mobile Number">
+                            android:hint="Rate Per Unit (₹)">
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditTenantMobile"
+                                android:id="@+id/etEditRatePerUnit"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="phone" />
+                                android:inputType="numberDecimal" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilTenantAadhaar"
                             style="?attr/textInputStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginBottom="12dp"
-                            android:hint="Aadhaar Number">
+                            android:layout_marginBottom="16dp"
+                            android:hint="Fixed Base Charges (₹)">
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditTenantAadhaar"
+                                android:id="@+id/etEditFixedCharges"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="number"
-                                android:maxLength="12" />
+                                android:inputType="numberDecimal" />
                         </com.google.android.material.textfield.TextInputLayout>
 
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="?attr/colorSurfaceVariant"
+                            android:layout_marginBottom="16dp"/>
+
+                        <!-- Total Computed Amount Output Display Box -->
                         <com.google.android.material.textfield.TextInputLayout
-                            android:id="@+id/tilTenantAddress"
                             style="?attr/textInputStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Permanent Address">
+                            android:hint="Calculated Grand Total Amount (₹)"
+                            app:endIconMode="clear_text">
                             <com.google.android.material.textfield.TextInputEditText
-                                android:id="@+id/etEditTenantAddress"
+                                android:id="@+id/etEditTotalAmount"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:inputType="textPostalAddress" />
+                                android:inputType="numberDecimal"
+                                android:textStyle="bold"
+                                android:textColor="?attr/colorPrimary" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Submission Control Button -->
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSaveAssetChanges"
+                    android:id="@+id/btnSaveBillChanges"
                     style="?attr/materialButtonStyle"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:text="Commit Layout &amp; Save Changes" />
+                    android:text="Update Bill Details" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </LinearLayout>

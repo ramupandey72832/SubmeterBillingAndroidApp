@@ -1,6 +1,12 @@
 package com.github.devfrogora.service.dto.reports;
 
-public class BillReportDto {
+import java.io.Serializable;
+
+// FIX: Append "implements Serializable" to the class header declaration
+public class BillReportDto implements Serializable {
+
+    // It is highly recommended to declare a stable version ID for safe serialization
+    private static final long serialVersionUID = 1L;
     private int billId;
     private String roomNumber;
     private String meterSerialNumber;

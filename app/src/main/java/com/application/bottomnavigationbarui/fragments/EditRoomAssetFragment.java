@@ -73,7 +73,7 @@ public class EditRoomAssetFragment extends Fragment {
         tenancyViewModel.loadEntireRoomAssetConfiguration(passedRoomNumber);
 
         // Cancel / Back actions
-        binding.btnBack.setOnClickListener(v -> closeFragment());
+        binding.toolbar.setNavigationOnClickListener(v -> closeFragment());
 
         binding.btnSaveAssetChanges.setOnClickListener(v -> {
             String updatedRoomNum = binding.etEditRoomNumber.getText().toString().trim();

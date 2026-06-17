@@ -2,6 +2,7 @@
 <com.google.android.material.card.MaterialCardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     style="?attr/materialCardViewStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -19,7 +20,7 @@
             android:layout_height="wrap_content"
             android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textSize="18sp"
-            android:text="Bill #105"
+            tools:text="Bill #105"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -31,7 +32,7 @@
             android:layout_marginTop="2dp"
             android:textAppearance="@style/TextAppearance.App.LabelBody"
             android:textSize="16sp"
-            android:text="(Room 101, Alex)"
+            tools:text="(Room 101, Alex)"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvBillNumber"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -44,7 +45,7 @@
             android:textAppearance="@style/TextAppearance.App.LabelBody"
             android:textColor="?attr/colorOnSurfaceVariant"
             android:textSize="14sp"
-            android:text="01 Apr 2026"
+            tools:text="01 Apr 2026"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvRoomAndName"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -57,7 +58,7 @@
             android:textAppearance="@style/TextAppearance.App.LabelTitle"
             android:textColor="?attr/colorPrimary"
             android:textSize="16sp"
-            android:text="₹233"
+            tools:text="₹233"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvDate"
             app:layout_constraintEnd_toStartOf="@id/layoutAction"/>
@@ -71,26 +72,65 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <LinearLayout
-                android:id="@+id/btnViewReceipt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:visibility="visible">
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
-                <ImageView
-                    android:layout_width="32dp"
-                    android:layout_height="32dp"
-                    android:src="@drawable/ic_pdf"
-                    app:tint="?attr/colorOnSurfaceVariant" />
-
-                <TextView
+                <LinearLayout
+                    android:id="@+id/btnEditBill"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.App.LabelBody"
-                    android:textSize="12sp"
-                    android:textStyle="bold"
-                    android:text="View Receipt"/>
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_edit"
+                        app:tint="?attr/colorPrimary" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:text="Edit Bill"/>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btnViewReceipt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:paddingHorizontal="8dp"
+                    android:paddingVertical="4dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/ic_pdf"
+                        app:tint="?attr/colorOnSurfaceVariant" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:text="View Receipt"/>
+                </LinearLayout>
             </LinearLayout>
         </FrameLayout>
 
@@ -108,7 +148,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textAppearance="@style/TextAppearance.App.LabelTitle"
-            android:text="paid"
+            tools:text="paid"
             android:textSize="16sp"
             app:layout_constraintTop_toBottomOf="@+id/divider"
             app:layout_constraintStart_toStartOf="parent" />
@@ -120,6 +160,9 @@
             android:layout_marginTop="8dp"
             android:src="@drawable/ic_share"
             android:contentDescription="Share Bill"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             app:tint="?attr/colorPrimary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/divider"/>
