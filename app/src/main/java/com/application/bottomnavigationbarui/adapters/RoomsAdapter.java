@@ -1,13 +1,24 @@
 package com.application.bottomnavigationbarui.adapters;
 
+import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.bottomnavigationbarui.databinding.RoomsItemRoomBinding;
+import com.application.bottomnavigationbarui.qr.QrCodeHelper;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
+import com.github.devfrogora.service.utils.CryptoHelper;
+import com.google.mlkit.vision.barcode.common.Barcode;
+import com.itextpdf.text.pdf.qrcode.BitMatrix;
+import com.itextpdf.text.pdf.qrcode.QRCodeWriter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -51,7 +62,6 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomViewHold
 
     public static class RoomViewHolder extends RecyclerView.ViewHolder {
         private final RoomsItemRoomBinding binding;
-
         public RoomViewHolder(@NonNull RoomsItemRoomBinding binding) {
             super(binding.getRoot());
             this.binding = binding;
@@ -59,9 +69,26 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomViewHold
 
         public void bind(RoomRegistryDto room, OnRoomActionListener listener) {
             // Bind Core Text Data
+            String tempEncrypted = "";
+
             binding.tvRoomName.setText(room.getRoomNumber());
             binding.tvTenantName.setText("Tenant: " + room.getTenantName());
             binding.tvSubmeterSerial.setText("Submeter Serial: " + room.getSubmeterSerialNumber());
+            try {
+                tempEncrypted = CryptoHelper.encryptToBase64("ROOM_NUMBER_"+room.getRoomNumber(), CryptoHelper.MY_SECRET_KEY);
+                binding.etEncryptedRoomNumber.setText(tempEncrypted);
+                binding.etEncryptedRoomNumber.setEnabled(false);
+                android.util.Log.d("CryptoTest", "Encrypted string for QR: " + tempEncrypted);
+            } catch (Exception e) {
+                // Log the error instead of crashing the application
+                android.util.Log.e("CryptoTest", "Encryption failed", e);
+            }
+
+            final String encryptedRoomNumber = tempEncrypted;
+
+            binding.tilQrCode.setEndIconOnClickListener(v -> {
+                if(!encryptedRoomNumber.isEmpty()) showQrPopup(v.getContext(), encryptedRoomNumber, room.getRoomNumber());
+            });
 
             // Bind Dynamic Status Badge Styling
             if (room.isVacant()) {
@@ -79,5 +106,29 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomViewHold
                     listener.onActionDelete(room, getAdapterPosition())
             );
         }
+        private void showQrPopup(Context context, String qrString, String roomTitle) {
+            try {
+                // 1. Generate QR Bitmap
+                Bitmap bmp = new QrCodeHelper().generateQrCode(qrString, 500, 500);
+
+                // 2. Create ImageView for Dialog
+                ImageView imageView = new ImageView(context);
+                imageView.setImageBitmap(bmp);
+                imageView.setPadding(40, 40, 40, 40);
+                imageView.setAdjustViewBounds(true);
+
+                // 3. Show in Material Dialog
+                new AlertDialog.Builder(context)
+                        .setTitle("QR Code: " + roomTitle)
+                        .setView(imageView)
+                        .setPositiveButton("Close", null)
+                        .show();
+
+            } catch (Exception e) {
+                android.util.Log.e("QR_ERR", "Could not generate QR code", e);
+            }
+        }
     }
+
+
 }

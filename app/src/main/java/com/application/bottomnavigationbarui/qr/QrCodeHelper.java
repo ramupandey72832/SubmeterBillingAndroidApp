@@ -16,6 +16,9 @@ import com.google.mlkit.vision.barcode.BarcodeScanner;
 import com.google.mlkit.vision.barcode.BarcodeScanning;
 import com.google.mlkit.vision.barcode.common.Barcode;
 import com.google.mlkit.vision.common.InputImage;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.qrcode.QRCodeWriter;
+import com.google.zxing.common.BitMatrix;
 
 import java.io.InputStream;
 
@@ -114,5 +117,24 @@ public class QrCodeHelper {
             width = (int) (height * ratio);
         }
         return Bitmap.createScaledBitmap(image, width, height, true);
+    }
+
+
+    public Bitmap generateQrCode(String text, int width, int height) {
+        // We keep ZXing for generation because it's still the best for creating clean bits
+        QRCodeWriter writer = new QRCodeWriter();
+        try {
+            BitMatrix bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, width, height);
+            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+            return bitmap;
+        } catch (Exception e) {
+            Log.e(TAG, "Error generating QR code", e);
+            return null;
+        }
     }
 }

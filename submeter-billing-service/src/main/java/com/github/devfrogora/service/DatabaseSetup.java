@@ -6,6 +6,10 @@ import com.github.devfrogora.data.config.SharedSchemaConfigurator;
 import com.github.devfrogora.data.dao.DaoManager;
 
 public class DatabaseSetup {
+    private static String dbUrl = "jdbc:sqldroid:submeter_bill.db";
+    private static String dbUsername = null;
+    private static String dbPassword = null;
+    private static String driverClassName = "org.sqldroid.SQLDroidDriver";
     public static void initializeDb(String AndroidOrDesktop,String dbPath) throws Exception {
         System.out.println("System: Initializing database connection configurations...");
         if(AndroidOrDesktop.equalsIgnoreCase("Desktop")){
@@ -34,15 +38,54 @@ public class DatabaseSetup {
     }
 
     public static void initializeDb(String dburl,String userName,String password,String driverClassName) throws Exception {
+        //1. Kill the old connection engine first
+        DatabaseConnection.clearConnection();
+
+        DatabaseSetup.dbUrl = dburl;
+        DatabaseSetup.dbUsername = userName;
+        DatabaseSetup.dbPassword = password;
+        DatabaseSetup.driverClassName = driverClassName;
         System.out.println("System: Initializing database connection configurations...");
             DatabaseConfig dbConfig = new DatabaseConfig(
-                    dburl,
-                    userName,
-                    password,
-                    driverClassName
+                    DatabaseSetup.dbUrl,
+                    DatabaseSetup.dbUsername,
+                    DatabaseSetup.dbPassword,
+                    DatabaseSetup.driverClassName
             );
             DatabaseConnection.initialize(dbConfig);
             SharedSchemaConfigurator.initializeSchema();
             DaoManager.initialize();
+    }
+
+    public static String getDbUrl() {
+        return dbUrl;
+    }
+
+    public static void setDbUrl(String dbUrl) {
+        DatabaseSetup.dbUrl = dbUrl;
+    }
+
+    public static String getDbUsername() {
+        return dbUsername;
+    }
+
+    public static void setDbUsername(String dbUsername) {
+        DatabaseSetup.dbUsername = dbUsername;
+    }
+
+    public static String getDbPassword() {
+        return dbPassword;
+    }
+
+    public static void setDbPassword(String dbPassword) {
+        DatabaseSetup.dbPassword = dbPassword;
+    }
+
+    public static String getDriverClassName() {
+        return driverClassName;
+    }
+
+    public static void setDriverClassName(String driverClassName) {
+        DatabaseSetup.driverClassName = driverClassName;
     }
 }

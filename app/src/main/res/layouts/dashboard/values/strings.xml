@@ -4,4 +4,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_db_name">submeter_bill.db</string>
+    <string name="default_db_driver">org.sqldroid.SQLDroidDriver</string>
+    <string name="jdbc_prefix">jdbc:sqldroid:</string>
 </resources>

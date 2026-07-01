@@ -111,7 +111,8 @@
             android:layout_height="52dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:background="?attr/colorSurface">
+            android:background="?attr/colorSurface"
+            android:visibility="gone">
 
             <ImageView
                 android:id="@+id/btnActionEdit"
@@ -154,6 +155,32 @@
                 tools:ignore="ContentDescription" />
 
         </LinearLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilQrCode"
+            style="?attr/textInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginTop="4dp"
+            android:hint="Encrypted QR Code"
+            app:endIconMode="custom"
+            app:endIconDrawable="@android:drawable/ic_menu_gallery"
+            app:endIconTint="?attr/colorPrimary"
+            app:endIconContentDescription="Copy Text payload">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEncryptedRoomNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:maxLength="5000"
+                android:maxLines="6"
+                android:scrollbars="vertical"
+                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.App.LabelBody"
+                tools:text="Please get the Qr Code from here -->>" />
+        </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

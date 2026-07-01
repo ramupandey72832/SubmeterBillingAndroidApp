@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.application.bottomnavigationbarui.databinding.ActivityMainBinding;
+import com.application.bottomnavigationbarui.fragments.DatabaseConfigurationFragment;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.LocalPermissionHelper;
@@ -52,8 +53,11 @@ public class MainActivity extends AppCompatActivity {
 
         try{
 //            DatabaseSetup.initializeDb("jdbc:sqlite:submeter_bill.db", null, null, "org.sqlite.JDBC"); // Desktop
-            String dbPath = getFilesDir().getAbsolutePath() + "/submeter_bill.db";
-            DatabaseSetup.initializeDb("jdbc:sqldroid:" + dbPath, null, null, "org.sqldroid.SQLDroidDriver");
+            String dburl = DatabaseConfigurationFragment.getDbUrl(this);
+            String driver = DatabaseConfigurationFragment.getDbDriver(this);
+            String username = null;
+            String password = null;
+            DatabaseSetup.initializeDb( dburl, username, password, driver);
         } catch(Exception e){
             ErrorUtils.handleDatabaseException("Error initializing database", e, ui);
         }

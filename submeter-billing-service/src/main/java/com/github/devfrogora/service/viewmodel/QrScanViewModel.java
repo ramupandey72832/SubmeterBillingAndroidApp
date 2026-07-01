@@ -44,7 +44,6 @@ public class QrScanViewModel {
      * Parses the scanned payload and checks the database for room validity.
      */
 // Define your custom key here (Keep this exactly identical to the key used to generate the QR)
-    private static final String MY_CUSTOM_KEY = "MySecretPassphrase123!";
 
     public void processScannedData(String scannedPayload) {
         if (scannedPayload == null || scannedPayload.trim().isEmpty()) {
@@ -63,7 +62,7 @@ public class QrScanViewModel {
                 // 1. Decode from Base64 & Decrypt using the Custom Key
                 String decryptedPayload;
                 try {
-                    decryptedPayload = CryptoHelper.decryptFromBase64(scannedPayload, MY_CUSTOM_KEY);
+                    decryptedPayload = CryptoHelper.decryptFromBase64(scannedPayload, CryptoHelper.MY_SECRET_KEY);
                 } catch (Exception e) {
                     this.errorMessage = "Security Error: Unable to decrypt QR code data. Invalid Key or Data.";
                     this.isLoading = false;

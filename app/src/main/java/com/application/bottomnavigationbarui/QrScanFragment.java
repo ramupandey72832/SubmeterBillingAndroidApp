@@ -107,7 +107,7 @@ public class QrScanFragment extends Fragment {
         // 2. Intercept verification exceptions or format complaints via system ErrorUtils mechanics
         if (viewModel.getErrorMessage() != null) {
             ErrorUtils.handleDatabaseException(
-                    "Scan Verification Aborted",
+                    viewModel.getErrorMessage(),
                     new Exception(viewModel.getErrorMessage()),
                     ui
             );

@@ -18,6 +18,7 @@ import com.application.bottomnavigationbarui.adapters.DashboardBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentDashboardBinding;
 import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.AddTenantFragment;
+import com.application.bottomnavigationbarui.fragments.DatabaseConfigurationFragment;
 import com.application.bottomnavigationbarui.fragments.DatabaseInspectorFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteRoomFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteTenantFragment;
@@ -114,7 +115,9 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
         binding.dashboardSection.mpin.setOnClickListener(v ->
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new SetupMpinFragment()));
 
-         final String MY_CUSTOM_KEY = "MySecretPassphrase123!";
+        binding.dashboardSection.databaseConfiguration.setOnClickListener(v ->
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseConfigurationFragment()));
+
 
         binding.dashboardSection.test.setOnClickListener(v -> {
             try {
@@ -130,8 +133,8 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
                 rooms.add("ROOM_NUMBER_G02");
 
                 for (String room : rooms) {
-                    String encryptedBase64 = CryptoHelper.encryptToBase64(room, MY_CUSTOM_KEY);
-                    android.util.Log.d("CryptoTest", "Encrypted string for QR: " + encryptedBase64);
+                    String encryptedBase64 = CryptoHelper.encryptToBase64(room, CryptoHelper.MY_SECRET_KEY);
+//                    android.util.Log.d("CryptoTest", "Encrypted string for QR: " + encryptedBase64);
                 }
 
             } catch (Exception e) {

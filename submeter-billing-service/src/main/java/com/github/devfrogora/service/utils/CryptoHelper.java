@@ -7,7 +7,7 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
 public class CryptoHelper {
-    public static final String MY_CUSTOM_KEY = "MySecretPassphrase123!";
+    public static final String MY_SECRET_KEY = "MySecretPassphrase123!";
     private static final String ALGORITHM = "AES";
 
     /**

@@ -24,6 +24,7 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -63,12 +64,42 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
 
         demoTenant();
 
-        List<String> roomNumbers = viewModel.getRoomNumbersList();  // fetch room Number from Data layer
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, roomNumbers);
+        // 1. Fetch your dataset safely from the ViewModel layer
+        List<String> roomNumbers = viewModel.getRoomNumbersList();
+
+// Defensive fallback check: Ensure the view layer handles empty data layer queries gracefully
+        if (roomNumbers == null || roomNumbers.isEmpty()) {
+            roomNumbers = new ArrayList<>();
+            // Optional: Add a temporary placeholder so the user knows why it's empty
+            roomNumbers.add("NAN");
+        }
+
+// 2. Instantiate a clean Material 3 compliant dropdown list layout item
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                requireContext(),
+                android.R.layout.simple_dropdown_item_1line, // Best for M3 styling
+                roomNumbers
+        );
 
         AutoCompleteTextView roomDropdown = binding.layoutAddTenant.actvRoomDropdown;
+
+// 3. Attach your adapter payload first
+        roomDropdown.setAdapter(adapter);
+
         roomDropdown.setOnItemClickListener((parent, view1, position, id) -> {
             String selectedRoom = parent.getItemAtPosition(position).toString();
+
+            // Safety handling: Guard against placeholder selection clicks
+            if (selectedRoom.equals("NAN")) {
+                roomDropdown.setText("", false);
+                return;
+            }
+
+            // Pass the chosen value safely into your tenant presentation or verification layer
+            // viewModel.setSelectedRoomNumber(selectedRoom);
+
+            Toast.makeText(getContext(), "Selected Room: " + selectedRoom, Toast.LENGTH_SHORT).show();
+
             binding.layoutAddTenant.actvRoomDropdown.setText(selectedRoom);
         });
         roomDropdown.setAdapter(adapter);

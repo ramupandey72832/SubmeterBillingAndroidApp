@@ -15,6 +15,10 @@ public class DatabaseConnection {
     private static Connection sharedReaderConnection = null;
 
     public static synchronized void initialize(DatabaseConfig config) {
+        // Reset the connections if config changes
+        if (databaseConfig != null && !databaseConfig.getUrl().equals(config.getUrl())) {
+            shutdown();
+        }
         databaseConfig = config;
     }
 
@@ -120,5 +124,33 @@ public class DatabaseConnection {
             }
         } catch (SQLException ignored) {}
         sharedReaderConnection = null;
+    }
+
+
+    /**
+     * Hard reset of the connection pool.
+     * Closes the shared reader and clears the thread-local cache.
+     */
+    public static synchronized void clearConnection() {
+        // 1. Close and nullify the shared reader
+        try {
+            if (sharedReaderConnection != null && !sharedReaderConnection.isClosed()) {
+                sharedReaderConnection.close();
+            }
+        } catch (SQLException ignored) {
+        } finally {
+            sharedReaderConnection = null;
+        }
+
+        // 2. Clear any connection stuck in the current thread (important for transactions)
+        Connection threadConn = threadConnection.get();
+        try {
+            if (threadConn != null && !threadConn.isClosed()) {
+                threadConn.close();
+            }
+        } catch (SQLException ignored) {
+        } finally {
+            threadConnection.remove();
+        }
     }
 }

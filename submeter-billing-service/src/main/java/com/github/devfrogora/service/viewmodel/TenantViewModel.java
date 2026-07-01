@@ -9,6 +9,7 @@ import com.github.devfrogora.service.utils.OperationResult;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class TenantViewModel {
 
@@ -52,7 +53,16 @@ public class TenantViewModel {
     public String getErrorMessage() { return errorMessage; }
     public boolean isOperationSuccess() { return isOperationSuccess; }
     public String getFeedbackMessage() { return feedbackMessage; }
-    public List<String> getRoomNumbersList() { return roomNumbersList; }
+    /**
+     * MODIFIED GETTER: Automatically guarantees the data layer is read
+     * and hydrated before returning the list block back to the View.
+     */
+    public List<String> getRoomNumbersList() {
+        if (roomNumbersList == null || roomNumbersList.isEmpty()) {
+            loadAllRoomNumbersSynchronously();
+        }
+        return roomNumbersList;
+    }
 
 
     // --- UI Presentation Actions ---
@@ -176,5 +186,40 @@ public class TenantViewModel {
             this.isLoading = false;
             notifyUi();
         }).start();
+    }
+
+    private void loadAllRoomNumbersSynchronously() {
+        CountDownLatch latch = new CountDownLatch(1);
+
+        new Thread(() -> {
+            try {
+                OperationResult<List<String>> result = roomMeterService.getAllRoomNumbers();
+                if (result.isSuccess()) {
+                    this.roomNumbersList = result.getData();
+                    this.isOperationSuccess = true;
+                } else {
+                    this.errorMessage = result.getMessage();
+                }
+            } finally {
+                latch.countDown();
+            }
+        }).start();
+
+        try {
+            // FIXED: Only blocks for a maximum of 1000 milliseconds.
+            // If the DB takes longer, it breaks out safely instead of freezing the app.
+            boolean success = latch.await(6000, java.util.concurrent.TimeUnit.MILLISECONDS);
+
+            if (!success) {
+                this.errorMessage = "Timeout Error: Database took too long to return room records.";
+                // Fill with an empty list so the app doesn't crash on null loops
+                if (this.roomNumbersList == null) {
+                    this.roomNumbersList = new java.util.ArrayList<>();
+                }
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            this.errorMessage = "Room loading synchronization interrupted: " + e.getMessage();
+        }
     }
 }
