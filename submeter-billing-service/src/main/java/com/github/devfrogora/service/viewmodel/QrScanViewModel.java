@@ -15,6 +15,7 @@ public class QrScanViewModel {
 
     public interface StateListener {
         void onStateChanged();
+        void onManualRoomNumber();
     }
 
     private StateListener listener;
@@ -30,6 +31,7 @@ public class QrScanViewModel {
     private void notifyUi() {
         if (listener != null) {
             listener.onStateChanged();
+            listener.onManualRoomNumber();
         }
     }
 
@@ -45,7 +47,7 @@ public class QrScanViewModel {
      */
 // Define your custom key here (Keep this exactly identical to the key used to generate the QR)
 
-    public void processScannedData(String scannedPayload) {
+    public void processScannedData(String scannedPayload, boolean isManual) {
         if (scannedPayload == null || scannedPayload.trim().isEmpty()) {
             this.errorMessage = "Scan Error: Empty barcode or QR code detected.";
             notifyUi();
@@ -60,26 +62,30 @@ public class QrScanViewModel {
         new Thread(() -> {
             try {
                 // 1. Decode from Base64 & Decrypt using the Custom Key
-                String decryptedPayload;
-                try {
-                    decryptedPayload = CryptoHelper.decryptFromBase64(scannedPayload, CryptoHelper.MY_SECRET_KEY);
-                } catch (Exception e) {
-                    this.errorMessage = "Security Error: Unable to decrypt QR code data. Invalid Key or Data.";
-                    this.isLoading = false;
-                    notifyUi();
-                    return;
-                }
+                String decryptedPayload,roomNumber ="";
 
-                // 2. Validate the string formatting filters on the decrypted data
-                if (!decryptedPayload.contains("ROOM_NUMBER_")) {
-                    this.errorMessage = "Invalid Format: Scanned code is not a valid room QR identifier.";
-                    this.isLoading = false;
-                    notifyUi();
-                    return;
-                }
+                if(isManual == false){
+                    try {
+                        decryptedPayload = CryptoHelper.decryptFromBase64(scannedPayload, CryptoHelper.MY_SECRET_KEY);
+                    } catch (Exception e) {
+                        this.errorMessage = "Security Error: Unable to decrypt QR code data. Invalid Key or Data.";
+                        this.isLoading = false;
+                        notifyUi();
+                        return;
+                    }
 
-                // Extract target room number
-                String roomNumber = decryptedPayload.replace("ROOM_NUMBER_", "").trim();
+                    // 2. Validate the string formatting filters on the decrypted data
+                    if (!decryptedPayload.contains("ROOM_NUMBER_")) {
+                        this.errorMessage = "Invalid Format: Scanned code is not a valid room QR identifier.";
+                        this.isLoading = false;
+                        notifyUi();
+                        return;
+                    }
+
+                    // Extract target room number
+                     roomNumber = decryptedPayload.replace("ROOM_NUMBER_", "").trim();
+                }
+                if(isManual == true) roomNumber = scannedPayload;
 
                 // 3. Query the room service
                 boolean isRoomExist = roomMeterService.isRoomExist(roomNumber);
@@ -87,7 +93,7 @@ public class QrScanViewModel {
                 if (isRoomExist) {
                     this.verifiedRoomNumber = roomNumber;
                 } else {
-                    this.errorMessage = "Asset Failure: Room " + roomNumber + " does not exist in the configuration database.";
+                    this.errorMessage = "Asset Failure: Room " + roomNumber + " does not exist in Room table.";
                 }
             } catch (Exception e) {
                 this.errorMessage = "Verification Error: " + e.getMessage();
@@ -97,6 +103,11 @@ public class QrScanViewModel {
             }
         }).start();
     }
+
+
+
+
+
 
     /**
      * Resets verified state tracking parameters to allow the camera to listen for a fresh scan hook.

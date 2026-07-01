@@ -163,7 +163,7 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="16dp"
             android:layout_marginTop="4dp"
-            android:hint="Encrypted QR Code"
+            android:hint="Encrypted Room Number QR Code"
             app:endIconMode="custom"
             app:endIconDrawable="@android:drawable/ic_menu_gallery"
             app:endIconTint="?attr/colorPrimary"

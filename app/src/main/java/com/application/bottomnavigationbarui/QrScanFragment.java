@@ -1,6 +1,7 @@
 // File: app/.../fragments/QrScanFragment.java
 package com.application.bottomnavigationbarui;
 
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -63,6 +64,13 @@ public class QrScanFragment extends Fragment {
                     getActivity().runOnUiThread(() -> renderUiState());
                 }
             }
+
+            @Override
+            public void onManualRoomNumber( ) {
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> renderUiState("manual"));
+                }
+            }
         });
 
         // Initialize CameraHelper safely after view creation
@@ -71,7 +79,7 @@ public class QrScanFragment extends Fragment {
             public void onQrDetected(String data, Uri uri) {
                 temporaryImageUri = uri;
                 // Forward raw scan text directly to the ViewModel state machine
-                viewModel.processScannedData(data);
+                viewModel.processScannedData(data,false);
             }
         });
 
@@ -91,29 +99,68 @@ public class QrScanFragment extends Fragment {
         }
         if (btnFlashlight != null) btnFlashlight.setOnClickListener(v -> onFlashClicked());
         if (btnRefresh != null) btnRefresh.setOnClickListener(this::refreshCamera);
+
+
+        binding.btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String roomNumber = binding.etRoomNumber.getText().toString();
+                if (roomNumber.isEmpty()) {
+                    ErrorUtils.handleDatabaseException(
+                            "Please enter a room number",
+                            new Exception("Invalid Room Number"),
+                            ui
+                    );
+                    return;
+                }else{
+                    viewModel.processScannedData(roomNumber,true);
+                }
+            }
+
+        });
+
     }
 
+    private boolean isHandlingError = false;
     /**
      * Inspects current state properties inside the ViewModel and handles updates safely.
      */
     private void renderUiState() {
         // 1. Toggle progress indicator or custom views during active background threads
         if (viewModel.isLoading()) {
-            // binding.scanProgress.setVisibility(View.VISIBLE);
+//             binding.scanProgress.setVisibility(View.VISIBLE);
         } else {
             // binding.scanProgress.setVisibility(View.GONE);
         }
 
+
         // 2. Intercept verification exceptions or format complaints via system ErrorUtils mechanics
-        if (viewModel.getErrorMessage() != null) {
-            ErrorUtils.handleDatabaseException(
-                    viewModel.getErrorMessage(),
-                    new Exception(viewModel.getErrorMessage()),
-                    ui
-            );
-            // Reset the verification state so user can tap refresh and scan another asset
-            viewModel.resetVerificationState();
+        if (viewModel.getErrorMessage() != null && !isHandlingError) {
+            isHandlingError = true;
+            String msg = viewModel.getErrorMessage();
+
+            // Show Custom Popup
+            binding.tvErrorMessage.setText(msg);
+            binding.layoutErrorPopup.setVisibility(View.VISIBLE);
+            binding.layoutErrorPopup.setAlpha(0f);
+            binding.layoutErrorPopup.animate().alpha(1f).setDuration(300).start();
+
+            // Dismiss after 3 seconds
+            binding.layoutErrorPopup.postDelayed(() -> {
+                if (binding != null) {
+                    binding.layoutErrorPopup.animate().alpha(0f).setDuration(300).withEndAction(() -> {
+                        if (binding != null) {
+                            binding.layoutErrorPopup.setVisibility(View.GONE);
+                            isHandlingError = false;
+                            viewModel.resetVerificationState();
+                            refreshCamera(binding.btnRefresh);
+                        }
+                    }).start();
+                }
+            }, 3000);
         }
+
+
 
         // 3. Navigate away exclusively on successful database/asset verification confirmation
         if (viewModel.getVerifiedRoomNumber() != null && temporaryImageUri != null) {
@@ -126,6 +173,78 @@ public class QrScanFragment extends Fragment {
 
             sendToResultFragment(targetRoom, targetUri);
         }
+    }
+
+    private void renderUiState(String anyString) {
+        // 1. Toggle progress indicator or custom views during active background threads
+        if (viewModel.isLoading()) {
+//             binding.scanProgress.setVisibility(View.VISIBLE);
+        } else {
+            // binding.scanProgress.setVisibility(View.GONE);
+        }
+
+
+        // 2. Intercept verification exceptions or format complaints via system ErrorUtils mechanics
+        if (viewModel.getErrorMessage() != null && !isHandlingError) {
+            isHandlingError = true;
+            String msg = viewModel.getErrorMessage();
+
+            // Show Custom Popup
+            binding.tvErrorMessage.setText(msg);
+            binding.layoutErrorPopup.setVisibility(View.VISIBLE);
+            binding.layoutErrorPopup.setAlpha(0f);
+            binding.layoutErrorPopup.animate().alpha(1f).setDuration(300).start();
+
+            // Dismiss after 3 seconds
+            binding.layoutErrorPopup.postDelayed(() -> {
+                if (binding != null) {
+                    binding.layoutErrorPopup.animate().alpha(0f).setDuration(300).withEndAction(() -> {
+                        if (binding != null) {
+                            binding.layoutErrorPopup.setVisibility(View.GONE);
+                            isHandlingError = false;
+                            viewModel.resetVerificationState();
+                            refreshCamera(binding.btnRefresh);
+                        }
+                    }).start();
+                }
+            }, 3000);
+        }
+
+
+
+        // 3. Navigate away exclusively on successful database/asset verification confirmation
+        if (viewModel.getVerifiedRoomNumber() != null) {
+            Log.d(TAG, "renderUiState: " + viewModel.getVerifiedRoomNumber());
+            String targetRoom = viewModel.getVerifiedRoomNumber();
+
+            // Clear tracking variables before leaving the fragment instance context
+            viewModel.resetVerificationState();
+
+            sendToResultFragment(targetRoom);
+        }
+    }
+
+    /**
+     * Shows a message for 3 seconds using a Snackbar (standard Material approach)
+     * or you can use a custom overlay View.
+     */
+    private void showTimedInvalidScanPopup(String message) {
+        if (binding == null) return;
+
+        // Option A: Using Google Material Snackbar (Easiest & Best for 3 sec)
+        com.google.android.material.snackbar.Snackbar snackbar =
+                com.google.android.material.snackbar.Snackbar.make(
+                        binding.getRoot(),
+                        message,
+                        3000 // 3000 milliseconds = 3 seconds
+                );
+
+        // Optional: Style it to look like an error
+        snackbar.setBackgroundTint(getResources().getColor(android.R.color.holo_red_dark));
+        snackbar.setTextColor(getResources().getColor(android.R.color.white));
+        snackbar.show();
+
+        // Option B: If you prefer a centered custom UI, toggle a View visibility
     }
 
     @Override
@@ -155,7 +274,7 @@ public class QrScanFragment extends Fragment {
         if (cameraHelper == null) return;
         boolean isNowOn = cameraHelper.toggleTorch();
         if (btnFlashlight != null) {
-            btnFlashlight.setColorFilter(isNowOn ? android.graphics.Color.YELLOW : android.graphics.Color.WHITE);
+            btnFlashlight.setColorFilter(isNowOn ? Color.YELLOW : Color.BLUE);
         }
     }
 
@@ -173,6 +292,16 @@ public class QrScanFragment extends Fragment {
 
     public void sendToResultFragment(String result, Uri uri) {
         if (result == null || uri == null || getActivity() == null) return;
+
+        Bundle bundle = new Bundle();
+        bundle.putString("ARG_QR_DATA", result);
+
+        MeterReadingFragment resultFragment = new MeterReadingFragment();
+        NavigationUtils.navigateTo(getActivity(), resultFragment, bundle);
+    }
+
+    public void sendToResultFragment(String result) {
+        if (result == null || getActivity() == null) return;
 
         Bundle bundle = new Bundle();
         bundle.putString("ARG_QR_DATA", result);

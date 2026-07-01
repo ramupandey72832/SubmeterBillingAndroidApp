@@ -6,6 +6,88 @@
     android:layout_height="match_parent"
     android:background="?attr/colorSurfaceVariant">
 
+    <!-- Scanner Camera Viewport Surface Layer -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/previewView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottomBar"
+        android:layout_below="@id/topBar" />
+
+    <!-- Container to group the Frame and the Label together -->
+    <RelativeLayout
+        android:id="@+id/qrFrameContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+
+        <!-- CUSTOM VIEW: Scanning Guide Frame -->
+        <View
+            android:id="@+id/qrFrameGuide"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
+            android:tooltipText="Please Scan Room Number"
+            android:background="@drawable/qr_scan_frame_border" />
+
+        <!-- The Visible Text Label -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/qrFrameGuide"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="12dp"
+            android:text="Please Scan Room Number"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:shadowColor="@android:color/black"
+            android:shadowDx="2"
+            android:shadowDy="2"
+            android:shadowRadius="2" />
+
+    </RelativeLayout>
+
+
+
+    <!-- CUSTOM POPUP: Error Overlay (Hidden by default) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/layoutErrorPopup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/bottomBar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:visibility="gone"
+        app:cardBackgroundColor="#E53935"
+        app:cardCornerRadius="12dp"
+        app:cardElevation="10dp"
+        app:strokeWidth="0dp">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingVertical="12dp">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@android:drawable/stat_notify_error"
+                app:tint="@android:color/white" />
+
+            <TextView
+                android:id="@+id/tvErrorMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:text="Invalid QR Detected"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <!-- Theme-Based Camera Top Overlay Control Bar -->
     <LinearLayout
         android:id="@+id/topBar"
@@ -17,45 +99,31 @@
         android:orientation="horizontal"
         android:padding="8dp"
         android:elevation="4dp">
-
+        <!-- ... (Existing buttons: btnBack, btnFlashlight, btnRefresh) ... -->
         <ImageButton
             android:id="@+id/btnBack"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Back"
             android:src="@drawable/ic_arrow_back"
             app:tint="?attr/colorOnSurface" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
+        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" />
         <ImageButton
             android:id="@+id/btnFlashlight"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Toggle Flashlight"
             android:src="@drawable/ic_flash_on"
             app:tint="?attr/colorOnSurface" />
-
         <ImageButton
             android:id="@+id/btnRefresh"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="16dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Refresh"
             android:src="@drawable/ic_refresh"
             app:tint="?attr/colorOnSurface" />
-
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginEnd="48dp" />
+        <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" android:layout_marginEnd="48dp" />
     </LinearLayout>
 
     <!-- Theme-Based Camera Bottom Sheet Overlay Bar -->
@@ -69,7 +137,7 @@
         android:gravity="center_vertical"
         android:padding="12dp"
         android:elevation="8dp">
-
+        <!-- ... (Existing inputFieldLayout and actionButton) ... -->
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputFieldLayout"
             style="?attr/textInputStyle"
@@ -77,33 +145,21 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:hintEnabled="false">
-
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/inputField"
+                android:id="@+id/etRoomNumber"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Enter Room Number..."
-                android:importantForAutofill="no"
                 android:inputType="text"
-                android:maxLines="1"
                 android:paddingVertical="12dp"/>
         </com.google.android.material.textfield.TextInputLayout>
-
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/actionButton"
+            android:id="@+id/btnNext"
             style="?attr/materialButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:text="Next" />
     </LinearLayout>
-
-    <!-- Scanner Camera Viewport Surface Layer -->
-    <androidx.camera.view.PreviewView
-        android:id="@+id/previewView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottomBar"
-        android:layout_below="@id/topBar" />
 
 </RelativeLayout>
