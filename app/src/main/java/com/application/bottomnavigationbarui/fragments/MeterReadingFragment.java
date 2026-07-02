@@ -90,6 +90,11 @@ public class MeterReadingFragment extends Fragment {
                 String fixedStr = binding.etFixedCharge.getText().toString().trim();
                 String rateStr = binding.etRatePerUnit.getText().toString().trim();
 
+                // NEW FIELDS
+                String extraStr = binding.etExtraCharge.getText().toString().trim();
+                String notes = binding.etNotes.getText().toString().trim();
+
+
                 if (roomNumber.isEmpty() || submeterSerialNumber.isEmpty() || currentStr.isEmpty() || fixedStr.isEmpty() || rateStr.isEmpty()) {
                     Toast.makeText(getContext(), "Please populate all fields completely.", Toast.LENGTH_SHORT).show();
                     return;
@@ -99,6 +104,9 @@ public class MeterReadingFragment extends Fragment {
                 double previousMeterReading = viewModel.getPreviousReading(); // Read straight from state values
                 double fixedCharge = Double.parseDouble(fixedStr);
                 double ratePerUnit = Double.parseDouble(rateStr);
+
+                // Handle Extra Charge (default to 0 if empty)
+                double extraCharge = extraStr.isEmpty() ? 0.0 : Double.parseDouble(extraStr);
 
                 // Quick client side sanity boundary check
                 if (currentMeterReading < previousMeterReading) {
@@ -113,7 +121,9 @@ public class MeterReadingFragment extends Fragment {
                         currentMeterReading,
                         previousMeterReading,
                         ratePerUnit,
-                        fixedCharge
+                        fixedCharge,
+                        extraCharge, // Passed here
+                        notes        // Passed here
                 );
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
             }
@@ -139,10 +149,20 @@ public class MeterReadingFragment extends Fragment {
 
             binding.etRatePerUnit.setEnabled(true);
             binding.etFixedCharge.setEnabled(true);
+
+            // ENABLE NEW FIELDS
+            binding.etExtraCharge.setEnabled(true);
+            binding.etNotes.setEnabled(true);
+
             binding.btnNext.setEnabled(true);
         } else {
             binding.etRatePerUnit.setEnabled(false);
             binding.etFixedCharge.setEnabled(false);
+
+            // DISABLE NEW FIELDS
+            binding.etExtraCharge.setEnabled(false);
+            binding.etNotes.setEnabled(false);
+
             binding.btnNext.setEnabled(false);
         }
     }

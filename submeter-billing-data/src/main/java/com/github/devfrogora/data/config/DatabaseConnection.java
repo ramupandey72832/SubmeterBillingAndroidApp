@@ -2,8 +2,11 @@ package com.github.devfrogora.data.config;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DatabaseConnection {
     private static DatabaseConfig databaseConfig;
@@ -13,13 +16,25 @@ public class DatabaseConnection {
 
     // Core Fix: Maintain a singular cached reader connection to prevent raw file handle leaks
     private static Connection sharedReaderConnection = null;
+    public interface MigrationListener {
+        void onMigrationMessage(String message);
+        void onMigrationError(String error, Exception e);
+    }
+    private static MigrationListener migrationListener;
 
-    public static synchronized void initialize(DatabaseConfig config) {
+    public static void setMigrationListener(MigrationListener listener) {
+        migrationListener = listener;
+    }
+
+    public static synchronized void initialize(DatabaseConfig config) throws SQLException {
         // Reset the connections if config changes
         if (databaseConfig != null && !databaseConfig.getUrl().equals(config.getUrl())) {
             shutdown();
         }
         databaseConfig = config;
+
+        // TRIGGER MIGRATION HERE
+        migrationLogic();
     }
 
     /**
@@ -151,6 +166,57 @@ public class DatabaseConnection {
         } catch (SQLException ignored) {
         } finally {
             threadConnection.remove();
+        }
+    }
+
+    public static void migrationLogic() throws SQLException {
+        Connection conn = getConnection();
+        try (  Statement stmt = conn.createStatement()) {
+
+            Set<String> columns = new HashSet<>();
+            try (ResultSet rs = stmt.executeQuery("PRAGMA table_info(bills)")) {
+                while (rs.next()) {
+                    columns.add(rs.getString("name"));
+                }
+            }
+
+            StringBuilder changes = new StringBuilder();
+
+            if (!columns.contains("payment_date")) {
+                stmt.execute("ALTER TABLE bills ADD COLUMN payment_date TEXT;");
+                changes.append("Added payment_date. ");
+            }
+            if (!columns.contains("extra_charge")) {
+                stmt.execute("ALTER TABLE bills ADD COLUMN extra_charge REAL DEFAULT 0.0;");
+                changes.append("Added extra_charge. ");
+            }
+            if (!columns.contains("fixed_charge")) {
+                stmt.execute("ALTER TABLE bills ADD COLUMN fixed_charge REAL DEFAULT 0.0;");
+                changes.append("Added fixed_charge. ");
+            }
+            if (!columns.contains("note")) {
+                stmt.execute("ALTER TABLE bills ADD COLUMN note TEXT;");
+                changes.append("Added note. ");
+            }
+            if (!columns.contains("room_number")) {
+                stmt.execute("ALTER TABLE bills ADD COLUMN room_number TEXT;");
+                changes.append("Added room_number. ");
+            }
+
+            // Report success back to the UI layer without using Android APIs
+            if (migrationListener != null) {
+                if (changes.length() > 0) {
+                    migrationListener.onMigrationMessage("Database updated: " + changes.toString());
+                } else {
+                    migrationListener.onMigrationMessage("Database schema is up to date.");
+                }
+            }
+
+        } catch (SQLException e) {
+            if (migrationListener != null) {
+                migrationListener.onMigrationError("Migration failed", e);
+            }
+            throw new SQLException("DatabaseConnection Migration failed", e);
         }
     }
 }

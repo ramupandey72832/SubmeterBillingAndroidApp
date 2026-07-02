@@ -6,6 +6,9 @@ import com.github.devfrogora.data.dao.DbUtils;
 import com.github.devfrogora.data.entities.Bill;
 
 import java.sql.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +27,11 @@ public class SQLiteBillDao implements BillDao {
                 bill.getUnitsConsumed(),
                 bill.getRatePerUnit(),
                 bill.getFixedCharge(),
+                bill.getExtraCharge(),
                 bill.getTotalAmount(),
+                bill.getNote(),
                 bill.getBillingDate(),
+                bill.getPaymentDate(),
                 bill.isPaid() ? 1 : 0
         );
     }
@@ -106,10 +112,15 @@ public class SQLiteBillDao implements BillDao {
                 bill.getMeterSerialNumber(),
                 bill.getTenantId(),
                 bill.getTenantName(),
+                bill.getRoomNumber(),
                 bill.getUnitsConsumed(),
                 bill.getRatePerUnit(),
+                bill.getFixedCharge(),
+                bill.getExtraCharge(),
                 bill.getTotalAmount(),
+                bill.getNote(),
                 bill.getBillingDate(),
+                bill.getPaymentDate(),
                 bill.isPaid() ? 1 : 0,
                 bill.getBillId()
         );
@@ -118,7 +129,9 @@ public class SQLiteBillDao implements BillDao {
     @Override
     public boolean updatePaymentStatus(int billId, boolean isPaid) throws SQLException {
         String sql = SqlLoader.get("bill.update_status");
-        return DbUtils.executeUpdate(sql, isPaid ? 1 : 0, billId);
+        String todayIsoString = new SimpleDateFormat("yyyy-MM-dd").format(LocalDate.now());
+
+        return DbUtils.executeUpdate(sql, todayIsoString ,isPaid ? 1 : 0, billId);
     }
 
     @Override
@@ -156,6 +169,10 @@ public class SQLiteBillDao implements BillDao {
         bill.setTotalAmount(rs.getDouble("total_amount"));
         bill.setBillingDate(rs.getString("billing_date"));
         bill.setPaid(rs.getBoolean("paid"));
+
+        bill.setPaymentDate(rs.getString("payment_date"));
+        bill.setExtraCharge(rs.getDouble("extra_charge"));
+        bill.setNote(rs.getString("note"));
         return bill;
     }
 }

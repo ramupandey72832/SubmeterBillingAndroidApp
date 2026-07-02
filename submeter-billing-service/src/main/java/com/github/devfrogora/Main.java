@@ -1,7 +1,6 @@
 package com.github.devfrogora;
 
 import com.github.devfrogora.data.dao.DaoManager;
-import com.github.devfrogora.data.entities.Tenant;
 import com.github.devfrogora.service.DatabaseSetup;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.TenancyManagementService;
@@ -50,7 +49,7 @@ public class Main {
 
         System.out.println("\n--- Executing Screen C: Utility Reading and Billing Operations ---");
         // Simulating 250 units consumed (100.0 baseline -> 350.0 current)
-        billingService.addMeterReadingWithGenerateBill("404-B", 350.0, 10.50, 150.00);
+        billingService.addMeterReadingAndGenerateBill("404-B", 350.0, 10.50, 150.00,20,"fine");
     }
 
     void terminateTenancyOfRoom(String roomNumber) throws SQLException {

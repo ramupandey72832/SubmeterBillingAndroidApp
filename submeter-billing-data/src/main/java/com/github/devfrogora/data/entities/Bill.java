@@ -15,6 +15,19 @@ public class Bill {
     private double totalAmount;
     private String billingDate; // Stored as ISO-8601 string (YYYY-MM-DD)
     private boolean isPaid;     // Maps cleanly to SQLite's 0/1 Integer
+    private String paymentDate;
+    private double extraCharge;
+    private String note;
+
+    // Getters and Setters
+    public String getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(String paymentDate) { this.paymentDate = paymentDate; }
+
+    public double getExtraCharge() { return extraCharge; }
+    public void setExtraCharge(double extraCharge) { this.extraCharge = extraCharge; }
+
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
 
     // Default Constructor (Required for many serialization/mapping frameworks)
     public Bill() {

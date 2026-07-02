@@ -10,15 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.application.bottomnavigationbarui.R;
-import com.application.bottomnavigationbarui.databinding.FragmentDashboardBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentGenerateBillBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
-
-import java.sql.SQLException;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,16 +34,20 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
     private static final String ARG_PREVIOUSMETERREADING = "param4";
     private static final String ARG_METERREADING = "param5";
     private static final String ARG_RATEPERUNIT = "param6";
-    private static final String ARG_FIXEDCHARGE = "param67";
+    private static final String ARG_FIXEDCHARGE = "param7";
+    private static final String ARG_EXTRACHARGE = "param8";
+    private static final String ARG_NOTE = "param9";
 
     // TODO: Rename and change types of parameters
     private String getArgRoomnumber;
     private String getArgTenantname;
     private String getArgSubmeterserialnumber;
-    private double getArgMeterreading;
-    private double getArgPreviousMeterreading;
+    private double getArgCurrentReading;
+    private double getArgPreviousReading;
     private double getArgRateperunit;
     private double getArgFixedcharge;
+    private double getArgExtraCharge;
+    private String getArgNote;
 
     public GenerateBillFragment() {
         // Required empty public constructor
@@ -63,16 +63,19 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
      */
     // TODO: Rename and change types and number of parameters
     public static GenerateBillFragment newInstance(String roomNumber, String tenantName, String submeterSerialNumber,
-                                                   double meterReading, double previousMeterReading, double ratePerUnit ,double fixedCharge) {
+                                                   double current, double prev, double rate ,
+                                                   double fixed, double extra, String notes) {
         GenerateBillFragment fragment = new GenerateBillFragment();
         Bundle args = new Bundle();
         args.putString(ARG_ROOMNUMBER, roomNumber);
         args.putString(ARG_TENANTNAME, tenantName);
         args.putString(ARG_SUBMETERSERIALNUMBER, submeterSerialNumber);
-        args.putDouble(ARG_METERREADING, meterReading);
-        args.putDouble(ARG_PREVIOUSMETERREADING, previousMeterReading);
-        args.putDouble(ARG_RATEPERUNIT, ratePerUnit);
-        args.putDouble(ARG_FIXEDCHARGE, fixedCharge);
+        args.putDouble(ARG_METERREADING, current);
+        args.putDouble(ARG_PREVIOUSMETERREADING, prev);
+        args.putDouble(ARG_RATEPERUNIT, rate);
+        args.putDouble(ARG_FIXEDCHARGE, fixed);
+        args.putDouble(ARG_EXTRACHARGE, extra);
+        args.putString(ARG_NOTE, notes);
         fragment.setArguments(args);
         return fragment;
     }
@@ -84,10 +87,12 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
             getArgRoomnumber = getArguments().getString(ARG_ROOMNUMBER);
             getArgTenantname = getArguments().getString(ARG_TENANTNAME);
             getArgSubmeterserialnumber = getArguments().getString(ARG_SUBMETERSERIALNUMBER);
-            getArgMeterreading = getArguments().getDouble(ARG_METERREADING);
-            getArgPreviousMeterreading = getArguments().getDouble(ARG_PREVIOUSMETERREADING);
+            getArgCurrentReading = getArguments().getDouble(ARG_METERREADING);
+            getArgPreviousReading = getArguments().getDouble(ARG_PREVIOUSMETERREADING);
             getArgRateperunit = getArguments().getDouble(ARG_RATEPERUNIT);
             getArgFixedcharge = getArguments().getDouble(ARG_FIXEDCHARGE);
+            getArgExtraCharge = getArguments().getDouble(ARG_EXTRACHARGE);
+            getArgNote = getArguments().getString(ARG_NOTE);
         }
     }
 
@@ -106,14 +111,16 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
 
         binding.tvRoomNumberLabel.setText(getArgRoomnumber);
         binding.tvTenantName.setText(getArgTenantname);
-        double unitsConsumed = getArgMeterreading - getArgPreviousMeterreading;
-        binding.tvPreviousReading.setText(Double.toString(getArgPreviousMeterreading));
-        binding.tvCurrentReading.setText(Double.toString(getArgMeterreading));
+        double unitsConsumed = getArgCurrentReading - getArgPreviousReading;
+        binding.tvPreviousReading.setText(Double.toString(getArgPreviousReading));
+        binding.tvCurrentReading.setText(Double.toString(getArgCurrentReading));
         binding.tvUnitsConsumed.setText(Double.toString(unitsConsumed));
         binding.tvUnitRate.setText(Double.toString(getArgRateperunit));
         binding.tvCalculation.setText(unitsConsumed +" KWh * "+ getArgRateperunit +" + "+ getArgFixedcharge);
         binding.tvFixedCharges.setText(Double.toString(getArgFixedcharge));
-        double totalAmount = unitsConsumed * getArgRateperunit + getArgFixedcharge;
+        binding.tvExtraCharges.setText(Double.toString(getArgExtraCharge));
+        binding.tvNotes.setText(getArgNote);
+        double totalAmount = unitsConsumed * getArgRateperunit + getArgFixedcharge +getArgExtraCharge;
         binding.tvTotalAmount.setText(Double.toString(totalAmount));
 
         // How much Unit Consumed Should be calculated here and also fetch the previous reading from database
@@ -138,7 +145,7 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
     private void addMeterReadingAndGenerateBill() {
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
         try {
-            meterBillingService.addMeterReadingWithGenerateBill(getArgRoomnumber,getArgMeterreading,getArgRateperunit,getArgFixedcharge);
+            meterBillingService.addMeterReadingAndGenerateBill(getArgRoomnumber, getArgCurrentReading,getArgRateperunit,getArgFixedcharge,getArgExtraCharge,getArgNote);
         } catch (Exception e) {
             ErrorUtils.handleDatabaseException("Error : ", e, ui);
         }

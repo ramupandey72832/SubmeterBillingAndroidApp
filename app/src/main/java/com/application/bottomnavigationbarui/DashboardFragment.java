@@ -62,6 +62,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(getContext());
 
+
         displayedPendingList = new ArrayList<>();
         binding.rvPendingBills.setLayoutManager(new LinearLayoutManager(getContext()));
 
@@ -162,6 +163,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
 
         // Fire metrics evaluation fetch loops
         viewModel.loadDashboardSummary();
+        viewModel.performDatabaseCheck();
     }
 
     /**
@@ -194,6 +196,12 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
             displayedPendingList.clear();
             displayedPendingList.addAll(viewModel.getPendingBillsList());
             billAdapter.notifyDataSetChanged();
+        }
+
+        if (viewModel.getMigrationStatus() != null) {
+            Toast.makeText(getContext(), viewModel.getMigrationStatus(), Toast.LENGTH_SHORT).show();
+            // Clear it so it doesn't toast again on next state change
+             viewModel.clearMigrationStatus();
         }
     }
 

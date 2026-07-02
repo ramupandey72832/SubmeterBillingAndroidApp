@@ -239,6 +239,28 @@
                         tools:text="₹100" />
                 </RelativeLayout>
 
+                <!-- NEW: Extra Charges Block -->
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.App.LabelBody"
+                        android:textColor="?attr/colorOnSurfaceVariant"
+                        android:textSize="15sp"
+                        android:text="Extra Charges" />
+                    <TextView
+                        android:id="@+id/tvExtraCharges"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
+                        android:textAppearance="@style/TextAppearance.App.LabelTitle"
+                        android:textSize="15sp"
+                        tools:text="₹50" />
+                </RelativeLayout>
+
                 <!-- Horizontal Separator Line -->
                 <View
                     android:layout_width="match_parent"
@@ -267,6 +289,32 @@
                         android:textSize="16sp"
                         tools:text="₹233" />
                 </RelativeLayout>
+
+                <!-- NEW: Notes/Remarks Section -->
+                <LinearLayout
+                    android:id="@+id/layoutNotes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="40dp"
+                    android:padding="12dp"
+                    android:background="?attr/colorSurfaceVariant">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Notes:"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:textColor="?attr/colorOnSurfaceVariant"/>
+                    <TextView
+                        android:id="@+id/tvNotes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textSize="14sp"
+                        android:textStyle="italic"
+                        tools:text="Fan repair cost included." />
+                </LinearLayout>
 
                 <!-- Bottom Action Button -->
                 <com.google.android.material.button.MaterialButton

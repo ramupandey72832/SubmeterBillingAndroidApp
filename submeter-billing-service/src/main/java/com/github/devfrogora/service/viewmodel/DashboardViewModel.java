@@ -25,6 +25,7 @@ public class DashboardViewModel {
     // Core list collections cached safely across fragment lifecycles
     private List<BillReportDto> pendingBillsList = new ArrayList<>();
 
+
     public interface StateListener {
         void onStateChanged();
     }
@@ -144,5 +145,29 @@ public class DashboardViewModel {
                 notifyUi();
             }
         }).start();
+    }
+
+    // Inside DashboardViewModel.java
+    private String migrationStatus;
+
+    public void performDatabaseCheck() {
+        meterBillingService.checkAndRunMigrations(new MeterBillingService.MigrationCallback() {
+            @Override
+            public void onMessage(String msg) {
+                migrationStatus = msg;
+                notifyUi(); // Trigger UI update
+            }
+
+            @Override
+            public void onError(String err, Exception e) {
+                errorMessage = err + ": " + e.getMessage();
+                notifyUi();
+            }
+        });
+    }
+
+    public String getMigrationStatus() { return migrationStatus; }
+    public void clearMigrationStatus() {
+        this.migrationStatus = null;
     }
 }

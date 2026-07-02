@@ -1,5 +1,6 @@
 package com.github.devfrogora.service.impl;
 
+import com.github.devfrogora.data.config.DatabaseConnection;
 import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.entities.*;
 import com.github.devfrogora.data.utils.DateUtils;
@@ -89,14 +90,15 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 submeterSerialNumber,
                 0,
                 fixedCharge,
-                rate
+                0,
+                rate,
+                ""
         );
 
         updateBillPaymentStatus(billId,true);
     }
 
-    @Override
-    public void addMeterReadingWithGenerateBill(String roomNumber, double currentMeterReading, double rate, double fixedCharge)throws SQLException  {
+    public void addMeterReadingAndGenerateBill(String roomNumber, double currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes)throws SQLException  {
         // 1. Resolve room and submeter
         Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Target unit identification code not found: " + roomNumber));
@@ -159,7 +161,9 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 submeter.getMeterSerialNumber(),
                 previousValue,
                 fixedCharge,
-                rate
+                extraCharge,
+                rate,
+                notes
         );
     }
 
@@ -167,11 +171,11 @@ public class MeterBillingServiceImpl implements MeterBillingService {
      * Core Invoice Processing Component.
      */
     private int generateBill(String tenantName, String roomNumber, int currentReadingId, double currentReading,
-                              Integer previousReadingId, int meterId, Integer tenantId, String submeterSerialNumber, double previousReading, double fixedCharge, double ratePerUnit) throws SQLException {
+                              Integer previousReadingId, int meterId, Integer tenantId, String submeterSerialNumber, double previousReading, double fixedCharge, double extraCharge, double ratePerUnit, String note) throws SQLException {
 
         double consumption = currentReading - previousReading;
         double usageCost = consumption * ratePerUnit;
-        double totalDue = usageCost + fixedCharge;
+        double totalDue = usageCost + fixedCharge +extraCharge ;
 
         Bill bill = new Bill();
         bill.setPreviousReadingId(previousReadingId);
@@ -184,7 +188,9 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         bill.setRatePerUnit(ratePerUnit);
         bill.setTotalAmount(totalDue);
         bill.setFixedCharge(fixedCharge);
+        bill.setExtraCharge(extraCharge);
         bill.setBillingDate(LocalDate.now().toString());
+        bill.setNote(note);
         bill.setRoomNumber(roomNumber);
         bill.setPaid(false);
         int billId = DaoManager.getBillDao().insertBill(bill);
@@ -222,7 +228,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
             double currentReading = bill.getCurrentReadingId() > 0   ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
 
             return new BillReportDto( bill.getBillId(), bill.getRoomNumber(), bill.getMeterSerialNumber(), previousReading, currentReading,
-                    bill.getRatePerUnit(), bill.getFixedCharge(), bill.getTenantName(), bill.getBillingDate(), bill.getTotalAmount(), bill.isPaid() ? "PAID" : "UNPAID");
+                    bill.getRatePerUnit(), bill.getFixedCharge(),bill.getExtraCharge(), bill.getTenantName(), bill.getNote(), bill.getTotalAmount(),bill.getBillingDate(),bill.getPaymentDate(), bill.isPaid() ? "PAID" : "UNPAID");
         }
         return null;
     }
@@ -261,9 +267,12 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     currentReading,
                     bill.getRatePerUnit(),
                     bill.getFixedCharge(),
+                    bill.getExtraCharge(),
                     bill.getTenantName(),
-                    bill.getBillingDate(),
+                    bill.getNote(),
                     bill.getTotalAmount(),
+                    bill.getBillingDate(),
+                    bill.getPaymentDate(),
                     bill.isPaid() ? "PAID" : "UNPAID"
             ));
         }
@@ -289,9 +298,12 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                         b.getCurrentReadingId(),
                         b.getRatePerUnit(),
                         b.getFixedCharge(),
+                        b.getExtraCharge(),
                         b.getTenantName(),
-                        b.getBillingDate(),
+                        b.getNote(),
                         b.getTotalAmount(),
+                        b.getBillingDate(),
+                        b.getPaymentDate(),
                         b.isPaid() ? "PAID" : "UNPAID"
                 ))
                 .collect(Collectors.toList());
@@ -325,9 +337,12 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     currentReading,
                     bill.getRatePerUnit(),
                     bill.getFixedCharge(),
+                    bill.getExtraCharge(),
                     bill.getTenantName(),
-                    bill.getBillingDate(),
+                    bill.getNote(),
                     bill.getTotalAmount(),
+                    bill.getBillingDate(),
+                    bill.getPaymentDate(),
                     bill.isPaid() ? "PAID" : "UNPAID"
             ));
         }
@@ -362,9 +377,12 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     currentReading,
                     bill.getRatePerUnit(),
                     bill.getFixedCharge(),
+                    bill.getExtraCharge(),
                     bill.getTenantName(),
-                    bill.getBillingDate(),
+                    bill.getNote(),
                     bill.getTotalAmount(),
+                    bill.getBillingDate(),
+                    bill.getPaymentDate(),
                     bill.isPaid() ? "PAID" : "UNPAID"
             ));
         }
@@ -378,5 +396,27 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bill ID " + billId + " not found."));
         return new BillDTO(bill.getBillId(),bill.getBillingDate(),bill.getUnitsConsumed(),
                 bill.getRatePerUnit(),bill.getTotalAmount(),bill.isPaid());
+    }
+
+    @Override
+    public void checkAndRunMigrations(MigrationCallback callback) {
+        // Set the listener on the data layer briefly to catch the result
+        DatabaseConnection.setMigrationListener(new DatabaseConnection.MigrationListener() {
+            @Override
+            public void onMigrationMessage(String message) {
+                callback.onMessage(message);
+            }
+
+            @Override
+            public void onMigrationError(String error, Exception e) {
+                callback.onError(error, e);
+            }
+        });
+
+        try {
+            DatabaseConnection.migrationLogic();
+        } catch (SQLException e) {
+            callback.onError("Critical migration failure", e);
+        }
     }
 }

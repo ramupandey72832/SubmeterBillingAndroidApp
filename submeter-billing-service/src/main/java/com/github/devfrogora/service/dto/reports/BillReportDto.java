@@ -3,6 +3,7 @@ package com.github.devfrogora.service.dto.reports;
 import java.io.Serializable;
 
 // FIX: Append "implements Serializable" to the class header declaration
+
 public class BillReportDto implements Serializable {
 
     // It is highly recommended to declare a stable version ID for safe serialization
@@ -17,12 +18,16 @@ public class BillReportDto implements Serializable {
     private String tenantName;
     private String billingDate;
     private double totalAmount;
+    private String paymentDate;
+    private double extraCharge;
+    private String note;
     private String paymentStatus; // e.g., "PAID" or "UNPAID"
 
     // Constructor, Getters, and Setters
+
     public BillReportDto(int billId, String roomNumber, String meterSerialNumber, double previousReading,
-                         double currentReading, double ratePerUnit, double fixedCharge, String tenantName,
-                         String billingDate, double totalAmount, String paymentStatus) {
+                         double currentReading, double ratePerUnit, double fixedCharge,double extraCharge, String tenantName,
+                         String note,double totalAmount,String billingDate,String paymentDate , String paymentStatus) {
         this.billId = billId;
         this.roomNumber = roomNumber;
         this.meterSerialNumber = meterSerialNumber;
@@ -30,9 +35,12 @@ public class BillReportDto implements Serializable {
         this.currentReading = currentReading;
         this.ratePerUnit = ratePerUnit;
         this.fixedCharge = fixedCharge;
+        this.extraCharge = extraCharge;
         this.tenantName = tenantName;
-        this.billingDate = billingDate;
+        this.note = note;
         this.totalAmount = totalAmount;
+        this.billingDate = billingDate;
+        this.paymentDate = paymentDate;
         this.paymentStatus = paymentStatus;
     }
 
@@ -87,6 +95,17 @@ public class BillReportDto implements Serializable {
         this.paymentStatus = paymentStatus;
     }
 
+
+
+    public String getPaymentDate() { return paymentDate; }
+    public void setPaymentDate(String paymentDate) { this.paymentDate = paymentDate; }
+
+    public double getExtraCharge() { return extraCharge; }
+    public void setExtraCharge(double extraCharge) { this.extraCharge = extraCharge; }
+
+    public String getNote() { return note; }
+    public void setNote(String note) { this.note = note; }
+
     @Override
     public String toString() {
         return "BillReportDto{" +
@@ -99,7 +118,10 @@ public class BillReportDto implements Serializable {
                 ", currentReading=" + currentReading +
                 ", ratePerUnit=" + ratePerUnit +
                 ", fixedCharge=" + fixedCharge +
+                ", extraCharge=" + extraCharge +
                 ", totalAmount=" + totalAmount +
+                ", note=" + note +
+                ", paymentDate=" + paymentDate +
                 ", paymentStatus='" + paymentStatus + '\'' +
                 '}';
     }

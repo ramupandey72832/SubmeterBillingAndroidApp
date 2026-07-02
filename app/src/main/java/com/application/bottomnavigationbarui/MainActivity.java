@@ -34,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 //        EdgeToEdge.enable(this);
         ui = new UiHelper(this);
 
+
+
         // Initialize it immediately while MainActivity is INITIALIZING
         localPermissionHelper = new LocalPermissionHelper(this, new LocalPermissionHelper.OnPermissionsListener() {
             @Override
