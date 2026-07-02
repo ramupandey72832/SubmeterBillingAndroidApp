@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -15,7 +17,6 @@ import androidx.fragment.app.Fragment;
 import com.application.bottomnavigationbarui.adapters.ReportAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentReportsBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.ExcelGenerator;
 import com.application.bottomnavigationbarui.utils.PdfGenerator;
 import com.application.bottomnavigationbarui.utils.SimplePdfGenerator;
 import com.application.bottomnavigationbarui.utils.UiHelper;
@@ -39,6 +40,9 @@ public class ReportsFragment extends Fragment {
 
     // Decoupled Business Core state holder
     private ReportsViewModel viewModel;
+    private ActivityResultLauncher<String> createRangeExcelLauncher;
+    private ActivityResultLauncher<String> createExcelLauncher;
+    private ActivityResultLauncher<String> importExcelLauncher;
 
     public ReportsFragment() {
         // Required empty public constructor
@@ -48,6 +52,62 @@ public class ReportsFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         binding = FragmentReportsBinding.inflate(inflater, container, false);
         return binding.getRoot();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        createRangeExcelLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("application/vnd.ms-excel"),
+                uri -> {
+                    if (uri != null && getContext() != null) {
+                        try {
+                            java.io.OutputStream os = getContext().getContentResolver().openOutputStream(uri);
+                            if (os != null) {
+                                viewModel.writeRangeExcelReport(os);
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Failed to open document file writer", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+
+        // 1. Storage Action: Create Document (Export Save destination)
+        createExcelLauncher = registerForActivityResult(
+                new ActivityResultContracts.CreateDocument("application/vnd.ms-excel"),
+                uri -> {
+                    if (uri != null && getContext() != null) {
+                        try {
+                            // Open Android Stream descriptor and pass it cleanly to service layer
+                            java.io.OutputStream os = getContext().getContentResolver().openOutputStream(uri);
+                            if (os != null) {
+                                viewModel.executeFullExcelBackup(os);
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Failed to open export write channel", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
+
+        // 2. Storage Action: Get Document (Import Source target)
+        importExcelLauncher = registerForActivityResult(
+                new ActivityResultContracts.GetContent(),
+                uri -> {
+                    if (uri != null && getContext() != null) {
+                        try {
+                            java.io.InputStream is = getContext().getContentResolver().openInputStream(uri);
+                            if (is != null) {
+                                viewModel.executeFullExcelImport(is);
+                            }
+                        } catch (Exception e) {
+                            Toast.makeText(getContext(), "Failed to open file read channel", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }
+        );
     }
 
     @Override
@@ -112,6 +172,16 @@ public class ReportsFragment extends Fragment {
 
         // Trigger asynchronous initialization sweep for past records
         viewModel.loadHistoricalThreeMonthReports();
+
+        binding.btnExportAllToExcel.setOnClickListener(v -> {
+            // Trigger save layout selection screen safely targeting a default name
+            createExcelLauncher.launch("Full_Database_Backup.xls");
+        });
+
+        binding.btnImportAllFromExcel.setOnClickListener(v -> {
+            importExcelLauncher.launch("application/vnd.ms-excel");
+        });
+
     }
 
     /**
@@ -121,6 +191,17 @@ public class ReportsFragment extends Fragment {
         // 1. Manage layout click statuses during background operations
         binding.btnGenerateReport.setEnabled(!viewModel.isLoading());
         binding.btnGenerateLatestMonthlyBillsReport.setEnabled(!viewModel.isLoading());
+
+        binding.btnExportAllToExcel.setEnabled(!viewModel.isLoading());
+        binding.btnImportAllFromExcel.setEnabled(!viewModel.isLoading());
+
+        if (viewModel.isBackupSuccess()) {
+            Toast.makeText(requireContext(), viewModel.getOperationResultMessage(), Toast.LENGTH_LONG).show();
+        }
+
+        if (viewModel.isImportSuccess()) {
+            Toast.makeText(requireContext(), viewModel.getOperationResultMessage(), Toast.LENGTH_LONG).show();
+        }
 
         // 2. Intercept and isolate system failures cleanly through ErrorUtils layers
         if (viewModel.getErrorMessage() != null) {
@@ -141,12 +222,16 @@ public class ReportsFragment extends Fragment {
                 String start = dateFormat.format(startCalendar.getTime());
                 String end = dateFormat.format(endCalendar.getTime());
 
-                // Execute UI/Android document writer engines cleanly
-                ExcelGenerator.generateBillReport(requireContext(), viewModel.getRangeFilteredBills(), start, end);
-                SimplePdfGenerator.generateBillReport(requireContext(), viewModel.getRangeFilteredBills(), start, end);
+                // 1. Launch Android document selection screen safely
+                createRangeExcelLauncher.launch("Billing_Report_" + start + "_to_" + end + ".xls");
 
-                Toast.makeText(requireContext(), "Generating report from " + start + " to " + end, Toast.LENGTH_LONG).show();
+                // 2. Execute standard Android document engine (PDF) as before
+                SimplePdfGenerator.generateBillReport(requireContext(), viewModel.getRangeFilteredBills(), start, end);
             }
+        }
+
+        if (viewModel.isRangeExcelWritten()) {
+            Toast.makeText(requireContext(), "Excel report successfully compiled and saved!", Toast.LENGTH_SHORT).show();
         }
 
         // 5. Handle multi-bill compilation ready signals

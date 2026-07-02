@@ -5,6 +5,7 @@ import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
+import com.github.devfrogora.service.utils.ExcelGenerator;
 import com.github.devfrogora.service.utils.OperationResult;
 
 import java.util.ArrayList;
@@ -153,6 +154,89 @@ public class ReportsViewModel {
                 this.isMultiPdfReady = true;
             } catch (Exception e) {
                 this.errorMessage = "Error gathering active targets: " + e.getMessage();
+            } finally {
+                this.isLoading = false;
+                notifyUi();
+            }
+        }).start();
+    }
+
+    private boolean isRangeExcelWritten = false;
+
+    public boolean isRangeExcelWritten() { return isRangeExcelWritten; }
+
+    public void writeRangeExcelReport(java.io.OutputStream outputStream) {
+        this.isLoading = true;
+        this.isRangeExcelWritten = false;
+        notifyUi();
+
+        new Thread(() -> {
+            try (outputStream) {
+                var result = ExcelGenerator.generateBillReport(outputStream, this.rangeFilteredBills);
+                if (result.isSuccess()) {
+                    this.isRangeExcelWritten = true;
+                } else {
+                    this.errorMessage = result.getMessage();
+                }
+            } catch (Exception e) {
+                this.errorMessage = "Stream write error: " + e.getMessage();
+            } finally {
+                this.isLoading = false;
+                notifyUi();
+            }
+        }).start();
+    }
+
+    private boolean isBackupSuccess = false;
+    private boolean isImportSuccess = false;
+    private String operationResultMessage = null;
+
+    public boolean isBackupSuccess() { return isBackupSuccess; }
+    public boolean isImportSuccess() { return isImportSuccess; }
+    public String getOperationResultMessage() { return operationResultMessage; }
+
+    public void executeFullExcelBackup(java.io.OutputStream outputStream) {
+        this.isLoading = true;
+        this.errorMessage = null;
+        this.isBackupSuccess = false;
+        notifyUi();
+
+        new Thread(() -> {
+            try (outputStream) { // Use try-with-resources to ensure stream closures
+                var result = ExcelGenerator.exportAllTablesToExcel(outputStream);
+                if (result.isSuccess()) {
+                    this.operationResultMessage = "Database successfully backed up to Excel workbook!";
+                    this.isBackupSuccess = true;
+                } else {
+                    this.errorMessage = result.getMessage();
+                }
+            } catch (Exception e) {
+                this.errorMessage = "Stream error during backup: " + e.getMessage();
+            } finally {
+                this.isLoading = false;
+                notifyUi();
+            }
+        }).start();
+    }
+
+    public void executeFullExcelImport(java.io.InputStream inputStream) {
+        this.isLoading = true;
+        this.errorMessage = null;
+        this.isImportSuccess = false;
+        notifyUi();
+
+        new Thread(() -> {
+            try (inputStream) {
+                var result = ExcelGenerator.importAllTablesFromExcel(inputStream);
+                if (result.isSuccess()) {
+                    this.operationResultMessage = "Database successfully restored from Excel workbook!";
+                    this.isImportSuccess = true;
+                    loadHistoricalThreeMonthReports();
+                } else {
+                    this.errorMessage = result.getMessage();
+                }
+            } catch (Exception e) {
+                this.errorMessage = "Stream error during import: " + e.getMessage();
             } finally {
                 this.isLoading = false;
                 notifyUi();
