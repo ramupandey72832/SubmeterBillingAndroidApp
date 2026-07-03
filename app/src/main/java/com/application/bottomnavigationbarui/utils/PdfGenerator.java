@@ -151,8 +151,14 @@ public class PdfGenerator {
             currentY += leading + 3;
 
             paint.setTextAlign(Paint.Align.LEFT);
+            canvas.drawText("Extra Charges", offsetX + indent, currentY, paint);
+            paint.setTextAlign(Paint.Align.RIGHT);
+            canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getExtraCharge()), rightMarginEdge, currentY, paint);
+            currentY += leading + 3;
+
+            paint.setTextAlign(Paint.Align.LEFT);
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
-            canvas.drawText("Bill Amount", offsetX + indent, currentY, paint);
+            canvas.drawText("Total Amount", offsetX + indent, currentY, paint);
             paint.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
@@ -161,23 +167,16 @@ public class PdfGenerator {
             canvas.drawLine(offsetX + indent, currentY, rightMarginEdge, currentY, paint);
             currentY += 11;
 
-            // --- ARREARS & TOTAL DUE ---
-            paint.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText("Arrears Due", offsetX + indent, currentY, paint);
-            paint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText("0.00", rightMarginEdge, currentY, paint);
-            currentY += leading;
+
 
             paint.setTextAlign(Paint.Align.LEFT);
-            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
-            canvas.drawText("Total Due", offsetX + indent, currentY, paint);
-            paint.setTextAlign(Paint.Align.RIGHT);
-            canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
-            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
-            currentY += 5;
-
-            canvas.drawLine(offsetX + indent, currentY, rightMarginEdge, currentY, paint);
-            currentY += 12;
+            // ADDED: Notes/Remarks
+            if (bill.getNote() != null) {
+                paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.ITALIC));
+                canvas.drawText("Notes: " + bill.getNote(), indent, currentY, paint);
+                paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+                currentY += leading + 10;
+            }
 
             // --- STATUS SYSTEM ---
             paint.setTextAlign(Paint.Align.LEFT);

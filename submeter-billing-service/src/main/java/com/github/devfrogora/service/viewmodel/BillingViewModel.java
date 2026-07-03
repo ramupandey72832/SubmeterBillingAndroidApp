@@ -117,7 +117,7 @@ public class BillingViewModel {
     /**
      * Pushes adjusted calculations into storage cleanly using inline database updates.
      */
-    public void updateExistingBillMetrics(int billId, double currentReading, double rate, double fixed,double extra, double total, String note) {
+    public void updateExistingBillMetrics(int billId, double currentReading, double previousReading, double rate, double fixed,double extra, double total, String note) {
         this.isLoading = true;
         this.isOperationSuccess = false;
         this.errorMessage = null;
@@ -137,10 +137,11 @@ public class BillingViewModel {
                 bill.setFixedCharge(fixed);
                 bill.setExtraCharge(extra);
                 bill.setNote(note);
+                bill.setUnitsConsumed(currentReading-previousReading);
                 DaoManager.getBillDao().updateBill(bill);
 
                 // 2. FIX: Direct transaction update to bypass missing DAO interface methods completely
-                String sqlUpdateReading = "UPDATE MeterReading SET reading_value = ? WHERE reading_id = ?";
+                String sqlUpdateReading = "UPDATE meter_readings SET reading_value = ? WHERE reading_id = ?";
                 boolean readingUpdated = DbUtils.executeUpdate(
                         sqlUpdateReading,
                         currentReading,

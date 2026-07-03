@@ -129,9 +129,9 @@ public class SQLiteBillDao implements BillDao {
     @Override
     public boolean updatePaymentStatus(int billId, boolean isPaid) throws SQLException {
         String sql = SqlLoader.get("bill.update_status");
-        String todayIsoString = new SimpleDateFormat("yyyy-MM-dd").format(LocalDate.now());
+        String paymentDate = isPaid ? LocalDate.now().toString() : null;
 
-        return DbUtils.executeUpdate(sql, todayIsoString ,isPaid ? 1 : 0, billId);
+        return DbUtils.executeUpdate(sql, paymentDate ,isPaid ? 1 : 0, billId);
     }
 
     @Override

@@ -48,6 +48,7 @@ public class DashboardViewModel {
 
     // --- State Getters ---
     public boolean isLoading() { return isLoading; }
+
     public String getErrorMessage() { return errorMessage; }
     public boolean isDataLoaded() { return isDataLoaded; }
     public boolean isStatusUpdateSuccess() { return isStatusUpdateSuccess; }

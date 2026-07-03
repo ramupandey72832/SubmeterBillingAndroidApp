@@ -129,18 +129,20 @@ public class EditBillFragment extends Fragment {
             return;
         }
 
+        double previous = selectedBill.getPreviousReading();
         double current = Double.parseDouble(curRaw);
         double rate = Double.parseDouble(ratRaw);
         double fixed = Double.parseDouble(fixRaw);
         double extra = Double.parseDouble(extraRaw);
         double total = Double.parseDouble(totRaw);
 
+
         if (current < selectedBill.getPreviousReading()) {
             Toast.makeText(getContext(), "Error: Current reading cannot drop below the previous reading value.", Toast.LENGTH_LONG).show();
             return;
         }
 
-        viewModel.updateExistingBillMetrics(selectedBill.getBillId(), current, rate, fixed, extra ,total,note);
+        viewModel.updateExistingBillMetrics(selectedBill.getBillId(), current,previous, rate, fixed, extra ,total,note);
     }
 
     private void handleUiStateFeedback() {
