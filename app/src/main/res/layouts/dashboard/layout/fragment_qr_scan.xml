@@ -126,6 +126,7 @@
         <View android:layout_width="0dp" android:layout_height="0dp" android:layout_weight="1" android:layout_marginEnd="48dp" />
     </LinearLayout>
 
+
     <!-- Theme-Based Camera Bottom Sheet Overlay Bar -->
     <LinearLayout
         android:id="@+id/bottomBar"
@@ -135,31 +136,39 @@
         android:background="?attr/colorSurface"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:padding="12dp"
+        android:paddingTop="12dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="28dp"
         android:elevation="8dp">
-        <!-- ... (Existing inputFieldLayout and actionButton) ... -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputFieldLayout"
-            style="?attr/textInputStyle"
-            android:layout_width="0dp"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/inputFieldLayout"
+        style="?attr/textInputStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        app:hintEnabled="false">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etRoomNumber"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:hintEnabled="false">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etRoomNumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Enter Room Number..."
-                android:inputType="text"
-                android:paddingVertical="12dp"/>
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnNext"
-            style="?attr/materialButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Next" />
-    </LinearLayout>
+            android:hint="Enter Room Number..."
+            android:inputType="text"
+            android:paddingVertical="12dp"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnNext"
+        style="?attr/materialButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:text="Next" />
+
+</LinearLayout>
+
+
 
 </RelativeLayout>

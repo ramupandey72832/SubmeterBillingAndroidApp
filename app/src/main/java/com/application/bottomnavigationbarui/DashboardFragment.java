@@ -120,30 +120,6 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseConfigurationFragment()));
 
 
-        binding.dashboardSection.test.setOnClickListener(v -> {
-            try {
-                // Run the cross-platform crypto helper
-                List<String> rooms = new ArrayList<>();
-                rooms.add("ROOM_NUMBER_301");
-                rooms.add("ROOM_NUMBER_302");
-                rooms.add("ROOM_NUMBER_101");
-                rooms.add("ROOM_NUMBER_102");
-                rooms.add("ROOM_NUMBER_103");
-                rooms.add("ROOM_NUMBER_104");
-                rooms.add("ROOM_NUMBER_G01");
-                rooms.add("ROOM_NUMBER_G02");
-
-                for (String room : rooms) {
-                    String encryptedBase64 = CryptoHelper.encryptToBase64(room, CryptoHelper.MY_SECRET_KEY);
-//                    android.util.Log.d("CryptoTest", "Encrypted string for QR: " + encryptedBase64);
-                }
-
-            } catch (Exception e) {
-                // Log the error instead of crashing the application
-                android.util.Log.e("CryptoTest", "Encryption failed", e);
-            }
-        });
-
         binding.dashboardSection.dbTables.setOnClickListener(v->{
             NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseInspectorFragment());
         });

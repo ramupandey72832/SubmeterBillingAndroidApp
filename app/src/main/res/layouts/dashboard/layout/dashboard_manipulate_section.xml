@@ -364,41 +364,6 @@
                     android:focusable="true"
                     android:background="?attr/selectableItemBackground">
                     <FrameLayout
-                        android:id="@+id/test"
-                        android:layout_width="@dimen/icon_container_size"
-                        android:layout_height="@dimen/icon_container_size"
-                        android:background="@drawable/bg_circle_icon"
-                        android:layout_gravity="center_horizontal">
-                        <ImageView
-                            android:layout_width="@dimen/action_icon_size"
-                            android:layout_height="@dimen/action_icon_size"
-                            android:layout_gravity="center"
-                            android:src="@drawable/ic_lock_idle_lock"
-                            app:tint="?attr/colorPrimary" />
-                    </FrameLayout>
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/label_margin_top"
-                        android:gravity="center"
-                        android:textAppearance="@style/TextAppearance.App.LabelBody"
-                        android:textColor="?attr/colorOnSurface"
-                        android:textSize="@dimen/text_size_label"
-                        android:text="Test" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_columnWeight="1"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:paddingTop="@dimen/grid_item_padding"
-                    android:paddingBottom="@dimen/grid_item_padding"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:background="?attr/selectableItemBackground">
-                    <FrameLayout
                         android:id="@+id/databaseConfiguration"
                         android:layout_width="@dimen/icon_container_size"
                         android:layout_height="@dimen/icon_container_size"
