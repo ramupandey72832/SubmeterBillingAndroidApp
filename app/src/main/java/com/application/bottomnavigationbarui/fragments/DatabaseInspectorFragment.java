@@ -1,6 +1,7 @@
 package com.application.bottomnavigationbarui.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ public class DatabaseInspectorFragment extends Fragment {
     private GenericTableAdapter tableAdapter;
 
     private final String[] databaseTables = {
-            "ROOM", "TENANT", "TENANCY", "SUBMETER", "BILL", "METER_READING"
+            "ROOMS", "TENANTS", "TENANCIES", "SUBMETERS", "BILLS", "METER_READINGS"
     };
 
     @Nullable
@@ -68,9 +69,10 @@ public class DatabaseInspectorFragment extends Fragment {
         // Trigger default data load for the first table
         viewModel.loadTableData(databaseTables[0]);
     }
-
+    String TAG = "DatabaseInspectorFragment";
     private void renderTableUIState() {
         if (viewModel.getErrorMessage() != null) {
+            Log.d(TAG, "renderTableUIState: " + viewModel.getErrorMessage());
             Toast.makeText(getContext(), viewModel.getErrorMessage(), Toast.LENGTH_LONG).show();
             return;
         }

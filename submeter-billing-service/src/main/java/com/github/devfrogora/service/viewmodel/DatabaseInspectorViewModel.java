@@ -42,28 +42,28 @@ public class DatabaseInspectorViewModel {
 
         try {
             switch (tableName.toUpperCase()) {
-                case "ROOM":
+                case "ROOMS":
                     currentHeaders.addAll(Arrays.asList("Room ID", "Room Number", "Room Type", "Rent Amount"));
                     for (Room r : DaoManager.getRoomDao().getAllRooms()) {
                         currentRows.add(Arrays.asList(String.valueOf(r.getRoomId()), r.getRoomNumber(), r.getRoomType(), "₹" + r.getRentAmount()));
                     }
                     break;
 
-                case "TENANT":
+                case "TENANTS":
                     currentHeaders.addAll(Arrays.asList("Tenant ID", "Name", "Aadhaar", "Mobile", "Address"));
                     for (Tenant t : DaoManager.getTenantDao().getAllTenants()) {
                         currentRows.add(Arrays.asList(String.valueOf(t.getTenantId()), t.getName(), t.getAadharNumber(), t.getPhoneNumber(), t.getAddress()));
                     }
                     break;
 
-                case "TENANCY":
+                case "TENANCIES":
                     currentHeaders.addAll(Arrays.asList("Tenancy ID", "Room ID", "Tenant ID", "Start Date", "End Date", "Is Active"));
                     for (Tenancy ty : DaoManager.getTenancyDao().getAllTenancies()) {
                         currentRows.add(Arrays.asList(String.valueOf(ty.getTenancyId()), String.valueOf(ty.getRoomId()), String.valueOf(ty.getTenantId()), ty.getStartDate(), ty.getEndDate() != null ? ty.getEndDate() : "--", ty.getEndDate() == null ? "YES" : "NO"));
                     }
                     break;
 
-                case "SUBMETER":
+                case "SUBMETERS":
                     currentHeaders.addAll(Arrays.asList("Meter ID", "Room ID", "Serial Number", "Initial Reading"));
                     // Safe fallback map handling if tables contain raw option arrays
                     List<Room> allRooms = DaoManager.getRoomDao().getAllRooms();
@@ -74,20 +74,20 @@ public class DatabaseInspectorViewModel {
                     }
                     break;
 
-                case "BILL":
+                case "BILLS":
                     currentHeaders.addAll(Arrays.asList("bill_id","previous_reading_id","current_reading_id","meter_id","meter_serial_number",
                             "tenant_id","tenant_name","room_number","units_consumed",
-                            "rate_per_unit", "fixed_charge", "total_amount", "billing_date", "paid"));
+                            "rate_per_unit", "fixed_charge","extra_charge", "total_amount", "note", "billing_date", "payment_date", "paid"));
                     for (Bill b : DaoManager.getBillDao().getAllBills()) {
                         currentRows.add(Arrays.asList(String.valueOf(b.getBillId()), String.valueOf(b.getPreviousReadingId()),
                                 String.valueOf(b.getCurrentReadingId()), String.valueOf(b.getMeterId()), b.getMeterSerialNumber(),
                                 String.valueOf(b.getTenantId()), b.getTenantName(), b.getRoomNumber(), String.valueOf(b.getUnitsConsumed()),
-                                String.valueOf(b.getRatePerUnit()), String.valueOf(b.getFixedCharge()),
-                                 "₹" + b.getTotalAmount(), b.getBillingDate(), b.isPaid() ? "PAID" : "UNPAID"));
+                                String.valueOf(b.getRatePerUnit()), String.valueOf(b.getFixedCharge()),String.valueOf(b.getExtraCharge()),
+                                 "₹" + b.getTotalAmount(), b.getNote(), b.getBillingDate(), b.getPaymentDate(),b.isPaid() ? "PAID" : "UNPAID"));
                     }
                     break;
 
-                case "METER_READING":
+                case "METER_READINGS":
                     currentHeaders.addAll(Arrays.asList("Reading ID", "Meter ID", "Reading Value", "Reading_date"));
                     for (MeterReading mr : DaoManager.getMeterReadingDao().getAllReadings()) {
                         currentRows.add(Arrays.asList(String.valueOf(mr.getReadingId()), String.valueOf(mr.getMeterId()), mr.getReadingValue() + " kWh", mr.getReadingDate()));

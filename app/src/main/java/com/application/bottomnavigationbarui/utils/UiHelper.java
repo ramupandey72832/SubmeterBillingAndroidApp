@@ -65,7 +65,5 @@ public class UiHelper {
         createSafeToast(fulMsg, "#4CAF50", Toast.LENGTH_SHORT).show();
         System.out.println(fulMsg);
         e.printStackTrace();
-
-
     }
 }

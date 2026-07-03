@@ -34,7 +34,7 @@ public class DatabaseConnection {
         databaseConfig = config;
 
         // TRIGGER MIGRATION HERE
-        migrationLogic();
+//        migrationLogic();
     }
 
     /**

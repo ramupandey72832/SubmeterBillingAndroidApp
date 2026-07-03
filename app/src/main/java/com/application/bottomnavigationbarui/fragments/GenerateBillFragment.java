@@ -144,10 +144,15 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
 
     private void addMeterReadingAndGenerateBill() {
         MeterBillingService meterBillingService = new MeterBillingServiceImpl();
+        boolean isException = false;
         try {
-            meterBillingService.addMeterReadingAndGenerateBill(getArgRoomnumber, getArgCurrentReading,getArgRateperunit,getArgFixedcharge,getArgExtraCharge,getArgNote);
+            meterBillingService.addMeterReadingAndGenerateBill(getArgRoomnumber, getArgCurrentReading,
+                    getArgRateperunit,getArgFixedcharge,getArgExtraCharge,getArgNote);
         } catch (Exception e) {
+            isException = true;
             ErrorUtils.handleDatabaseException("Error : ", e, ui);
+        }finally {
+            if(!isException) ui.showSuccessAlert("Bill Generated SuccessFully : ", new Exception(""));
         }
     }
 }

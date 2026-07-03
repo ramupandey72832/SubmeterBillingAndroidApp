@@ -8,7 +8,12 @@ import java.util.List;
 public class BackupDao {
 
     public static final String[] TABLES_TO_BACKUP = {
-            "tenants", "rooms", "tenancies", "submeters", "meter_readings", "bills"
+            "rooms",
+            "tenants",
+            "submeters",
+            "tenancies",
+            "meter_readings",
+            "bills"
     };
 
     public interface TableDataConsumer {
@@ -64,22 +69,28 @@ public class BackupDao {
 
         DatabaseConnection.beginTransaction();
         try {
+            // 1. Force Disable Foreign Keys (Best effort)
             try (Statement stmt = conn.createStatement()) {
                 stmt.execute("PRAGMA foreign_keys = OFF;");
             }
 
+            // --- STEP A: DELETE IN REVERSE ORDER (Children first) ---
+            // bills -> meter_readings -> tenancies -> submeters -> tenants -> rooms
+            for (int i = TABLES_TO_BACKUP.length - 1; i >= 0; i--) {
+                String tableName = TABLES_TO_BACKUP[i];
+                try (Statement deleteStmt = conn.createStatement()) {
+                    deleteStmt.execute("DELETE FROM " + tableName);
+                }
+            }
+
+            // --- STEP B: INSERT IN FORWARD ORDER (Parents first) ---
+            // rooms -> tenants -> submeters -> tenancies -> meter_readings -> bills
             for (String tableName : TABLES_TO_BACKUP) {
                 List<String> columns = provider.getColumnsForTable(tableName);
                 if (columns == null || columns.isEmpty()) continue;
 
                 int rowCount = provider.getRowCount(tableName);
 
-                // Clear structural data inside data-layer
-                try (Statement deleteStmt = conn.createStatement()) {
-                    deleteStmt.execute("DELETE FROM " + tableName);
-                }
-
-                // Build statements safely away from domain models
                 StringBuilder columnsBuilder = new StringBuilder();
                 StringBuilder placeholdersBuilder = new StringBuilder();
                 for (int c = 0; c < columns.size(); c++) {
@@ -110,9 +121,11 @@ public class BackupDao {
                 }
             }
 
+            // 3. Re-enable Foreign Keys
             try (Statement stmt = conn.createStatement()) {
                 stmt.execute("PRAGMA foreign_keys = ON;");
             }
+
             DatabaseConnection.commitTransaction();
 
         } catch (Exception e) {

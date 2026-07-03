@@ -163,7 +163,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
 
         // Fire metrics evaluation fetch loops
         viewModel.loadDashboardSummary();
-        viewModel.performDatabaseCheck();
+//        viewModel.performDatabaseCheck();  // Run only if one want to check or alter
     }
 
     /**

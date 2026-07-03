@@ -71,6 +71,8 @@ public class EditBillFragment extends Fragment {
             binding.etEditRatePerUnit.setText(String.valueOf(selectedBill.getRatePerUnit()));
             binding.etEditFixedCharges.setText(String.valueOf(selectedBill.getFixedCharge()));
             binding.etEditTotalAmount.setText(String.valueOf(selectedBill.getTotalAmount()));
+            binding.etEditNote.setText(selectedBill.getNote());
+            binding.etEditExtraCharges.setText(String.valueOf(selectedBill.getExtraCharge()));
 
             // Attach Auto-Calculation dynamic structural triggers
             TextWatcher continuousMathWatcher = new TextWatcher() {
@@ -82,6 +84,7 @@ public class EditBillFragment extends Fragment {
             binding.etEditCurrentReading.addTextChangedListener(continuousMathWatcher);
             binding.etEditRatePerUnit.addTextChangedListener(continuousMathWatcher);
             binding.etEditFixedCharges.addTextChangedListener(continuousMathWatcher);
+            binding.etEditExtraCharges.addTextChangedListener(continuousMathWatcher);
         }
 
         binding.btnSaveBillChanges.setOnClickListener(v -> submitBillAdjustments());
@@ -95,14 +98,16 @@ public class EditBillFragment extends Fragment {
             String currentRaw = binding.etEditCurrentReading.getText().toString().trim();
             String rateRaw = binding.etEditRatePerUnit.getText().toString().trim();
             String fixedRaw = binding.etEditFixedCharges.getText().toString().trim();
+            String extraRaw = binding.etEditExtraCharges.getText().toString().trim();
 
             double current = currentRaw.isEmpty() ? 0.0 : Double.parseDouble(currentRaw);
             double rate = rateRaw.isEmpty() ? 0.0 : Double.parseDouble(rateRaw);
             double fixed = fixedRaw.isEmpty() ? 0.0 : Double.parseDouble(fixedRaw);
+            double extra = extraRaw.isEmpty() ? 0.0 : Double.parseDouble(extraRaw);
             double previous = selectedBill != null ? selectedBill.getPreviousReading() : 0.0;
 
             double consumed = Math.max(0.0, current - previous);
-            double calculatedTotal = (consumed * rate) + fixed;
+            double calculatedTotal = (consumed * rate) + fixed + extra;
 
             // Update display natively without breaking infinite loops flags
             binding.etEditTotalAmount.setText(String.format(java.util.Locale.US, "%.2f", calculatedTotal));
@@ -116,6 +121,8 @@ public class EditBillFragment extends Fragment {
         String ratRaw = binding.etEditRatePerUnit.getText().toString().trim();
         String fixRaw = binding.etEditFixedCharges.getText().toString().trim();
         String totRaw = binding.etEditTotalAmount.getText().toString().trim();
+        String extraRaw = binding.etEditExtraCharges.getText().toString().trim();
+        String note = binding.etEditNote.getText().toString().trim();
 
         if (curRaw.isEmpty() || ratRaw.isEmpty() || fixRaw.isEmpty() || totRaw.isEmpty()) {
             Toast.makeText(getContext(), "All computational metric fields are required.", Toast.LENGTH_SHORT).show();
@@ -125,6 +132,7 @@ public class EditBillFragment extends Fragment {
         double current = Double.parseDouble(curRaw);
         double rate = Double.parseDouble(ratRaw);
         double fixed = Double.parseDouble(fixRaw);
+        double extra = Double.parseDouble(extraRaw);
         double total = Double.parseDouble(totRaw);
 
         if (current < selectedBill.getPreviousReading()) {
@@ -132,7 +140,7 @@ public class EditBillFragment extends Fragment {
             return;
         }
 
-        viewModel.updateExistingBillMetrics(selectedBill.getBillId(), current, rate, fixed, total);
+        viewModel.updateExistingBillMetrics(selectedBill.getBillId(), current, rate, fixed, extra ,total,note);
     }
 
     private void handleUiStateFeedback() {

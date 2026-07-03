@@ -303,9 +303,16 @@ public class PdfGenerator {
         canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getFixedCharge()), rightMarginEdge, currentY, paint);
         currentY += leading + 5;
 
+        // ADDED: Extra Charges
+        paint.setTextAlign(Paint.Align.LEFT);
+        canvas.drawText("Extra Charges", indent, currentY, paint);
+        paint.setTextAlign(Paint.Align.RIGHT);
+        canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getExtraCharge()), rightMarginEdge, currentY, paint);
+        currentY += leading + 5;
+
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
-        canvas.drawText("Bill Amount", indent, currentY, paint);
+        canvas.drawText("Total Amount", indent, currentY, paint);
         paint.setTextAlign(Paint.Align.RIGHT);
         canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
         paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
@@ -314,27 +321,38 @@ public class PdfGenerator {
         canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
         currentY += 14;
 
+//        paint.setTextAlign(Paint.Align.LEFT);
+//        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+//        canvas.drawText("Arrears", indent, currentY, paint);
+//        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+//        currentY += leading;
+//
+//        canvas.drawText("  Arrears Due", indent, currentY, paint);
+//        paint.setTextAlign(Paint.Align.RIGHT);
+//        canvas.drawText("0.00", rightMarginEdge, currentY, paint);
+//        currentY += leading;
+//
+//        paint.setTextAlign(Paint.Align.LEFT);
+//        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
+//        canvas.drawText("  Total Due", indent, currentY, paint);
+//        paint.setTextAlign(Paint.Align.RIGHT);
+//        canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
+//        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+//        currentY += 10;
+//
+//        canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
+//        currentY += 15;
+
         paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
-        canvas.drawText("Arrears", indent, currentY, paint);
-        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
-        currentY += leading;
-
-        canvas.drawText("  Arrears Due", indent, currentY, paint);
-        paint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText("0.00", rightMarginEdge, currentY, paint);
-        currentY += leading;
-
-        paint.setTextAlign(Paint.Align.LEFT);
-        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
-        canvas.drawText("  Total Due", indent, currentY, paint);
-        paint.setTextAlign(Paint.Align.RIGHT);
-        canvas.drawText(String.format(Locale.getDefault(), chargeFormat, bill.getTotalAmount()), rightMarginEdge, currentY, paint);
-        paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
-        currentY += 10;
-
-        canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
-        currentY += 15;
+        // ADDED: Notes/Remarks
+        if (bill.getNote() != null) {
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.ITALIC));
+            canvas.drawText("Notes: " + bill.getNote(), indent, currentY, paint);
+            paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
+            currentY += leading + 5;
+            canvas.drawLine(indent, currentY, rightMarginEdge, currentY, paint);
+            currentY += 15;
+        }
 
         paint.setTextAlign(Paint.Align.LEFT);
         canvas.drawText("STATUS:", indent, currentY, paint);
