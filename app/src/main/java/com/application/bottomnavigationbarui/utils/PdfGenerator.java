@@ -173,7 +173,7 @@ public class PdfGenerator {
             // ADDED: Notes/Remarks
             if (bill.getNote() != null) {
                 paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.ITALIC));
-                canvas.drawText("Notes: " + bill.getNote(), indent, currentY, paint);
+                canvas.drawText("Notes: " + bill.getNote(), offsetX + indent, currentY, paint);
                 paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
                 currentY += leading + 10;
             }

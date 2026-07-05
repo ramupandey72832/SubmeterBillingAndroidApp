@@ -26,6 +26,7 @@ public class MeterReadingViewModel {
     private String meterSerialNumber = "";
     private double previousReading = 0.0;
     private String tenantName = "";
+    private String tenantContactNumber ="";
 
     public interface StateListener {
         void onStateChanged();
@@ -58,6 +59,7 @@ public class MeterReadingViewModel {
     public String getMeterSerialNumber() { return meterSerialNumber; }
     public double getPreviousReading() { return previousReading; }
     public String getTenantName() { return tenantName; }
+    public String getTenantContactNumber() { return tenantContactNumber; }
 
     // --- UI Presentation Actions ---
 
@@ -107,6 +109,7 @@ public class MeterReadingViewModel {
                 this.previousReading = meterBillingService.getLatestReading(submeter.getMeterSerialNumber());
                 this.meterSerialNumber = submeter.getMeterSerialNumber();
                 this.tenantName = tenantOpt.get().getName();
+                this.tenantContactNumber = tenantOpt.get().getPhoneNumber();
                 this.isRoomVerified = true;
 
             } catch (Exception e) {

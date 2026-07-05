@@ -69,6 +69,7 @@ public class MeterReadingFragment extends Fragment {
         }
 
         // Initialize immutable visual states on loading profiles
+
         binding.etSubmeterSerialNumber.setEnabled(false);
         binding.etPreviousMeterReading.setEnabled(false);
         binding.etRatePerUnit.setEnabled(false);
@@ -80,6 +81,8 @@ public class MeterReadingFragment extends Fragment {
             String roomNumber = binding.etRoomNumber.getText().toString().trim();
             viewModel.checkRoomDetails(roomNumber);
         });
+
+
 
         binding.btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -144,6 +147,7 @@ public class MeterReadingFragment extends Fragment {
 
         // 3. Unlock input variables if the data checks confirm success states
         if (viewModel.isRoomVerified()) {
+            binding.tvTenantName.setText("Name : "+viewModel.getTenantName()+" PH.NO.: "+viewModel.getTenantContactNumber());
             binding.etSubmeterSerialNumber.setText(viewModel.getMeterSerialNumber());
             binding.etPreviousMeterReading.setText(String.valueOf(viewModel.getPreviousReading()));
 

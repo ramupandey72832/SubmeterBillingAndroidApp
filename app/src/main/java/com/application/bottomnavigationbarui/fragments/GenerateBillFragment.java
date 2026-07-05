@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.application.bottomnavigationbarui.BillsFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentGenerateBillBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
@@ -109,6 +111,12 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(requireContext());
 
+        binding.btnBack.setOnClickListener(view1 -> {
+            if (getActivity() != null) {
+                getActivity().getOnBackPressedDispatcher().onBackPressed();
+            }
+        });
+
         binding.tvRoomNumberLabel.setText(getArgRoomnumber);
         binding.tvTenantName.setText(getArgTenantname);
         double unitsConsumed = getArgCurrentReading - getArgPreviousReading;
@@ -152,7 +160,10 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
             isException = true;
             ErrorUtils.handleDatabaseException("Error : ", e, ui);
         }finally {
-            if(!isException) ui.showSuccessAlert("Bill Generated SuccessFully : ", new Exception(""));
+            if(!isException) {
+                ui.showSuccessAlert("Bill Generated SuccessFully : ", new Exception(""));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new BillsFragment());
+            }
         }
     }
 }

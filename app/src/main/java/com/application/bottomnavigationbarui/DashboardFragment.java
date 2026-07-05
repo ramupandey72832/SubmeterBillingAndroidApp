@@ -111,7 +111,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new EndRoomTenancyFragment()));
 
         binding.btnScanMeter.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new MeterReadingFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new QrScanFragment()));
 
         binding.dashboardSection.mpin.setOnClickListener(v ->
                 NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new SetupMpinFragment()));

@@ -70,6 +70,16 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvTenantName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:textAppearance="@style/TextAppearance.App.LabelBody"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:textSize="14sp"
+            android:text="Tenant Name " />
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/tilSubmeterNumber"
             style="?attr/textInputStyle"
