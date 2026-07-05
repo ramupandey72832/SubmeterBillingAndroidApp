@@ -243,4 +243,15 @@ public class ReportsViewModel {
             }
         }).start();
     }
+
+    public void clearRangeExportFlags() {
+        this.isRangeExportReady = false;
+        // If you have a variable specifically for the 'ExcelWritten' toast, clear it too
+        this.isRangeExcelWritten = false;
+    }
+
+    public void clearMultiPdfFlag() {
+        this.isMultiPdfReady = false;
+    }
+
 }

@@ -216,6 +216,8 @@ public class ReportsFragment extends Fragment {
 
         // 4. Handle date-range results ready signals
         if (viewModel.isRangeExportReady()) {
+            viewModel.clearRangeExportFlags();
+
             if (viewModel.getRangeFilteredBills().isEmpty()) {
                 Toast.makeText(getContext(), "No Bills Found", Toast.LENGTH_SHORT).show();
             } else {
@@ -236,6 +238,7 @@ public class ReportsFragment extends Fragment {
 
         // 5. Handle multi-bill compilation ready signals
         if (viewModel.isMultiPdfReady()) {
+            viewModel.clearMultiPdfFlag();
             PdfGenerator.generateMultipleBillsPdf(getContext(), viewModel.getLatestMonthlyBills());
         }
     }
