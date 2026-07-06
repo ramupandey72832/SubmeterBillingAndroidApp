@@ -86,7 +86,8 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
             }
 
             // LAUNCH THE SECURITY DIALOG GATE HERE
-            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+            String msg = "Are you sure you want to terminate tenancy for room " + roomNumber + " on " + endDate + "?" ;
+            VerifyMpinDialogFragment dialog =  VerifyMpinDialogFragment.newInstance(msg);
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
     }
@@ -134,6 +135,7 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
 
         // 4. Handle successful tenancy drop loops
         if (viewModel.isTerminationSuccess()) {
+            viewModel.resetTerminationFlag();
             Toast.makeText(getContext(), "Tenancy successfully terminated.", Toast.LENGTH_LONG).show();
             clearFormFields();
         }

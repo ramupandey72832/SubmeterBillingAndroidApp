@@ -122,7 +122,13 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             }
 
             // LAUNCH THE SECURITY GATE DIALOG HERE
-            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+            String message = "Tenant Name: " + tenantName + "\n" +
+                    "Aadhar Number: " + aadharNumber + "\n" +
+                    "Tenant Mobile: " + tenantMobile + "\n" +
+                    "Tenant Address: " + tenantAddress + "\n" +
+                    "Room Number: " + roomNumber + "\n" +
+                    "Start Date: " + startDate;
+            VerifyMpinDialogFragment dialog =  VerifyMpinDialogFragment.newInstance(message);
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
     }

@@ -60,15 +60,15 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
 
         binding.btnDeleteTenant.setOnClickListener(view1 -> {
             String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString().trim();
-            String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString().trim();
 
-            if (tenantAadhaarNumber.isEmpty() || tenantRoomNumber.isEmpty()) {
+            if (tenantAadhaarNumber.isEmpty()) {
                 Toast.makeText(getContext(), "Please fill in all mandatory field strings.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // LAUNCH THE POPUP GATE DIALOG HERE
-            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+            String msg = "Are you sure you want to delete tenant " + tenantAadhaarNumber + " from systems?" ;
+            VerifyMpinDialogFragment dialog =  VerifyMpinDialogFragment.newInstance(msg);
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
 
@@ -86,10 +86,9 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
 
     private void executeDeleteTenantLogic() {
         String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString().trim();
-        String tenantRoomNumber = binding.etTenantRoomNumber.getText().toString().trim();
 
         // Forward deletion actions over to ViewModel operations
-        viewModel.deleteTenant(tenantAadhaarNumber, tenantRoomNumber);
+        viewModel.deleteTenant(tenantAadhaarNumber);
     }
 
     /**
@@ -120,7 +119,6 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
 
     private void clearInputs() {
         binding.etTenantAadhaarNumber.setText("");
-        binding.etTenantRoomNumber.setText("");
     }
 
     @Override

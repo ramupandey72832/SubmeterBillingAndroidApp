@@ -390,4 +390,8 @@ public class TenancyViewModel {
             }
         }).start();
     }
+
+    public void resetTerminationFlag() {
+        this.isTerminationSuccess = false;
+    }
 }

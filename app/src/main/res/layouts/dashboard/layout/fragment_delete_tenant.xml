@@ -72,24 +72,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Room/Unit Number Identification -->
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/tilTenantRoomNumber"
-            style="?attr/textInputStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:hint="Room Number"
-            app:startIconDrawable="@drawable/ic_menu_home"
-            app:startIconTint="?attr/colorOnSurfaceVariant">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/etTenantRoomNumber"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:maxLines="1" />
-        </com.google.android.material.textfield.TextInputLayout>
 
         <!-- Verification Input Field -->
         <com.google.android.material.textfield.TextInputLayout

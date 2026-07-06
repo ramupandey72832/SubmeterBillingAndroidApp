@@ -111,9 +111,9 @@ public class TenantViewModel {
     }
 
     // --- Tenant Deletion Action with Embedded Safety Logic ---
-    public void deleteTenant(String aadhaarNumber, String roomNumber) {
-        if (aadhaarNumber == null || aadhaarNumber.trim().isEmpty() || roomNumber == null || roomNumber.trim().isEmpty()) {
-            this.errorMessage = "Validation Error: Aadhaar and Room Number are mandatory fields.";
+    public void deleteTenant(String aadhaarNumber) {
+        if (aadhaarNumber == null || aadhaarNumber.trim().isEmpty()) {
+            this.errorMessage = "Validation Error: Aadhaar Number are mandatory fields.";
             notifyUi();
             return;
         }
@@ -126,28 +126,14 @@ public class TenantViewModel {
 
         new Thread(() -> {
             try {
-                String cleanRoom = roomNumber.trim();
                 String cleanAadhaar = aadhaarNumber.trim();
-
-                // 1. Verify structural room existence
-                boolean isRoomExist = roomMeterService.isRoomExist(cleanRoom);
-                if (!isRoomExist) {
-                    this.errorMessage = "Business Validation: Room " + cleanRoom + " does not exist in the system.";
-                    this.isLoading = false;
-                    notifyUi();
-                    return;
-                }
 
                 // 2. Query active tenancy contracts
                 TenancyDTO tenancyDTO = tenancyManagementService.findActiveTenancyByTenantAadhar(cleanAadhaar);
 
                 if (tenancyDTO != null) {
                     // Tenant has an active tenancy layout somewhere
-                    if (tenancyDTO.getRoomNumber().equalsIgnoreCase(cleanRoom)) {
-                        this.errorMessage = "Safety Restriction: Tenant cannot be hard-deleted while actively occupying room " + cleanRoom + ". Terminate their tenancy structure first.";
-                    } else {
-                        this.errorMessage = "Safety Restriction: Tenant has an active tenancy contract tied to room: " + tenancyDTO.getRoomNumber();
-                    }
+                    this.errorMessage = "Safety Restriction: Tenant has an active tenancy contract tied to room: " + tenancyDTO.getRoomNumber();
                     this.isLoading = false;
                     notifyUi();
                     return;
@@ -155,10 +141,12 @@ public class TenantViewModel {
 
                 // 3. Safe Deletion execution path (No active tenancy blocking history constraints)
                 tenancyManagementService.deleteTenantIfNoActiveTenancy(cleanAadhaar);
+
                 this.feedbackMessage = "Tenant record successfully dropped from systems.";
                 this.isOperationSuccess = true;
 
             } catch (Exception e) {
+                // will throw if its linked to any foreign key like bill , etc
                 this.errorMessage = "Critical database failure during tenant removal: " + e.getMessage();
             } finally {
                 this.isLoading = false;

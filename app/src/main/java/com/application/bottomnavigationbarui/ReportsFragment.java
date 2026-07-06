@@ -2,7 +2,12 @@
 package com.application.bottomnavigationbarui;
 
 import android.app.DatePickerDialog;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -80,6 +85,10 @@ public class ReportsFragment extends Fragment {
                 uri -> {
                     if (uri != null && getContext() != null) {
                         try {
+                            // 1. Convert the content URI into an absolute file path
+                            String absolutePath = getAbsolutePathFromUri(uri);
+                            binding.tvDatabasePath.setText("Exported File Path: " + absolutePath);
+
                             // Open Android Stream descriptor and pass it cleanly to service layer
                             java.io.OutputStream os = getContext().getContentResolver().openOutputStream(uri);
                             if (os != null) {
@@ -108,6 +117,34 @@ public class ReportsFragment extends Fragment {
                     }
                 }
         );
+    }
+
+    private String getAbsolutePathFromUri(Uri uri) {
+        if (uri == null) return null;
+
+        // Check if the URI is a document managed by Android's Storage Access Framework
+        if (DocumentsContract.isDocumentUri(getContext(), uri)) {
+            String docId = DocumentsContract.getDocumentId(uri);
+
+            // Split the type from the path (e.g., "primary:Download/my_file.xls")
+            String[] split = docId.split(":");
+            String type = split[0];
+
+            if ("primary".equalsIgnoreCase(type)) {
+                if (split.length > 1) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                } else {
+                    return Environment.getExternalStorageDirectory() + "/";
+                }
+            }
+        }
+
+        // Fallback to standard path if it's a file URI or unparseable content URI
+        if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return uri.toString(); // Ultimate fallback if nothing else matches
     }
 
     @Override

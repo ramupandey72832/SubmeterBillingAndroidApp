@@ -44,7 +44,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
-    public void initialMeterReading(int submeterId, double initialReading , int fixedCharge, double rate) throws SQLException {
+    public void initialMeterReading(int submeterId, double initialReading , double fixedCharge, double rate) throws SQLException {
         Optional<Submeter> submeter = DaoManager.getSubmeterDao().getSubmeterById(submeterId);
 
         if(submeter.isEmpty()){
@@ -68,7 +68,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     void addIntialMeterReading(int submeterId, String submeterSerialNumber, int roomId,String roomNumber,int currentReadingId ,
-                               double currentMeterReading , int fixedCharge, double rate  ) throws SQLException{
+                               double currentMeterReading , double fixedCharge, double rate  ) throws SQLException{
         // 5. Query active lease profile for tenant details
         Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(roomId);
         String tenantName = "Vacant Unit Asset";

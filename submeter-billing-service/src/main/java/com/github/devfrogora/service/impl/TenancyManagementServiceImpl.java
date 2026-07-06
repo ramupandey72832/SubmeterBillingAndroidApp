@@ -27,6 +27,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
             tenantEntity.setName(tenantDto.getName());
             tenantEntity.setAadharNumber(tenantDto.getAadharNumber());
             tenantEntity.setPhoneNumber(tenantDto.getPhoneNumber());
+            tenantEntity.setAddress(tenantDto.getAddress());
 
             boolean inserted = DaoManager.getTenantDao().insertTenant(tenantEntity);
             if (!inserted) {

@@ -41,7 +41,8 @@ public class RoomMeterServiceImpl implements RoomMeterService {
 
             Room room = new Room();
             room.setRoomNumber(roomNumber);
-            room.setRentAmount(roomType.equalsIgnoreCase("2BHK") ? 12000.00 : 7500.00);
+            room.setRoomType(roomType);
+            room.setRentAmount(0);
 
             boolean inserted = DaoManager.getRoomDao().insertRoom(room);
             if (!inserted) {
@@ -66,7 +67,9 @@ public class RoomMeterServiceImpl implements RoomMeterService {
                     DatabaseConnection.rollbackTransaction();
                     return OperationResult.failure("Failed to attach hardware submeter registry.");
                 }
-                meterBillingService.initialMeterReading(meterId, meterInitialReading, 50, 10);
+
+                double noCharge = 0;
+                meterBillingService.initialMeterReading(meterId, meterInitialReading, noCharge, noCharge);
             } else {
                 meterBillingService.initialMeterReading(linkedMeters.get().getMeterId(), meterInitialReading, 50, 10);
             }

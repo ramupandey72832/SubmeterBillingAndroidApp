@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface MeterBillingService {
 
-    public void initialMeterReading(int submeterId, double initialReading , int fixedCharge, double rate) throws SQLException;
+    public void initialMeterReading(int submeterId, double initialReading , double fixedCharge, double rate) throws SQLException;
     void addMeterReadingAndGenerateBill(String roomNumber, double currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes) throws SQLException;
     void updateBillPaymentStatus(int billId, boolean isPaid) throws SQLException;
 
