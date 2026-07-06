@@ -126,7 +126,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
     }
 
     @Override
-    public OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber) {
+    public OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber,double initialReading) {
         try {
             DatabaseConnection.beginTransaction();
 
@@ -138,6 +138,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
                 Submeter submeter = submeterOpt.get();
                 submeter.setRoomId(room.getRoomId());
                 submeter.setMeterSerialNumber(newMeterSerialNumber);
+                submeter.setInitialReading(initialReading);
                 DaoManager.getSubmeterDao().updateSubmeter(submeter);
 
                 DatabaseConnection.commitTransaction();

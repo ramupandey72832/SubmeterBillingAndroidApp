@@ -22,7 +22,7 @@ public interface RoomMeterService {
      * Modifies the hardware submeter serial numbers.
      * Reports an OperationResult confirming execution status back to the ViewModel.
      */
-    OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber);
+    OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber,double initialReading);
 
     /**
      * Safely tears down room assets if they are currently unrented.

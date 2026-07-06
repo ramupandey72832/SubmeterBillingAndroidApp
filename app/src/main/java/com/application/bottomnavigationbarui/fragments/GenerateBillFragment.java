@@ -136,7 +136,9 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
         binding.btnGenerateSendBill.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+                String msg = "Meter Serial Number "+getArgSubmeterserialnumber+" Current Reading "+getArgCurrentReading +
+                        " Rate Per Unit "+getArgRateperunit+" Fixed Charge "+getArgFixedcharge+" Extra Charge "+getArgExtraCharge+" Note "+getArgNote;
+                VerifyMpinDialogFragment dialog =  VerifyMpinDialogFragment.newInstance(msg);
                 dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
             }
         });

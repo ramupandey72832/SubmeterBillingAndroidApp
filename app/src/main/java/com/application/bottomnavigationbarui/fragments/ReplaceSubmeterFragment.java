@@ -60,14 +60,16 @@ public class ReplaceSubmeterFragment extends Fragment implements VerifyMpinDialo
             String roomNumber = binding.etRoomNumber.getText().toString().trim();
             String oldMeterSerialNumber = binding.etOldMeterNumber.getText().toString().trim();
             String newMeterSerialNumber = binding.etNewSerialNumber.getText().toString().trim();
+            double initialReading = Double.parseDouble(binding.etInitialReading.getText().toString().trim());
 
-            if (roomNumber.isEmpty() || oldMeterSerialNumber.isEmpty() || newMeterSerialNumber.isEmpty()) {
+            if (roomNumber.isEmpty() || oldMeterSerialNumber.isEmpty() || newMeterSerialNumber.isEmpty() || binding.etInitialReading.getText().toString().isEmpty()) {
                 Toast.makeText(getContext(), "Please fill in all fields completely.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
             // LAUNCH THE SECURITY DIALOG GATE HERE
-            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+            String message = "Do you want to replace Submeter of Room " + roomNumber + " with new serial number " + newMeterSerialNumber + " and initial reading " + initialReading + "?";
+            VerifyMpinDialogFragment dialog =  VerifyMpinDialogFragment.newInstance(message);
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
     }
@@ -83,9 +85,10 @@ public class ReplaceSubmeterFragment extends Fragment implements VerifyMpinDialo
         String roomNumber = binding.etRoomNumber.getText().toString().trim();
         String oldMeterSerialNumber = binding.etOldMeterNumber.getText().toString().trim();
         String newMeterSerialNumber = binding.etNewSerialNumber.getText().toString().trim();
+        double initialReading = Double.parseDouble(binding.etInitialReading.getText().toString().trim());
 
         // Forward the operational parameters down to the ViewModel
-        viewModel.replaceSubmeter(roomNumber, oldMeterSerialNumber, newMeterSerialNumber);
+        viewModel.replaceSubmeter(roomNumber, oldMeterSerialNumber, newMeterSerialNumber,initialReading);
     }
 
     /**

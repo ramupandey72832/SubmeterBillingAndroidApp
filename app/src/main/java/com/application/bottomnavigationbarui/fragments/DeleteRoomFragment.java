@@ -10,8 +10,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentDeleteRoomBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -55,6 +57,11 @@ public class DeleteRoomFragment extends Fragment implements VerifyMpinDialogFrag
             }
         });
 
+        binding.btnBack.setOnClickListener(v -> {
+            clearInputs();
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+        });
+
         binding.btnDeleteRoom.setOnClickListener(v -> {
             String targetRoom = binding.etDeleteRoomNumber.getText().toString().trim();
             String confirmation = binding.etConfirmDelete.getText().toString().trim();
@@ -73,7 +80,8 @@ public class DeleteRoomFragment extends Fragment implements VerifyMpinDialogFrag
             }
 
             // LAUNCH THE POPUP DIALOG GATE HERE
-            VerifyMpinDialogFragment dialog = new VerifyMpinDialogFragment();
+            String msg = "Are you sure you want to delete room " + targetRoom + " from systems?" ;
+            VerifyMpinDialogFragment dialog =  VerifyMpinDialogFragment.newInstance(msg);
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
     }

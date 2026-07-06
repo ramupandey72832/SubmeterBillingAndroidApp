@@ -11,8 +11,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentDeleteTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -58,6 +60,11 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
             }
         });
 
+        binding.btnBack.setOnClickListener(v -> {
+            clearInputs();
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+        });
+
         binding.btnDeleteTenant.setOnClickListener(view1 -> {
             String tenantAadhaarNumber = binding.etTenantAadhaarNumber.getText().toString().trim();
 
@@ -72,9 +79,6 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
             dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
         });
 
-        binding.btnCancel.setOnClickListener(view1 -> {
-            clearInputs();
-        });
     }
 
     @Override
@@ -97,7 +101,7 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
     private void renderUiState() {
         // 1. Manage layout click handling criteria when processing actions
         binding.btnDeleteTenant.setEnabled(!viewModel.isLoading());
-        binding.btnCancel.setEnabled(!viewModel.isLoading());
+        binding.btnBack.setEnabled(!viewModel.isLoading());
 
         // 2. Intercept structural failures and project them using ErrorUtils layout mechanics
         if (viewModel.getErrorMessage() != null) {

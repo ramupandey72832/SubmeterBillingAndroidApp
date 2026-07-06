@@ -98,7 +98,7 @@ public class RoomMeterViewModel {
     }
 
     // --- New Submeter Replacement Action ---
-    public void replaceSubmeter(String roomNumber, String oldSerialNumber, String newSerialNumber) {
+    public void replaceSubmeter(String roomNumber, String oldSerialNumber, String newSerialNumber,double initialReading) {
         this.isLoading = true;
         this.errorMessage = null;
         this.isOperationSuccess = false;
@@ -106,7 +106,7 @@ public class RoomMeterViewModel {
 
         new Thread(() -> {
             // Service method now cleanly responds with an OperationResult package
-            OperationResult<Void> result = service.updateSubmeter(roomNumber, oldSerialNumber, newSerialNumber);
+            OperationResult<Void> result = service.updateSubmeter(roomNumber, oldSerialNumber, newSerialNumber,initialReading);
 
             this.isLoading = false;
             this.isOperationSuccess = result.isSuccess();

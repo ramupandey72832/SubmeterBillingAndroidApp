@@ -124,6 +124,25 @@
                 android:maxLines="1" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <!-- Input Field: New Meter Serial Number -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/tilInitialReading"
+            style="?attr/textInputStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="32dp"
+            android:hint="New Meter Serial Number"
+            app:startIconDrawable="@android:drawable/ic_input_add"
+            app:startIconTint="?attr/colorOnSurfaceVariant">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etInitialReading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
         <!-- Core Update Action Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnUpdate"
