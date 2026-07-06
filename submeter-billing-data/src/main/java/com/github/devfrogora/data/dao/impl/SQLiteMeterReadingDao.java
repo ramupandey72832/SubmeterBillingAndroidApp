@@ -42,6 +42,12 @@ public class SQLiteMeterReadingDao implements MeterReadingDao {
     }
 
     @Override
+    public Optional<MeterReading> getLatestMeterReadingBySerialNumber(String serialNumber) throws SQLException {
+        String sql = SqlLoader.get("reading.get_latest_by_serial");
+        return DbUtils.executeQuerySingle(sql, this::mapResultSetToReading, serialNumber);
+    }
+
+    @Override
     public List<MeterReading> getAllReadings() throws SQLException {
         String sql = SqlLoader.get("reading.get_all");
         return DbUtils.executeQueryList(sql, this::mapResultSetToReading);

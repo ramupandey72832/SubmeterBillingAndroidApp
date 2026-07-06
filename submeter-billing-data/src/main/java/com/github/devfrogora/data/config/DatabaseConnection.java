@@ -34,7 +34,7 @@ public class DatabaseConnection {
         databaseConfig = config;
 
         // TRIGGER MIGRATION HERE
-//        migrationLogic();
+        migrationLogic();
     }
 
     /**
@@ -178,6 +178,19 @@ public class DatabaseConnection {
                 while (rs.next()) {
                     columns.add(rs.getString("name"));
                 }
+            }
+
+            // Check for submeters table
+            Set<String> submeterColumns = new HashSet<>();
+            try (ResultSet rs = stmt.executeQuery("PRAGMA table_info(submeters)")) {
+                while (rs.next()) {
+                    submeterColumns.add(rs.getString("name"));
+                }
+            }
+
+            if (!submeterColumns.contains("is_active")) {
+                // Add column: 1 = Active, 0 = Detached/Archived
+                stmt.execute("ALTER TABLE submeters ADD COLUMN is_active INTEGER DEFAULT 1;");
             }
 
             StringBuilder changes = new StringBuilder();

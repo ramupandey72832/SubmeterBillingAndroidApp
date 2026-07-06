@@ -126,34 +126,38 @@ public class RoomMeterServiceImpl implements RoomMeterService {
     }
 
     @Override
-    public OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber,double initialReading) {
+    public OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber, double initialReading) {
         try {
             DatabaseConnection.beginTransaction();
 
-            Optional<Submeter> submeterOpt = DaoManager.getSubmeterDao().getSubmeterBySerialNumber(oldMeterSerialNumber);
-            if (submeterOpt.isPresent()) {
-                Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
-                        .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " not found."));
+            Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+                    .orElseThrow(() -> new ResourceNotFoundException("Room not found."));
 
-                Submeter submeter = submeterOpt.get();
-                submeter.setRoomId(room.getRoomId());
-                submeter.setMeterSerialNumber(newMeterSerialNumber);
-                submeter.setInitialReading(initialReading);
-                DaoManager.getSubmeterDao().updateSubmeter(submeter);
+            // 1. Find and Delete (or Archive) the old meter for this room
+            Optional<Submeter> oldMeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId());
+            if (oldMeter.isPresent()) {
+                // Delete the old meter reference (or mark as inactive)
+                DaoManager.getSubmeterDao().deactivateSubmeter(oldMeter.get().getMeterId());            }
 
-                DatabaseConnection.commitTransaction();
-                return OperationResult.success(null, "Submeter hardware registration code successfully reassigned.");
-            } else {
-                DatabaseConnection.rollbackTransaction();
-                return OperationResult.failure("Meter " + oldMeterSerialNumber + " not found.");
+            // 2. Provision the new hardware
+            Submeter newMeter = new Submeter();
+            newMeter.setRoomId(room.getRoomId());
+            newMeter.setMeterSerialNumber(newMeterSerialNumber);
+            newMeter.setInitialReading(initialReading);
+
+            int newMeterId = DaoManager.getSubmeterDao().insertSubmeter(newMeter);
+            if (newMeterId < 0) {
+                throw new SQLException("Failed to insert new submeter hardware.");
             }
+            // 3. Record the initial reading in the readings table so billing starts fresh
+            double noCharge = 0;
+            meterBillingService.initialMeterReading(newMeterId, initialReading, noCharge, noCharge);
 
-        } catch (ResourceNotFoundException e) {
+            DatabaseConnection.commitTransaction();
+            return OperationResult.success(null, "Hardware replaced. New meter sequence started.");
+        } catch (Exception e) {
             DatabaseConnection.rollbackTransaction();
-            return OperationResult.failure("Update Target Error: " + e.getMessage());
-        } catch (SQLException e) {
-            DatabaseConnection.rollbackTransaction();
-            return OperationResult.failure("Storage mutation exception during submeter swapping operations: " + e.getMessage());
+            return OperationResult.failure("Hardware swap failed: " + e.getMessage());
         }
     }
 

@@ -131,7 +131,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="32dp"
-            android:hint="New Meter Serial Number"
+            android:hint="Initial Reading"
             app:startIconDrawable="@android:drawable/ic_input_add"
             app:startIconTint="?attr/colorOnSurfaceVariant">
 

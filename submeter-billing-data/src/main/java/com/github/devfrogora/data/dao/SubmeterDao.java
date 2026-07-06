@@ -18,6 +18,8 @@ public interface SubmeterDao {
 
     // Update
     boolean updateSubmeter(Submeter submeter) throws SQLException;
+    boolean detachSubmeter(int meterId) throws SQLException;
+    boolean deactivateSubmeter(int meterId) throws SQLException;
 
     // Delete
     boolean deleteSubmeter(int meterId) throws SQLException;

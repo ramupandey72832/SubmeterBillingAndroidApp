@@ -14,6 +14,7 @@ public interface MeterReadingDao {
     Optional<MeterReading> getReadingById(Integer readingId) throws SQLException;
     List<MeterReading> getReadingsByMeterId(int meterId) throws SQLException;
     Optional<MeterReading> getLatestReadingByMeterId(int meterId) throws SQLException;
+    Optional<MeterReading> getLatestMeterReadingBySerialNumber(String serialNumber) throws SQLException;
     List<MeterReading> getAllReadings() throws SQLException;
 
     // Update
