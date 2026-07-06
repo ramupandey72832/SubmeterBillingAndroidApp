@@ -13,8 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.bottomnavigationbarui.RoomsFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -62,7 +64,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             }
         });
 
-        demoTenant();
+
 
         // 1. Fetch your dataset safely from the ViewModel layer
         List<String> roomNumbers = viewModel.getRoomNumbersList();
@@ -159,6 +161,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
 
         // 3. Wring out inputs exclusively upon structural commitment confirmations
         if (viewModel.isOperationSuccess()) {
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment());
             String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
             Toast.makeText(getContext(), "Tenant : " + tenantName + " added successfully", Toast.LENGTH_SHORT).show();
             clearInputs();

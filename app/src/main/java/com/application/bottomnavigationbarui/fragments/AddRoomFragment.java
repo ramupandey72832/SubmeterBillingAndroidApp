@@ -11,8 +11,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.application.bottomnavigationbarui.R;
+import com.application.bottomnavigationbarui.RoomsFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentAddRoomBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -57,7 +59,6 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
             }
         });
 
-        demo();
 
         binding.layoutAddroom.btnAddRoom.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,6 +126,7 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
 
         // 3. Clear data input layouts only on successful processing confirmation
         if (viewModel.isOperationSuccess()) {
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment());
             Toast.makeText(getContext(), "Room added successfully", Toast.LENGTH_SHORT).show();
             clearInputs();
         }
