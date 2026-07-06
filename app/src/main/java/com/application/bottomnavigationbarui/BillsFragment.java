@@ -1,6 +1,7 @@
 // File: app/.../fragments/BillsFragment.java
 package com.application.bottomnavigationbarui;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
@@ -65,7 +68,11 @@ public class BillsFragment extends Fragment {
             @Override
             public void onReceiptClick(BillReportDto bill) {
                 try {
-                    PdfGenerator.generateBillPdf(requireContext(), bill);
+                    String fileName = "Thermal_Bill_" + bill.getBillId() + ".pdf";
+
+                    PdfGenerator.generateBillPdf(requireContext(), bill,fileName);
+                    // Immediately trigger the external viewer
+                    viewGeneratedBill(fileName);
                 } catch (Exception e) {
                     ErrorUtils.handleDatabaseException("PDF Generation Failure", e, ui);
                 }
@@ -74,10 +81,10 @@ public class BillsFragment extends Fragment {
             @Override
             public void onShareClick(BillReportDto bill) {
                 try {
-                    PdfGenerator.generateBillPdf(requireContext(), bill);
+                    String filename = "Thermal_Bill_" + bill.getBillId() + ".pdf";
+                    PdfGenerator.generateBillPdf(requireContext(), bill,filename);
 
                     File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                    String filename = "Thermal_Bill_" + bill.getBillId() + ".pdf";
                     File sharedFile = new File(downloadsDir, filename);
 
                     if (!sharedFile.exists()) {
@@ -183,6 +190,38 @@ public class BillsFragment extends Fragment {
             adapter.notifyDataSetChanged();
         }
     }
+
+    private void viewGeneratedBill(String filename) {
+        try {
+            // 1. Locate the file (Assuming PdfGenerator saves to Downloads with this naming convention)
+            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File pdfFile = new File(downloadsDir, filename);
+
+            if (!pdfFile.exists()) {
+                Toast.makeText(requireContext(), "Bill file not found.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 2. Create a secure Content Uri using FileProvider
+            String authority = requireContext().getPackageName() + ".fileprovider";
+            Uri contentUri = FileProvider.getUriForFile(requireContext(), authority, pdfFile);
+
+            // 3. Create the View Intent
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setDataAndType(contentUri, "application/pdf");
+
+            // 4. Grant temporary read permissions
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+
+            // 5. Launch chooser so user can pick their favorite PDF app
+            startActivity(Intent.createChooser(intent, "Open Bill PDF using:"));
+
+        } catch (Exception e) {
+            ErrorUtils.handleDatabaseException("Could not open PDF viewer", e, ui);
+        }
+    }
+
 
     @Override
     public void onDestroyView() {

@@ -227,7 +227,7 @@ public class PdfGenerator {
     /**
      * Generates a single dedicated layout slip.
      */
-    public static void generateBillPdf(Context context, BillReportDto bill) {
+    public static void generateBillPdf(Context context, BillReportDto bill,String fileName) {
         PdfDocument pdfDocument = new PdfDocument();
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(PAGE_WIDTH, PAGE_HEIGHT, 1).create();
         PdfDocument.Page page = pdfDocument.startPage(pageInfo);
@@ -256,6 +256,8 @@ public class PdfGenerator {
 
         currentY += leading + 5;
         canvas.drawText("Bill Date  : " + bill.getBillingDate(), indent, currentY, paint);
+        currentY += leading + 3;
+        canvas.drawText("Bill No.  : " + bill.getBillId(), indent, currentY, paint);
         currentY += leading + 3;
 
         canvas.drawText("Tenant Name: " + bill.getTenantName(), indent, currentY, paint);
@@ -367,7 +369,6 @@ public class PdfGenerator {
 
         pdfDocument.finishPage(page);
 
-        String fileName = "Thermal_Bill_" + bill.getBillId() + ".pdf";
         File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
         File pdfFile = new File(downloadsDir, fileName);
 
