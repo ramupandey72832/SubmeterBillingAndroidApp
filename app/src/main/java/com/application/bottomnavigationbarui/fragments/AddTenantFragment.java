@@ -198,14 +198,6 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
         });
     }
 
-    void demoTenant() {
-        binding.layoutAddTenant.etTenantName.setText("Himadari");
-        binding.layoutAddTenant.etAadharNumber.setText("123456789012");
-        binding.layoutAddTenant.etTenantMobile.setText("1234567890");
-//        binding.layoutAddTenant.etTenantParentMobile.setText("9876543210");
-        binding.layoutAddTenant.etTenantAddress.setText("123 Main Street");
-        binding.layoutAddTenant.actvRoomDropdown.setText("301");
-    }
 
     @Override
     public void onDestroyView() {

@@ -139,13 +139,6 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
         binding.layoutAddroom.etInitialReading.setText("");
     }
 
-    void demo() {
-        binding.layoutAddroom.etRoomNumber.setText("301");
-        binding.layoutAddroom.etRoomType.setText("1RK");
-        binding.layoutAddroom.etMeterSerial.setText("600001");
-        binding.layoutAddroom.etInitialReading.setText("396");
-    }
-
     @Override
     public void onDestroyView() {
         super.onDestroyView();
