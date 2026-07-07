@@ -3,19 +3,28 @@ package com.application.bottomnavigationbarui.fragments;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentDatabaseConfigurationBinding;
 import com.github.devfrogora.service.DatabaseSetup;
 import com.github.devfrogora.service.utils.CryptoHelper;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class DatabaseConfigurationFragment extends Fragment {
 
@@ -41,6 +50,7 @@ public class DatabaseConfigurationFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         loadSavedPreferences();
+        showDatabaseList();
 
         binding.btnSaveConfig.setOnClickListener(v -> saveAndInitializeEngine());
     }
@@ -123,9 +133,86 @@ public class DatabaseConfigurationFragment extends Fragment {
         }
     }
 
+    private void showDatabaseList() {
+        Context context = getContext();
+        if (context == null) return;
+
+        File directory = context.getFilesDir();
+
+        // Scan for files explicitly ending with '.db' extension criteria limits
+        File[] dbFiles = directory.listFiles((dir, name) -> name.toLowerCase().endsWith(".db"));
+
+        List<File> fileList = new ArrayList<>();
+        if (dbFiles != null) {
+            for (File file : dbFiles) {
+                fileList.add(file);
+                Log.d("TAG", "File: " + file.getName());
+            }
+        }
+
+        if (fileList.isEmpty()) {
+            binding.tvEmptyDbMessage.setVisibility(View.VISIBLE);
+            binding.rvDatabaseList.setVisibility(View.GONE);
+        } else {
+            binding.tvEmptyDbMessage.setVisibility(View.GONE);
+            binding.rvDatabaseList.setVisibility(View.VISIBLE);
+
+            binding.rvDatabaseList.setLayoutManager(new LinearLayoutManager(context));
+            binding.rvDatabaseList.setAdapter(new SimpleDbListAdapter(fileList));
+        }
+    }
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private static class SimpleDbListAdapter extends RecyclerView.Adapter<SimpleDbListAdapter.SimpleDbViewHolder> {
+        private final List<File> files;
+
+        public SimpleDbListAdapter(List<File> files) {
+            this.files = files;
+        }
+
+        @NonNull
+        @Override
+        public SimpleDbViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            // Inflates standard single text line row template
+            View view = LayoutInflater.from(parent.getContext()).inflate(android.R.layout.simple_list_item_1, parent, false);
+            return new SimpleDbViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull SimpleDbViewHolder holder, int position) {
+            File file = files.get(position);
+
+            int primaryColor = com.google.android.material.color.MaterialColors.getColor(
+                    holder.itemView.getContext(), // Pass your active layout context
+                    android.R.attr.textColor, // Fully resolved material package path
+                    android.graphics.Color.BLACK // Safe fallback color if the theme asset fails to resolve
+            );
+
+            holder.tvName.setTextColor(primaryColor);
+
+            // Displays ONLY the database file name (e.g., "submeter_bill.db")
+            holder.tvName.setText(file.getName());
+        }
+
+        @Override
+        public int getItemCount() {
+            return files.size();
+        }
+
+        static class SimpleDbViewHolder extends RecyclerView.ViewHolder {
+            TextView tvName;
+            public SimpleDbViewHolder(@NonNull View itemView) {
+                super(itemView);
+                tvName = itemView.findViewById(android.R.id.text1);
+
+                // Layout padding metrics for Material scannability
+                itemView.setPadding(40, 36, 40, 36);
+            }
+        }
     }
 }

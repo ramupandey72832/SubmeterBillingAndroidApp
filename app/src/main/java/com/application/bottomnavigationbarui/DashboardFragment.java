@@ -23,7 +23,6 @@ import com.application.bottomnavigationbarui.fragments.DatabaseInspectorFragment
 import com.application.bottomnavigationbarui.fragments.DeleteRoomFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteTenantFragment;
 import com.application.bottomnavigationbarui.fragments.EndRoomTenancyFragment;
-import com.application.bottomnavigationbarui.fragments.MeterReadingFragment;
 import com.application.bottomnavigationbarui.fragments.ReplaceSubmeterFragment;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.fragments.VerifyMpinDialogFragment;
@@ -32,9 +31,7 @@ import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
-import com.github.devfrogora.service.utils.CryptoHelper;
 import com.github.devfrogora.service.viewmodel.DashboardViewModel;
-import com.github.devfrogora.service.viewmodel.QrScanViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +41,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
     private UiHelper ui;
     private FragmentDashboardBinding binding;
     private DashboardBillsAdapter billAdapter;
-    private List<BillReportDto> displayedPendingList;
+    private List<BillReportDto> pendingBills;
     private BillReportDto selectedBillForProcessing;
 
     // Decoupled Business Core presentation layer coordinator
@@ -62,11 +59,12 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(getContext());
 
+        binding.tvActiveDatabaseName.setText("Connected: " + DatabaseConfigurationFragment.getDbUrl(getContext()));
 
-        displayedPendingList = new ArrayList<>();
+        pendingBills = new ArrayList<>();
         binding.rvPendingBills.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        billAdapter = new DashboardBillsAdapter(displayedPendingList, new DashboardBillsAdapter.OnBillStatusClickListener() {
+        billAdapter = new DashboardBillsAdapter(pendingBills, new DashboardBillsAdapter.OnBillStatusClickListener() {
             @Override
             public void onStatusBadgeClicked(BillReportDto bill) {
                 selectedBillForProcessing = bill;
@@ -160,8 +158,8 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
             binding.totalBills.setText(String.format(java.util.Locale.US, "%d", viewModel.getTotalBillsCount()));
             binding.totalRevenue.setText(String.format(java.util.Locale.US, "%.2f", viewModel.getTotalRevenue()));
 
-            displayedPendingList.clear();
-            displayedPendingList.addAll(viewModel.getPendingBillsList());
+            pendingBills.clear();
+            pendingBills.addAll(viewModel.getPendingBillsList());
             billAdapter.notifyDataSetChanged();
         }
 
@@ -169,8 +167,8 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
         if (viewModel.isStatusUpdateSuccess()) {
             Toast.makeText(getContext(), "Payment status updated successfully!", Toast.LENGTH_SHORT).show();
             // Refresh adapters lists dynamically using core model arrays
-            displayedPendingList.clear();
-            displayedPendingList.addAll(viewModel.getPendingBillsList());
+            pendingBills.clear();
+            pendingBills.addAll(viewModel.getPendingBillsList());
             billAdapter.notifyDataSetChanged();
         }
 

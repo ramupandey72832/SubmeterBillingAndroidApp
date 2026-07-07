@@ -23,6 +23,34 @@
             android:orientation="vertical"
             android:padding="16dp">
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="12dp"
+                android:paddingHorizontal="4dp">
+
+                <ImageView
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@android:drawable/ic_menu_info_details"
+                    app:tint="?attr/colorOnSurfaceVariant"
+                    android:layout_marginEnd="6dp"
+                    tools:ignore="ContentDescription" />
+
+                <TextView
+                    android:id="@+id/tvActiveDatabaseName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="@style/TextAppearance.App.LabelBody"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:textSize="12sp"
+                    android:textStyle="italic"
+                    android:text="database Name"
+                    tools:text="Connected: submeter_bill.db" />
+            </LinearLayout>
+
             <com.google.android.material.card.MaterialCardView
                 style="?attr/materialCardViewStyle"
                 android:layout_width="match_parent"
