@@ -83,7 +83,7 @@
         android:layout_height="56dp"
         android:layout_gravity="bottom|end"
         android:layout_margin="24dp"
-        android:text="Add New Room/Tenant"
+        android:text="Add New Room"
         android:textAllCaps="false"
         android:textSize="14sp"
         android:textColor="?attr/colorOnPrimary"
@@ -91,7 +91,7 @@
         app:iconTint="?attr/colorOnPrimary"
         app:cornerRadius="28dp"
         app:elevation="8dp"
-        app:icon="@drawable/ic_person_add"
+        app:icon="@drawable/ic_menu_home"
         app:iconPadding="10dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

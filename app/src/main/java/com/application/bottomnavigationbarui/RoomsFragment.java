@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.application.bottomnavigationbarui.adapters.RoomsAdapter;
 import com.application.bottomnavigationbarui.databinding.DialogQuickEditTenantBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentRoomsBinding;
+import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.EditRoomAssetFragment;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
@@ -57,6 +58,10 @@ public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomAction
         super.onViewCreated(view, savedInstanceState);
         ui = new UiHelper(getContext());
         roomList = new ArrayList<>();
+
+        binding.fabAddRoom.setOnClickListener(view1 -> {
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new AddRoomFragment());
+        });
 
         binding.rvRooms.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new RoomsAdapter(roomList, this);
