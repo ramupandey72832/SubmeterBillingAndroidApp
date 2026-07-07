@@ -59,18 +59,19 @@ public class DatabaseInspectorViewModel {
                 case "TENANCIES":
                     currentHeaders.addAll(Arrays.asList("Tenancy ID", "Room ID", "Tenant ID", "Start Date", "End Date", "Is Active"));
                     for (Tenancy ty : DaoManager.getTenancyDao().getAllTenancies()) {
-                        currentRows.add(Arrays.asList(String.valueOf(ty.getTenancyId()), String.valueOf(ty.getRoomId()), String.valueOf(ty.getTenantId()), ty.getStartDate(), ty.getEndDate() != null ? ty.getEndDate() : "--", ty.getEndDate() == null ? "YES" : "NO"));
+                        currentRows.add(Arrays.asList(String.valueOf(ty.getTenancyId()), String.valueOf(ty.getRoomId()),
+                                String.valueOf(ty.getTenantId()), ty.getStartDate(),
+                                ty.getEndDate() != null ? ty.getEndDate() : "--", ty.getEndDate() == null ? "YES" : "NO"));
                     }
                     break;
 
                 case "SUBMETERS":
-                    currentHeaders.addAll(Arrays.asList("Meter ID", "Room ID", "Serial Number", "Initial Reading"));
+                    currentHeaders.addAll(Arrays.asList("Meter ID", "Room ID", "Serial Number", "Initial Reading","Is Active"));
                     // Safe fallback map handling if tables contain raw option arrays
-                    List<Room> allRooms = DaoManager.getRoomDao().getAllRooms();
-                    for (Room r : allRooms) {
-                        DaoManager.getSubmeterDao().getSubmeterByRoomId(r.getRoomId()).ifPresent(s -> {
-                            currentRows.add(Arrays.asList(String.valueOf(s.getMeterId()), String.valueOf(s.getRoomId()), s.getMeterSerialNumber(), s.getInitialReading() + " kWh"));
-                        });
+                    List<Submeter> allSubmeters = DaoManager.getSubmeterDao().getAllSubmeters();
+                    for (Submeter s : allSubmeters) {
+                        currentRows.add(Arrays.asList(String.valueOf(s.getMeterId()), String.valueOf(s.getRoomId()),
+                                s.getMeterSerialNumber(), s.getInitialReading() + " kWh",s.getIsActive() == 1 ? "YES" : "NO"));
                     }
                     break;
 

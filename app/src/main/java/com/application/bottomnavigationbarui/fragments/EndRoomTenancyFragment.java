@@ -11,9 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentEndRoomTenancyBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
+import com.application.bottomnavigationbarui.utils.NavigationUtils;
 import com.application.bottomnavigationbarui.utils.UiHelper;
 import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
@@ -66,6 +68,12 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
                     getActivity().runOnUiThread(() -> renderUiState());
                 }
             }
+        });
+
+
+        binding.btnBack.setOnClickListener(v -> {
+            clearInputs();
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
         });
 
         // Initialize display container visibility conditions based on state default checks
@@ -137,11 +145,11 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
         if (viewModel.isTerminationSuccess()) {
             viewModel.resetTerminationFlag();
             Toast.makeText(getContext(), "Tenancy successfully terminated.", Toast.LENGTH_LONG).show();
-            clearFormFields();
+            clearInputs();
         }
     }
 
-    private void clearFormFields() {
+    private void clearInputs() {
         binding.etRoomNumber.setText("");
         binding.etEndDate.setText("");
         binding.cvTenantDetailsContainer.setVisibility(View.GONE);

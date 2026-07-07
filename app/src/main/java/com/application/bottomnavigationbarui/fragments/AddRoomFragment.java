@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.RoomsFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentAddRoomBinding;
@@ -48,6 +49,8 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
         RoomMeterServiceImpl service = new RoomMeterServiceImpl(new MeterBillingServiceImpl());
         viewModel = new RoomMeterViewModel(service);
 
+
+
         // Set up the listener to track state transitions
         viewModel.setStateListener(new RoomMeterViewModel.StateListener() {
             @Override
@@ -57,6 +60,11 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
                     getActivity().runOnUiThread(() -> renderUiState());
                 }
             }
+        });
+
+        binding.layoutAddroom.btnBack.setOnClickListener(v -> {
+            clearInputs();
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
         });
 
 
@@ -80,12 +88,6 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
             }
         });
 
-        binding.layoutAddroom.btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                clearInputs();
-            }
-        });
     }
 
     @Override

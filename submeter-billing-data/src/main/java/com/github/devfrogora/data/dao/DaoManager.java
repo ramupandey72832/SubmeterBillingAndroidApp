@@ -5,6 +5,8 @@ import com.github.devfrogora.data.dao.impl.*;
  * Centrally manages DAO instances.
  * This ensures your UI components don't have to keep calling "new SQLiteTenantDao()"
  */
+
+
 public class DaoManager {
     private static TenantDao tenantDao;
     private static RoomDao roomDao;

@@ -18,7 +18,8 @@ public class SQLiteSubmeterDao implements SubmeterDao {
         return DbUtils.executeInsert(sql,
                 submeter.getRoomId(),
                 submeter.getMeterSerialNumber(),
-                submeter.getInitialReading()
+                submeter.getInitialReading(),
+                submeter.getIsActive()
         );
     }
 
@@ -67,6 +68,7 @@ public class SQLiteSubmeterDao implements SubmeterDao {
                 submeter.getRoomId(),
                 submeter.getMeterSerialNumber(),
                 submeter.getInitialReading(),
+                submeter.getIsActive(),
                 submeter.getMeterId()
         );
     }
@@ -86,6 +88,7 @@ public class SQLiteSubmeterDao implements SubmeterDao {
         submeter.setRoomId(rs.getInt("room_id"));
         submeter.setMeterSerialNumber(rs.getString("meter_serial_number"));
         submeter.setInitialReading(rs.getDouble("initial_reading"));
+        submeter.setIsActive(rs.getInt("is_active"));
         return submeter;
     }
 }

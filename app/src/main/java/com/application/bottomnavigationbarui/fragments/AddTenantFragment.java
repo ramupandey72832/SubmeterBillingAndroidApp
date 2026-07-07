@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.RoomsFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
@@ -64,6 +65,10 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             }
         });
 
+        binding.layoutAddTenant.btnBack.setOnClickListener(v -> {
+            clearInputs();
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+        });
 
 
         // 1. Fetch your dataset safely from the ViewModel layer

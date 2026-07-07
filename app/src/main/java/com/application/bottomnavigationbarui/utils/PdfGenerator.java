@@ -259,6 +259,8 @@ public class PdfGenerator {
         currentY += leading + 3;
         canvas.drawText("Bill No.  : " + bill.getBillId(), indent, currentY, paint);
         currentY += leading + 3;
+        canvas.drawText("Meter No.  : " + bill.getMeterSerialNumber(), indent, currentY, paint);
+        currentY += leading + 3;
 
         canvas.drawText("Tenant Name: " + bill.getTenantName(), indent, currentY, paint);
         currentY += 7;

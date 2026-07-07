@@ -7,14 +7,16 @@ public class Submeter {
     private int roomId;
     private String meterSerialNumber;
     private double initialReading;
+    private int isActive;
 
     public Submeter() {}
 
-    public Submeter(int meterId, int roomId, String meterSerialNumber, double initialReading) {
+    public Submeter(int meterId, int roomId, String meterSerialNumber, double initialReading,int isActive) {
         this.meterId = meterId;
         this.roomId = roomId;
         this.meterSerialNumber = meterSerialNumber;
         this.initialReading = initialReading;
+        this.isActive = isActive;
     }
 
     // Getters and Setters
@@ -38,5 +40,13 @@ public class Submeter {
                 ", meterSerialNumber='" + meterSerialNumber + '\'' +
                 ", initialReading=" + initialReading +
                 '}';
+    }
+
+    public int getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(int isActive) {
+        this.isActive = isActive;
     }
 }

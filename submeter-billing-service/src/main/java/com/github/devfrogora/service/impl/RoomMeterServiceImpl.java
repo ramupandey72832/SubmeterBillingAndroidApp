@@ -61,6 +61,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
                 meter.setRoomId(roomId);
                 meter.setMeterSerialNumber(meterSerialNumber);
                 meter.setInitialReading(meterInitialReading);
+                meter.setIsActive(1);
 
                 int meterId = DaoManager.getSubmeterDao().insertSubmeter(meter);
                 if (meterId < 0) {
@@ -144,6 +145,7 @@ public class RoomMeterServiceImpl implements RoomMeterService {
             newMeter.setRoomId(room.getRoomId());
             newMeter.setMeterSerialNumber(newMeterSerialNumber);
             newMeter.setInitialReading(initialReading);
+            newMeter.setIsActive(1);
 
             int newMeterId = DaoManager.getSubmeterDao().insertSubmeter(newMeter);
             if (newMeterId < 0) {
