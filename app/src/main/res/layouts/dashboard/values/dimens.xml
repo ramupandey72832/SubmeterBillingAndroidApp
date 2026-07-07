@@ -14,4 +14,5 @@
     <dimen name="text_size_header">18sp</dimen>
     <dimen name="text_size_label">13sp</dimen>
     <dimen name="text_size_caption">12sp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>
