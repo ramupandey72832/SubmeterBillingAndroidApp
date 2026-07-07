@@ -29,7 +29,7 @@ import java.util.List;
 public class DatabaseConfigurationFragment extends Fragment {
 
     private FragmentDatabaseConfigurationBinding binding;
-    private static final String PUBLIC_PREFS = "db_public_config";
+    public static final String PUBLIC_PREFS = "db_public_config";
 
     public DatabaseConfigurationFragment() {
         // Required empty constructor bounds
