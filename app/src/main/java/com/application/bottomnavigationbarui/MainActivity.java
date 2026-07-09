@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.application.baselibrary.ui.utils.NavigationUtils;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.baselibrary.utils.GenericPermissionHelper;
 import com.application.bottomnavigationbarui.databinding.ActivityMainBinding;
@@ -31,36 +32,35 @@ public class MainActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "SecurityPrefs";
     private static final String KEY_MPIN = "user_mpin";
     public GenericPermissionHelper permissionHelper;
+    final List<String> requiredPermissions = Arrays.asList(
+            android.Manifest.permission.CAMERA,
+            android.Manifest.permission.READ_MEDIA_IMAGES
+    );
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        EdgeToEdge.enable(this);
         ui = new ToastMessage(this);
 
-
-        final List<String> requiredPermissions = Arrays.asList(
-                android.Manifest.permission.CAMERA,
-                android.Manifest.permission.READ_MEDIA_IMAGES
-        );
         // Initialize it immediately while MainActivity is INITIALIZING
         permissionHelper = new GenericPermissionHelper(this, requiredPermissions, new GenericPermissionHelper.OnPermissionsListener() {
             @Override
             public void onAllPermissionsGranted() {
                 // Find your active QrScanFragment and let it know
-                System.out.println("Permission Granted");
+                ui.showSuccessAlert("Permission Granted",new Exception("Permission Granted"));
             }
 
             @Override
             public void onPermissionsDenied(List<String> deniedPermissions) {
                 // Show Dialog
-                System.out.println("Permission not Granted");
+                ui.showWarningAlert("Permission Not Granted",new Exception("Permission Not Granted"));
             }
         });
 
         permissionHelper.checkForPermissions();
 
         try{
-//            DatabaseSetup.initializeDb("jdbc:sqlite:submeter_bill.db", null, null, "org.sqlite.JDBC"); // Desktop
+            // DatabaseSetup.initializeDb("jdbc:sqlite:submeter_bill.db", null, null, "org.sqlite.JDBC"); // Desktop
             String dburl = DatabaseConfigurationFragment.getDbUrl(this);
             String driver = DatabaseConfigurationFragment.getDbDriver(this);
             String username = null;
@@ -78,14 +78,14 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
             return insets;
         });
-// 1. Check if the MPIN exists in SharedPreferences
+        // 1. Check if the MPIN exists in SharedPreferences
         if (!isMpinConfigured()) {
             // 2. If it does not exist, immediately load the SetupMpinFragment
-            loadFragment(new SetupMpinFragment());
+            NavigationUtils.replaceFragment(this,new SetupMpinFragment(), R.id.frame_layout);
         } else {
             // 3. Optional: Load your default landing fragment (e.g., Home or Dashboard)
             // 3. Display the default fragment on launch
-            replaceFragment(new DashboardFragment());
+            NavigationUtils.replaceFragment(this,new DashboardFragment(), R.id.frame_layout);
 
             // 4. Handle navigation item selection
             binding.bottomNavigationView.setBackground(null);
@@ -93,16 +93,16 @@ public class MainActivity extends AppCompatActivity {
                 int itemId = item.getItemId();
 
                 if (itemId == R.id.dashboard) {
-                    replaceFragment(new DashboardFragment());
+                    NavigationUtils.replaceFragment(this,new DashboardFragment(), R.id.frame_layout);
                     return true;
                 }else if(itemId == R.id.room){
-                    replaceFragment(new RoomsFragment());
+                    NavigationUtils.replaceFragment(this, new RoomsFragment(), R.id.frame_layout);
                     return true;
                 } else if(itemId == R.id.report){
-                    replaceFragment(new ReportsFragment());
+                    NavigationUtils.replaceFragment(this, new ReportsFragment(), R.id.frame_layout);
                     return true;
                 } else if(itemId == R.id.billing){
-                    replaceFragment(new BillsFragment());
+                    NavigationUtils.replaceFragment(this, new BillsFragment(), R.id.frame_layout);
                     return true;
                 }
                 return false;
@@ -110,9 +110,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         binding.scanMeter.setOnClickListener(view -> {
-            replaceFragment(new QrScanFragment());
+            NavigationUtils.replaceFragment(this,new QrScanFragment(),R.id.frame_layout);
         });
-
     }
 
     private boolean isMpinConfigured() {
@@ -123,28 +122,8 @@ public class MainActivity extends AppCompatActivity {
         return savedMpin != null && !savedMpin.trim().isEmpty();
     }
 
-    /**
-     * Helper method to handle smooth fragment transactions
-     */
-    private void loadFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-
-        // Replace 'R.id.fragment_container' with the actual ID of your FrameLayout/FragmentContainerView in activity_main.xml
-        transaction.replace(R.id.frame_layout, fragment);
-
-        // Do NOT add to backstack here, because we don't want the user to press 'Back'
-        // and exit to an empty screen while bypassing setup!
-        transaction.commit();
-    }
-
     public void onMpinSetupComplete() {
         // Replace with whatever your primary dashboard or landing fragment is called
-        replaceFragment(new DashboardFragment());
-    }
-    private void replaceFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
+      NavigationUtils.replaceFragment(this,new DashboardFragment(),R.id.frame_layout);
     }
 }
