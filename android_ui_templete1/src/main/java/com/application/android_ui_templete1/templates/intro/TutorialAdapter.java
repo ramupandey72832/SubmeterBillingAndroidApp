@@ -1,4 +1,4 @@
-package com.application.bottomnavigationbarui.ui.slider;
+package com.application.android_ui_templete1.templates.intro;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,28 +6,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.application.bottomnavigationbarui.R;
+
+import com.application.android_ui_templete1.R;
 import com.bumptech.glide.Glide;
 import com.smarteist.autoimageslider.SliderViewAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SliderAdapter extends SliderViewAdapter<SliderAdapter.SliderAdapterViewHolder> {
+public class TutorialAdapter extends SliderViewAdapter<TutorialAdapter.SliderAdapterViewHolder> {
 
     // list for storing urls of images.
-    private final List<SliderData> mSliderItems;
+    private final List<TutorialData> mSliderItems;
 
     // Constructor
-    public SliderAdapter(Context context, ArrayList<SliderData> sliderDataArrayList) {
-        this.mSliderItems = sliderDataArrayList;
+    public TutorialAdapter(Context context, ArrayList<TutorialData> tutorialDataArrayList) {
+        this.mSliderItems = tutorialDataArrayList;
     }
 
     // We are inflating the slider_layout
     // inside on Create View Holder method.
     @Override
     public SliderAdapterViewHolder onCreateViewHolder(ViewGroup parent) {
-        View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.slider_layout, null);
+        View inflate = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_tutorial_step, null);
         return new SliderAdapterViewHolder(inflate);
     }
 
@@ -36,7 +37,7 @@ public class SliderAdapter extends SliderViewAdapter<SliderAdapter.SliderAdapter
     @Override
     public void onBindViewHolder(SliderAdapterViewHolder viewHolder, final int position) {
 
-        final SliderData sliderItem = mSliderItems.get(position);
+        final TutorialData sliderItem = mSliderItems.get(position);
 
         // Glide is use to load image
         // from url in your imageview.

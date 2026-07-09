@@ -1,13 +1,13 @@
-package com.application.bottomnavigationbarui.ui.slider;
+package com.application.android_ui_templete1.templates.intro;
 
-public class SliderData {
+public class TutorialData {
 
     // image url is used to
     // store the url of image
     private String imgUrl;
 
     // Constructor method.
-    public SliderData(String imgUrl) {
+    public TutorialData(String imgUrl) {
         this.imgUrl = imgUrl;
     }
 

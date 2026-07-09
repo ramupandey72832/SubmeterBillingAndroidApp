@@ -13,8 +13,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.application.bottomnavigationbarui.fragments.DatabaseConfigurationFragment;
-import com.application.bottomnavigationbarui.ui.slider.SliderAdapter;
-import com.application.bottomnavigationbarui.ui.slider.SliderData;
+import com.application.android_ui_templete1.templates.intro.TutorialAdapter;
+import com.application.android_ui_templete1.templates.intro.TutorialData;
 import com.smarteist.autoimageslider.SliderView;
 
 import java.util.ArrayList;
@@ -54,19 +54,19 @@ public class SplashActivity extends AppCompatActivity {
         }
 
         // we are creating array list for storing our image urls.
-        ArrayList<SliderData> sliderDataArrayList = new ArrayList<>();
+        ArrayList<TutorialData> tutorialDataArrayList = new ArrayList<>();
 
         // initializing the slider view.
         SliderView sliderView = findViewById(R.id.slider);
 
         // adding the urls inside array list
-        sliderDataArrayList.add(new SliderData(url1));
-        sliderDataArrayList.add(new SliderData(url2));
-        sliderDataArrayList.add(new SliderData(url3));
-        sliderDataArrayList.add(new SliderData(url4));
+        tutorialDataArrayList.add(new TutorialData(url1));
+        tutorialDataArrayList.add(new TutorialData(url2));
+        tutorialDataArrayList.add(new TutorialData(url3));
+        tutorialDataArrayList.add(new TutorialData(url4));
 
         // passing this array list inside our adapter class.
-        SliderAdapter adapter = new SliderAdapter(this, sliderDataArrayList);
+        TutorialAdapter adapter = new TutorialAdapter(this, tutorialDataArrayList);
 
         // below method is used to set auto cycle direction in left to
         // right direction you can change according to requirement.
