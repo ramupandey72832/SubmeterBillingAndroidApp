@@ -19,12 +19,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.ReportAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentReportsBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.PdfGenerator;
 import com.application.bottomnavigationbarui.utils.SimplePdfGenerator;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.viewmodel.ReportsViewModel;
@@ -36,7 +37,7 @@ import java.util.Locale;
 
 public class ReportsFragment extends Fragment {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentReportsBinding binding;
 
     private final Calendar startCalendar = Calendar.getInstance();
@@ -150,7 +151,7 @@ public class ReportsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(getContext());
+        ui = new ToastMessage(getContext());
 
         // Initialize pure ViewModel with the required operational services explicitly injected
         viewModel = new ReportsViewModel(

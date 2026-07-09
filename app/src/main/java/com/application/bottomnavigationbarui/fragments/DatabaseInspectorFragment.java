@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.application.bottomnavigationbarui.adapters.GenericTableAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentDatabaseInspectorBinding;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+
 import com.google.android.material.tabs.TabLayout;
 import com.github.devfrogora.service.viewmodel.DatabaseInspectorViewModel;
 

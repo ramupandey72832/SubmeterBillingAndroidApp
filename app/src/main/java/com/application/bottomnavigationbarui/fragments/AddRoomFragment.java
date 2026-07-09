@@ -10,13 +10,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.RoomsFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentAddRoomBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.viewmodel.RoomMeterViewModel;
@@ -24,7 +25,7 @@ import com.github.devfrogora.service.viewmodel.RoomMeterViewModel;
 public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
     private FragmentAddRoomBinding binding;
-    private UiHelper ui;
+    private ToastMessage ui;
 
     // Encapsulated pure business state holder
     private RoomMeterViewModel viewModel;
@@ -43,7 +44,7 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ui = new UiHelper(this.getContext());
+        ui = new ToastMessage(this.getContext());
 
         // Initialize Service with dependencies injected, and connect to ViewModel
         RoomMeterServiceImpl service = new RoomMeterServiceImpl(new MeterBillingServiceImpl());
@@ -64,7 +65,7 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
 
         binding.layoutAddroom.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(),R.id.frame_layout);
         });
 
 
@@ -128,7 +129,7 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
 
         // 3. Clear data input layouts only on successful processing confirmation
         if (viewModel.isOperationSuccess()) {
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment(),R.id.frame_layout);
             Toast.makeText(getContext(), "Room added successfully", Toast.LENGTH_SHORT).show();
             clearInputs();
         }

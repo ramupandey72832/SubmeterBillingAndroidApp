@@ -1,4 +1,5 @@
-package com.application.bottomnavigationbarui.qr;
+package com.application.baselibrary.libs.qr;
+
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;

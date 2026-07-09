@@ -13,12 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
+import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.RoomsFragment;
 import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
@@ -34,7 +36,7 @@ import java.util.Locale;
 
 public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentAddTenantBinding binding;
 
     // Decoupled presentation core coordinator
@@ -49,7 +51,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(this.getContext());
+        ui = new ToastMessage(this.getContext());
         startingDataPickerUI();
 
         // Initialize pure business layer states
@@ -67,7 +69,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
 
         binding.layoutAddTenant.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(), R.id.frame_layout);
         });
 
 
@@ -172,7 +174,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
 
         // 3. Wring out inputs exclusively upon structural commitment confirmations
         if (viewModel.isOperationSuccess()) {
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment(),R.id.frame_layout);
             String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
             Toast.makeText(getContext(), "Tenant : " + tenantName + " added successfully", Toast.LENGTH_SHORT).show();
             clearInputs();

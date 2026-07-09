@@ -11,16 +11,17 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.databinding.FragmentReplaceSubmeterBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.viewmodel.RoomMeterViewModel;
 
 public class ReplaceSubmeterFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentReplaceSubmeterBinding binding;
 
     // Decoupled Business Presentation Core
@@ -39,7 +40,7 @@ public class ReplaceSubmeterFragment extends Fragment implements VerifyMpinDialo
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(requireActivity());
+        ui = new ToastMessage(requireActivity());
 
         // Initialize pure ViewModel with the service and its required dependency chain
         RoomMeterServiceImpl service = new RoomMeterServiceImpl(new MeterBillingServiceImpl());

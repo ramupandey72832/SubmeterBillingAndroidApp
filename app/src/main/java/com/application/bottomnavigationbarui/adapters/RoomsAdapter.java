@@ -10,15 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.application.baselibrary.libs.qr.QrCodeHelper;
 import com.application.bottomnavigationbarui.databinding.RoomsItemRoomBinding;
-import com.application.bottomnavigationbarui.qr.QrCodeHelper;
+
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 import com.github.devfrogora.service.utils.CryptoHelper;
-import com.google.mlkit.vision.barcode.common.Barcode;
-import com.itextpdf.text.pdf.qrcode.BitMatrix;
-import com.itextpdf.text.pdf.qrcode.QRCodeWriter;
 
-import java.util.ArrayList;
 import java.util.List;
 
 

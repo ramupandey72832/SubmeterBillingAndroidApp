@@ -1,18 +1,16 @@
-package com.application.bottomnavigationbarui.utils;
+package com.application.baselibrary.ui.utils;
+
 
 import android.os.Bundle;
-
+import androidx.annotation.IdRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.application.bottomnavigationbarui.R;
-
-
 public class NavigationUtils {
 
-    public static void navigateTo(FragmentActivity activity, Fragment fragment,Bundle args) {
+    public static void navigateTo(FragmentActivity activity, Fragment fragment, @IdRes int containerId, Bundle args) {
         Fragment currentFragment = activity.getSupportFragmentManager()
-                .findFragmentById(R.id.frame_layout);
+                .findFragmentById(containerId);
 
         // Prevent double navigation to the same screen
         if (currentFragment != null && currentFragment.getClass().equals(fragment.getClass())) {
@@ -22,20 +20,20 @@ public class NavigationUtils {
         if (args != null) fragment.setArguments(args);
 
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, fragment)
+                .replace(containerId, fragment)
                 .addToBackStack(null)
                 .commitAllowingStateLoss();
     }
 
-    public static void replaceFragment(FragmentActivity activity,Fragment fragment) {
+    public static void replaceFragment(FragmentActivity activity, Fragment fragment, @IdRes int containerId) {
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, fragment).commit();
+                .replace(containerId, fragment).commit();
     }
 
-    public static void replaceFragmentWithBackStack(FragmentActivity activity, Fragment fragment) {
+    public static void replaceFragmentWithBackStack(FragmentActivity activity, Fragment fragment, @IdRes int containerId) {
         activity.getSupportFragmentManager().beginTransaction()
-                .replace(R.id.frame_layout, fragment)
-                .addToBackStack(null) // This is the key line
+                .replace(containerId, fragment)
+                .addToBackStack(null)
                 .commit();
     }
 }

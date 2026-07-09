@@ -10,18 +10,20 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
+import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentDeleteRoomBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.viewmodel.RoomMeterViewModel;
 
 public class DeleteRoomFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentDeleteRoomBinding binding;
 
     // Decoupled Business Core State Holder
@@ -40,7 +42,7 @@ public class DeleteRoomFragment extends Fragment implements VerifyMpinDialogFrag
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(this.getContext());
+        ui = new ToastMessage(this.getContext());
 
         // Initialize dependencies purely using business layer constructs
         RoomMeterServiceImpl service = new RoomMeterServiceImpl(new MeterBillingServiceImpl());
@@ -59,7 +61,7 @@ public class DeleteRoomFragment extends Fragment implements VerifyMpinDialogFrag
 
         binding.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(), R.id.frame_layout);
         });
 
         binding.btnDeleteRoom.setOnClickListener(v -> {

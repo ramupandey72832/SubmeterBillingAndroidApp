@@ -1,4 +1,4 @@
-package com.application.bottomnavigationbarui.utils;
+package com.application.baselibrary.ui.utils;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
@@ -7,10 +7,10 @@ import android.util.TypedValue;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class UiHelper {
+public class ToastMessage {
     private final Context context;
 
-    public UiHelper(Context context){
+    public ToastMessage(Context context){
         this.context = context;
     }
 

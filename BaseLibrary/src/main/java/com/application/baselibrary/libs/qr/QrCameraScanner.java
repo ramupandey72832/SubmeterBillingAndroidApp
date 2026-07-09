@@ -1,9 +1,11 @@
-package com.application.bottomnavigationbarui.camera;
+package com.application.baselibrary.libs.qr;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -18,8 +20,6 @@ import androidx.camera.view.PreviewView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-
-import com.application.bottomnavigationbarui.qr.MLKitBarcodeAnalyzer;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import java.io.File;
@@ -28,33 +28,34 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class CameraHelper {
+
+public class QrCameraScanner {
     private static final String TAG = "CameraHelper";
 
     private Camera camera;
     private ProcessCameraProvider cameraProvider;
     private PreviewView previewView;
-    private ExecutorService executor;
+    private ExecutorService analysisExecutor;
 
-    private final QrResultListener listener;
+    private final QrResultListener qrResultListener;
     private boolean isTorchOn = false;
 
     public interface QrResultListener {
-        void onQrDetected(String data, Uri uri);
+        void onQrDetected(String data, Uri capturedFrameUri);
     }
 
-    public CameraHelper(QrResultListener listener) {
-        this.listener = listener;
+    public QrCameraScanner(QrResultListener listener) {
+        this.qrResultListener = listener;
     }
 
     /**
      * Starts the CameraX lifecycle and attaches the ML Kit Analyzer.
      */
-    public void startCamera(Context context, @NonNull PreviewView previewView, Fragment fragment) {
+    public void startScanning(@NonNull Context context, @NonNull PreviewView previewView, @NonNull Fragment fragment) {
         this.previewView = previewView;
 
-        if (executor == null || executor.isShutdown()) {
-            executor = Executors.newSingleThreadExecutor();
+        if (analysisExecutor == null || analysisExecutor.isShutdown()) {
+            analysisExecutor = Executors.newSingleThreadExecutor();
         }
 
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(context);
@@ -64,21 +65,21 @@ public class CameraHelper {
                 cameraProvider = cameraProviderFuture.get();
                 cameraProvider.unbindAll();
 
-                // 1. Preview Use Case
+                // 1. Setup Preview Viewport
                 Preview preview = new Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
 
-                // 2. Image Analysis Use Case (ML Kit)
+                // 2. Setup Image Analyzer (Wired to our clean MLKitBarcodeAnalyzer)
                 ImageAnalysis imageAnalysis = new ImageAnalysis.Builder()
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build();
 
-                imageAnalysis.setAnalyzer(executor, new MLKitBarcodeAnalyzer((data, bitmap) -> {
-                    // Logic to save the frame where QR was found and notify listener
-                    handleQrDetection(context, data, bitmap, imageAnalysis);
+                imageAnalysis.setAnalyzer(analysisExecutor, new MLKitBarcodeAnalyzer((data, bitmap) -> {
+                    // Cache the successful frame and push updates back to UI
+                    processAndNotifyDetection(context, data, bitmap, imageAnalysis);
                 }));
 
-                // 3. Select Camera and Bind
+                // 3. Bind Hardware Use Cases to Fragment Lifecycle
                 CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
                 camera = cameraProvider.bindToLifecycle(
                         fragment.getViewLifecycleOwner(),
@@ -87,45 +88,46 @@ public class CameraHelper {
                         imageAnalysis
                 );
 
-                setupFocusListener();
+                setupTapToFocus();
 
             } catch (Exception e) {
-                Log.e(TAG, "Camera binding failed", e);
+                Log.e(TAG, "Camera lifecycle binding failed", e);
             }
         }, ContextCompat.getMainExecutor(context));
     }
 
     /**
-     * Saves the detected frame to cache and sends results to the UI thread.
+     * Saves the successful frame bitmap into local cache directory safely and triggers UI updates.
      */
-    private void handleQrDetection(Context context, String data, Bitmap bitmap, ImageAnalysis imageAnalysis) {
-        Uri uri = null;
+    private void processAndNotifyDetection(@NonNull Context context, @NonNull String data, Bitmap bitmap, @NonNull ImageAnalysis imageAnalysis) {
+        Uri fileUri = null;
         if (bitmap != null) {
             try {
-                File file = new File(context.getCacheDir(), "scan_" + System.currentTimeMillis() + ".jpg");
-                try (FileOutputStream out = new FileOutputStream(file)) {
+                File cachedImage = new File(context.getCacheDir(), "scan_session_" + System.currentTimeMillis() + ".jpg");
+                try (FileOutputStream out = new FileOutputStream(cachedImage)) {
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 70, out);
                 }
-                uri = Uri.fromFile(file);
+                fileUri = Uri.fromFile(cachedImage);
+                bitmap.recycle(); // Prevent memory leaks once written to memory storage
             } catch (Exception e) {
-                Log.e(TAG, "Failed to save result image", e);
+                Log.e(TAG, "Failed to cache scanned frame bitmap", e);
             }
         }
 
-        final Uri finalUri = uri;
-        new android.os.Handler(android.os.Looper.getMainLooper()).post(() -> {
+        final Uri finalUri = fileUri;
+        new Handler(Looper.getMainLooper()).post(() -> {
             if (cameraProvider != null) {
-                // Stop analysis once a code is found to prevent multiple triggers
+                // Instantly unbind analysis pipeline to freeze frame processing upon first detection
                 cameraProvider.unbind(imageAnalysis);
             }
-            if (listener != null) {
-                listener.onQrDetected(data, finalUri);
+            if (qrResultListener != null) {
+                qrResultListener.onQrDetected(data, finalUri);
             }
         });
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private void setupFocusListener() {
+    private void setupTapToFocus() { // Renamed from setupFocusListener
         if (previewView == null) return;
 
         previewView.setOnTouchListener((v, event) -> {
@@ -149,17 +151,17 @@ public class CameraHelper {
         return false;
     }
 
-    public void stopCamera() {
+    public void stopScanning() {
         if (cameraProvider != null) {
             cameraProvider.unbindAll();
         }
-        if (executor != null && !executor.isShutdown()) {
-            executor.shutdown();
+        if (analysisExecutor != null && !analysisExecutor.isShutdown()) {
+            analysisExecutor.shutdown();
         }
     }
 
-    public void restartCamera(Context context, @NonNull PreviewView previewView, Fragment fragment) {
-        stopCamera();
-        startCamera(context, previewView, fragment);
+    public void restartScanning(Context context, @NonNull PreviewView previewView, Fragment fragment) {
+        stopScanning();
+        startScanning(context, previewView, fragment);
     }
 }

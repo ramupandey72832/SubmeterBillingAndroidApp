@@ -11,12 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentEndRoomTenancyBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -32,7 +33,7 @@ import java.util.Locale;
 public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
     private FragmentEndRoomTenancyBinding binding;
-    private UiHelper ui;
+    private ToastMessage ui;
 
     // Decoupled Business Presentation layer
     private TenancyViewModel viewModel;
@@ -50,7 +51,7 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(this.getContext());
+        ui = new ToastMessage(this.getContext());
         startingDataPickerUI();
 
         // 1. Initialize ViewModel with its required operational services injected
@@ -73,7 +74,7 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
 
         binding.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(),R.id.frame_layout);
         });
 
         // Initialize display container visibility conditions based on state default checks

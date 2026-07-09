@@ -11,10 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
+import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
@@ -22,7 +24,7 @@ import com.github.devfrogora.service.viewmodel.MeterReadingViewModel;
 
 public class MeterReadingFragment extends Fragment {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentMeterReadingBinding binding;
 
     // Pure business presentation layer coordinator
@@ -41,7 +43,7 @@ public class MeterReadingFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(this.getContext());
+        ui = new ToastMessage(this.getContext());
 
         // Initialize our isolated ViewModel with its background dependencies explicitly injected
         viewModel = new MeterReadingViewModel(
@@ -128,7 +130,7 @@ public class MeterReadingFragment extends Fragment {
                         extraCharge, // Passed here
                         notes        // Passed here
                 );
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment);
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment, R.id.frame_layout);
             }
         });
     }

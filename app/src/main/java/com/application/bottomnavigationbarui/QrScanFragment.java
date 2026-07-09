@@ -14,12 +14,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.application.bottomnavigationbarui.camera.CameraHelper;
+
+import com.application.baselibrary.libs.qr.QrCameraScanner;
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.databinding.FragmentQrScanBinding;
 import com.application.bottomnavigationbarui.fragments.MeterReadingFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.viewmodel.QrScanViewModel;
@@ -27,9 +29,9 @@ import com.github.devfrogora.service.viewmodel.QrScanViewModel;
 public class QrScanFragment extends Fragment {
 
     private static final String TAG = "QrScanFragment";
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentQrScanBinding binding;
-    private CameraHelper cameraHelper;
+    private QrCameraScanner cameraHelper;
     private ImageButton btnFlashlight;
 
     // Decoupled Business Presentation core coordinator
@@ -49,7 +51,7 @@ public class QrScanFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(getContext());
+        ui = new ToastMessage(getContext());
 
         // Initialize pure ViewModel with the service and its required dependency chain
         RoomMeterServiceImpl service = new RoomMeterServiceImpl(new MeterBillingServiceImpl());
@@ -74,7 +76,7 @@ public class QrScanFragment extends Fragment {
         });
 
         // Initialize CameraHelper safely after view creation
-        cameraHelper = new CameraHelper(new CameraHelper.QrResultListener() {
+        cameraHelper = new QrCameraScanner(new QrCameraScanner.QrResultListener() {
             @Override
             public void onQrDetected(String data, Uri uri) {
                 temporaryImageUri = uri;
@@ -253,7 +255,7 @@ public class QrScanFragment extends Fragment {
         if (getActivity() instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) getActivity();
             View view = getView();
-            if (view != null && mainActivity.localPermissionHelper != null && mainActivity.localPermissionHelper.hasAllPermissions()) {
+            if (view != null && mainActivity.permissionHelper != null && mainActivity.permissionHelper.hasAllPermissions()) {
                 setupCameraPreview(view);
             }
         }
@@ -264,7 +266,7 @@ public class QrScanFragment extends Fragment {
             if (isAdded() && getContext() != null) {
                 androidx.camera.view.PreviewView previewView = binding.previewView;
                 if (previewView != null) {
-                    cameraHelper.startCamera(requireContext(), previewView, this);
+                    cameraHelper.startScanning(requireContext(), previewView, this);
                 }
             }
         }, 300);
@@ -285,7 +287,7 @@ public class QrScanFragment extends Fragment {
         androidx.camera.view.PreviewView previewView = root.findViewById(R.id.previewView);
         if (previewView != null) {
             viewModel.resetVerificationState();
-            cameraHelper.restartCamera(requireContext(), previewView, this);
+            cameraHelper.restartScanning(requireContext(), previewView, this);
             v.animate().rotationBy(360).setDuration(500).start();
         }
     }
@@ -297,7 +299,7 @@ public class QrScanFragment extends Fragment {
         bundle.putString("ARG_QR_DATA", result);
 
         MeterReadingFragment resultFragment = new MeterReadingFragment();
-        NavigationUtils.navigateTo(getActivity(), resultFragment, bundle);
+        NavigationUtils.navigateTo(getActivity(), resultFragment, R.id.frame_layout, bundle);
     }
 
     public void sendToResultFragment(String result) {
@@ -307,7 +309,7 @@ public class QrScanFragment extends Fragment {
         bundle.putString("ARG_QR_DATA", result);
 
         MeterReadingFragment resultFragment = new MeterReadingFragment();
-        NavigationUtils.navigateTo(getActivity(), resultFragment, bundle);
+        NavigationUtils.navigateTo(getActivity(), resultFragment, R.id.frame_layout, bundle);
     }
 
     @Override

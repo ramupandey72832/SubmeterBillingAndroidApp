@@ -13,20 +13,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentBillsBinding;
 import com.application.bottomnavigationbarui.fragments.EditBillFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.bottomnavigationbarui.utils.PdfGenerator;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.viewmodel.BillingViewModel;
@@ -37,7 +36,7 @@ import java.util.List;
 
 public class BillsFragment extends Fragment {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentBillsBinding binding;
 
     private BillingBillsAdapter adapter;
@@ -55,7 +54,7 @@ public class BillsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(requireContext());
+        ui = new ToastMessage(requireContext());
 
         // Initialize view display collection mapping pointers
         displayedBillList = new ArrayList<>();

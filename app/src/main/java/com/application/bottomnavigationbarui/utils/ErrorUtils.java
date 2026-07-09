@@ -1,5 +1,6 @@
 package com.application.bottomnavigationbarui.utils;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.github.devfrogora.service.exception.BusinessRuleException;
 import com.github.devfrogora.service.exception.ResourceNotFoundException;
 import com.github.devfrogora.service.exception.RoomOccupiedException;
@@ -8,7 +9,7 @@ import java.sql.SQLException;
 
 public class ErrorUtils {
 
-    public static void handleDatabaseException(String message ,Exception e, UiHelper ui) {
+    public static void handleDatabaseException(String message ,Exception e, ToastMessage ui) {
         message = message + " : ";
         if (e instanceof ResourceNotFoundException) {
             ui.showWarningAlert(message, e);

@@ -13,15 +13,16 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.RoomsAdapter;
 import com.application.bottomnavigationbarui.databinding.DialogQuickEditTenantBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentRoomsBinding;
 import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.EditRoomAssetFragment;
-import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
+
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -34,7 +35,7 @@ import java.util.List;
 
 public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomActionListener {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentRoomsBinding binding;
     private DialogQuickEditTenantBinding dialogBinding; // Dialog view binding reference
     private RoomsAdapter adapter;
@@ -56,11 +57,11 @@ public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomAction
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(getContext());
+        ui = new ToastMessage(getContext());
         roomList = new ArrayList<>();
 
         binding.fabAddRoom.setOnClickListener(view1 -> {
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new AddRoomFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new AddRoomFragment(),R.id.frame_layout);
         });
 
         binding.rvRooms.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -143,7 +144,7 @@ public class RoomsFragment extends Fragment implements RoomsAdapter.OnRoomAction
 
     @Override
     public void onQuickEdit(RoomRegistryDto room) {
-        NavigationUtils.replaceFragmentWithBackStack(requireActivity(), EditRoomAssetFragment.newInstance(room.getRoomNumber()));
+        NavigationUtils.replaceFragmentWithBackStack(requireActivity(), EditRoomAssetFragment.newInstance(room.getRoomNumber()), R.id.frame_layout);
     }
 
     @Override public void onActionEdit(RoomRegistryDto room) {}

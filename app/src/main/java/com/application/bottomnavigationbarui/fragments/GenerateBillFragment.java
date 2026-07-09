@@ -10,11 +10,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.application.baselibrary.ui.utils.NavigationUtils;
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.BillsFragment;
+import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentGenerateBillBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+
+
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 
@@ -24,7 +27,7 @@ import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
  * create an instance of this fragment.
  */
 public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener{
-    private UiHelper ui;
+    private ToastMessage ui;
 
     FragmentGenerateBillBinding binding;
 
@@ -109,7 +112,7 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(requireContext());
+        ui = new ToastMessage(requireContext());
 
         binding.btnBack.setOnClickListener(view1 -> {
             if (getActivity() != null) {
@@ -164,7 +167,7 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
         }finally {
             if(!isException) {
                 ui.showSuccessAlert("Bill Generated SuccessFully : ", new Exception(""));
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new BillsFragment());
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new BillsFragment(), R.id.frame_layout);
             }
         }
     }

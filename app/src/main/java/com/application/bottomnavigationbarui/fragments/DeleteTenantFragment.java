@@ -11,11 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
+import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentDeleteTenantBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
@@ -23,7 +25,7 @@ import com.github.devfrogora.service.viewmodel.TenantViewModel;
 
 public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentDeleteTenantBinding binding;
 
     // Decoupled clean business layer coordinator
@@ -42,7 +44,7 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(this.getContext());
+        ui = new ToastMessage(this.getContext());
 
         // Instantiate components with explicit injection parameters
         viewModel = new TenantViewModel(
@@ -62,7 +64,7 @@ public class DeleteTenantFragment extends Fragment implements VerifyMpinDialogFr
 
         binding.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(), R.id.frame_layout);
         });
 
         binding.btnDeleteTenant.setOnClickListener(view1 -> {

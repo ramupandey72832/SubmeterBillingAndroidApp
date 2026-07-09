@@ -12,32 +12,38 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
+import com.application.baselibrary.utils.GenericPermissionHelper;
 import com.application.bottomnavigationbarui.databinding.ActivityMainBinding;
 import com.application.bottomnavigationbarui.fragments.DatabaseConfigurationFragment;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.LocalPermissionHelper;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+
+
 import com.github.devfrogora.service.DatabaseSetup;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private UiHelper ui;
+    private ToastMessage ui;
     ActivityMainBinding binding;
     private static final String PREFS_NAME = "SecurityPrefs";
     private static final String KEY_MPIN = "user_mpin";
-    public LocalPermissionHelper localPermissionHelper;
+    public GenericPermissionHelper permissionHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        EdgeToEdge.enable(this);
-        ui = new UiHelper(this);
+        ui = new ToastMessage(this);
 
 
-
+        final List<String> requiredPermissions = Arrays.asList(
+                android.Manifest.permission.CAMERA,
+                android.Manifest.permission.READ_MEDIA_IMAGES
+        );
         // Initialize it immediately while MainActivity is INITIALIZING
-        localPermissionHelper = new LocalPermissionHelper(this, new LocalPermissionHelper.OnPermissionsListener() {
+        permissionHelper = new GenericPermissionHelper(this, requiredPermissions, new GenericPermissionHelper.OnPermissionsListener() {
             @Override
             public void onAllPermissionsGranted() {
                 // Find your active QrScanFragment and let it know
@@ -51,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        localPermissionHelper.checkForPermissions();
+        permissionHelper.checkForPermissions();
 
         try{
 //            DatabaseSetup.initializeDb("jdbc:sqlite:submeter_bill.db", null, null, "org.sqlite.JDBC"); // Desktop

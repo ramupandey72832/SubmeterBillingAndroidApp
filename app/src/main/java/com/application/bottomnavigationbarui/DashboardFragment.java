@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.DashboardBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentDashboardBinding;
 import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
@@ -27,8 +28,8 @@ import com.application.bottomnavigationbarui.fragments.ReplaceSubmeterFragment;
 import com.application.bottomnavigationbarui.fragments.SetupMpinFragment;
 import com.application.bottomnavigationbarui.fragments.VerifyMpinDialogFragment;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.NavigationUtils;
-import com.application.bottomnavigationbarui.utils.UiHelper;
+import com.application.baselibrary.ui.utils.NavigationUtils;
+
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.viewmodel.DashboardViewModel;
@@ -38,7 +39,7 @@ import java.util.List;
 
 public class DashboardFragment extends Fragment implements VerifyMpinDialogFragment.MpinVerificationListener {
 
-    private UiHelper ui;
+    private ToastMessage ui;
     private FragmentDashboardBinding binding;
     private DashboardBillsAdapter billAdapter;
     private List<BillReportDto> pendingBills;
@@ -57,7 +58,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ui = new UiHelper(getContext());
+        ui = new ToastMessage(getContext());
 
         binding.tvActiveDatabaseName.setText("Connected: " + DatabaseConfigurationFragment.getDbUrl(getContext()));
 
@@ -91,35 +92,35 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
 
         // Click listeners driving routing destinations
         binding.dashboardSection.addRoom.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new AddRoomFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new AddRoomFragment(),R.id.frame_layout));
 
         binding.dashboardSection.deleteRoom.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DeleteRoomFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DeleteRoomFragment(),R.id.frame_layout));
 
         binding.dashboardSection.addTenant.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new AddTenantFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new AddTenantFragment(),R.id.frame_layout));
 
         binding.dashboardSection.deleteTenant.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DeleteTenantFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DeleteTenantFragment(),R.id.frame_layout));
 
         binding.dashboardSection.replaceSubmeter.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new ReplaceSubmeterFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new ReplaceSubmeterFragment(),R.id.frame_layout));
 
         binding.dashboardSection.endTenancy.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new EndRoomTenancyFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new EndRoomTenancyFragment(),R.id.frame_layout));
 
         binding.btnScanMeter.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new QrScanFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new QrScanFragment(),R.id.frame_layout));
 
         binding.dashboardSection.mpin.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new SetupMpinFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new SetupMpinFragment(),R.id.frame_layout));
 
         binding.dashboardSection.databaseConfiguration.setOnClickListener(v ->
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseConfigurationFragment()));
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseConfigurationFragment(),R.id.frame_layout));
 
 
         binding.dashboardSection.dbTables.setOnClickListener(v->{
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseInspectorFragment());
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseInspectorFragment(),R.id.frame_layout);
         });
 
         // Search text filtration listeners
