@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.RecyclerView;
 import com.application.bottomnavigationbarui.databinding.ReportItemPreviousReportBinding;
-import com.application.bottomnavigationbarui.utils.SimplePdfGenerator;
+import com.application.bottomnavigationbarui.utils.BillPdfEngine;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 
 import java.io.File;
@@ -64,15 +64,14 @@ public class ReportAdapter extends RecyclerView.Adapter<ReportAdapter.ReportView
         // Click listener for the Download action button
         holder.binding.btnDownload.setOnClickListener(v -> {
             // Call your export helper, sending ONLY this month's bills
-            SimplePdfGenerator.generateBillReport(context, monthBills, monthKey, monthKey);
+            BillPdfEngine.generateBillingSummaryReport(context, monthBills, monthKey, monthKey);
         });
 
         // Click listener for the Share action button
         holder.binding.btnShare.setOnClickListener(v -> {
             // TODO: Optional share logic implementation
 
-
-            SimplePdfGenerator.generateBillReport(context, monthBills, monthKey, monthKey);
+            BillPdfEngine.generateBillingSummaryReport(context, monthBills, monthKey, monthKey);
 
             // 2. Locate the generated file inside the public Downloads directory
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);

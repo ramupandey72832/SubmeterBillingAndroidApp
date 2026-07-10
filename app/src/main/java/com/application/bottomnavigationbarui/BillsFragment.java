@@ -23,8 +23,8 @@ import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentBillsBinding;
 import com.application.bottomnavigationbarui.fragments.EditBillFragment;
+import com.application.bottomnavigationbarui.utils.BillPdfEngine;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.PdfGenerator;
 
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
@@ -69,7 +69,7 @@ public class BillsFragment extends Fragment {
                 try {
                     String fileName = "Thermal_Bill_" + bill.getBillId() + ".pdf";
 
-                    PdfGenerator.generateBillPdf(requireContext(), bill,fileName);
+                    BillPdfEngine.generateSingleBillSlip(requireContext(), bill,fileName);
                     // Immediately trigger the external viewer
                     viewGeneratedBill(fileName);
                 } catch (Exception e) {
@@ -81,7 +81,7 @@ public class BillsFragment extends Fragment {
             public void onShareClick(BillReportDto bill) {
                 try {
                     String filename = "Thermal_Bill_" + bill.getBillId() + ".pdf";
-                    PdfGenerator.generateBillPdf(requireContext(), bill,filename);
+                    BillPdfEngine.generateSingleBillSlip(requireContext(), bill,filename);
 
                     File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
                     File sharedFile = new File(downloadsDir, filename);

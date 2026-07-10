@@ -22,9 +22,8 @@ import androidx.fragment.app.Fragment;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.ReportAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentReportsBinding;
+import com.application.bottomnavigationbarui.utils.BillPdfEngine;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.application.bottomnavigationbarui.utils.PdfGenerator;
-import com.application.bottomnavigationbarui.utils.SimplePdfGenerator;
 
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
@@ -266,7 +265,7 @@ public class ReportsFragment extends Fragment {
                 createRangeExcelLauncher.launch("Billing_Report_" + start + "_to_" + end + ".xls");
 
                 // 2. Execute standard Android document engine (PDF) as before
-                SimplePdfGenerator.generateBillReport(requireContext(), viewModel.getRangeFilteredBills(), start, end);
+                BillPdfEngine.generateBillingSummaryReport(requireContext(), viewModel.getRangeFilteredBills(), start, end);
             }
         }
 
@@ -277,7 +276,7 @@ public class ReportsFragment extends Fragment {
         // 5. Handle multi-bill compilation ready signals
         if (viewModel.isMultiPdfReady()) {
             viewModel.clearMultiPdfFlag();
-            PdfGenerator.generateMultipleBillsPdf(getContext(), viewModel.getLatestMonthlyBills());
+            BillPdfEngine.generateBulkInvoicesGridPdf(getContext(),viewModel.getLatestMonthlyBills(),"All_Latest_Monthly_Bill.pdf");
         }
     }
 
