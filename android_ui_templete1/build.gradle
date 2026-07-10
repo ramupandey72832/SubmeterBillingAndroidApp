@@ -1,5 +1,6 @@
 plugins {
-    alias(libs.plugins.android.application)
+    // 1. Change from android.application to android.library
+    alias(libs.plugins.android.library)
 }
 
 android {
@@ -9,7 +10,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.application.android_ui_templete1"
+
         minSdk 24
         targetSdk 36
         versionCode 1
