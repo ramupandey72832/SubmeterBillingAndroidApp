@@ -21,10 +21,10 @@ import java.util.ArrayList;
 
 public class SplashActivity extends AppCompatActivity {
 
-    String url1 = "https://media.discordapp.net/attachments/1517224687426338916/1524000324459696258/image.png?ex=6a4e2767&is=6a4cd5e7&hm=4346a8707aa3a75f5611fb10d3a90d4bd3e552068a3fd9d08c402a99975dcf3e&=&format=webp&quality=lossless";
-    String url2 = "https://media.discordapp.net/attachments/1517224687426338916/1524000902619594812/image.png?ex=6a4e27f1&is=6a4cd671&hm=6e32a85f7bc9f18f8f009c3b6007a29814c8365030903297db32d8686c3fda5b&=&format=webp&quality=lossless";
-    String url3 = "https://media.discordapp.net/attachments/1517224687426338916/1524001105925771364/image.png?ex=6a4e2822&is=6a4cd6a2&hm=d35d7bf7795f59395b44057f09e8abb9726c5c2c5f651c6eed8596b0d7d76a38&=&format=webp&quality=lossless";
-    String url4 = "https://media.discordapp.net/attachments/1517224687426338916/1524001182048190625/image.png?ex=6a4e2834&is=6a4cd6b4&hm=95c2743d75b928e48564f800363f1a2e339dbffdb45de15c7a95a615acdcb27b&=&format=webp&quality=lossless";
+    String url1 = "https://raw.githubusercontent.com/DevFrogora/SubmeterBilling3LayerProject/refs/heads/main/Hosting_Images/guide_01.png";
+    String url2 = "https://raw.githubusercontent.com/DevFrogora/SubmeterBilling3LayerProject/refs/heads/main/Hosting_Images/guide_02.png";
+    String url3 = "https://raw.githubusercontent.com/DevFrogora/SubmeterBilling3LayerProject/refs/heads/main/Hosting_Images/guide_03.png";
+    String url4 = "https://raw.githubusercontent.com/DevFrogora/SubmeterBilling3LayerProject/refs/heads/main/Hosting_Images/guide_04.png";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
