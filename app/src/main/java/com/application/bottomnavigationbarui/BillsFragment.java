@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.application.baselibrary.media.MediaStoreHelper;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
 import com.application.bottomnavigationbarui.databinding.FragmentBillsBinding;
@@ -69,9 +70,23 @@ public class BillsFragment extends Fragment {
                 try {
                     String fileName = "Thermal_Bill_" + bill.getBillId() + ".pdf";
 
-                    BillPdfEngine.generateSingleBillSlip(requireContext(), bill,fileName);
-                    // Immediately trigger the external viewer
-                    viewGeneratedBill(fileName);
+                    // 1. Query if it exists already
+                    android.net.Uri fileUri = MediaStoreHelper.checkDownloadFileExistence(requireContext(), fileName);
+
+                    if (fileUri != null) {
+                        // File exists already! Open it directly
+                        android.widget.Toast.makeText(requireContext(), "Opening existing bill slip...", android.widget.Toast.LENGTH_SHORT).show();
+                        viewGeneratedBill(fileUri);
+                    } else {
+                        // 2. File does not exist. Create it and grab the exact returned Uri
+                        android.net.Uri freshUri = BillPdfEngine.generateSingleBillSlip(requireContext(), bill, fileName);
+
+                        if (freshUri != null) {
+                            viewGeneratedBill(freshUri);
+                        } else {
+                            android.widget.Toast.makeText(requireContext(), "Error initializing PDF generation file stream.", android.widget.Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 } catch (Exception e) {
                     ErrorUtils.handleDatabaseException("PDF Generation Failure", e, ui);
                 }
@@ -190,34 +205,18 @@ public class BillsFragment extends Fragment {
         }
     }
 
-    private void viewGeneratedBill(String filename) {
+    private void viewGeneratedBill(@NonNull android.net.Uri fileUri) {
         try {
-            // 1. Locate the file (Assuming PdfGenerator saves to Downloads with this naming convention)
-            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            File pdfFile = new File(downloadsDir, filename);
+            android.content.Intent intent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+            intent.setDataAndType(fileUri, "application/pdf");
 
-            if (!pdfFile.exists()) {
-                Toast.makeText(requireContext(), "Bill file not found.", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            // CRUCIAL: Grant temporary read permissions to whatever external PDF reader handles this intent
+            intent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NO_HISTORY);
 
-            // 2. Create a secure Content Uri using FileProvider
-            String authority = requireContext().getPackageName() + ".fileprovider";
-            Uri contentUri = FileProvider.getUriForFile(requireContext(), authority, pdfFile);
-
-            // 3. Create the View Intent
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setDataAndType(contentUri, "application/pdf");
-
-            // 4. Grant temporary read permissions
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-            // 5. Launch chooser so user can pick their favorite PDF app
-            startActivity(Intent.createChooser(intent, "Open Bill PDF using:"));
-
-        } catch (Exception e) {
-            ErrorUtils.handleDatabaseException("Could not open PDF viewer", e, ui);
+            startActivity(android.content.Intent.createChooser(intent, "Open Bill via"));
+        } catch (android.content.ActivityNotFoundException e) {
+            android.widget.Toast.makeText(requireContext(), "No PDF viewer app found on device", android.widget.Toast.LENGTH_LONG).show();
         }
     }
 

@@ -1,12 +1,17 @@
 package com.application.bottomnavigationbarui.utils;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,26 +28,52 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 
-public class BillPdfEngine { // Explicitly named for its domain purpose
+public class BillPdfEngine {
 
-    // 3-inch thermal slip dimensions (standard spot-billing printer format)
     private static final int SLIP_WIDTH = 220;
     private static final int SLIP_HEIGHT = 340;
-
-    // Standard A4 dimensions at 72 DPI
     private static final int A4_WIDTH = 595;
     private static final int A4_HEIGHT = 842;
 
     /**
-     * Generates a single individual thermal-style bill slip (Receipt).
+     * Deletes any pre-existing duplicate file entry in MediaStore to avoid "(1).pdf" duplicate naming bugs.
      */
-    public static void generateSingleBillSlip(@NonNull Context context, @NonNull BillReportDto targetBill, @NonNull String outputFileName) {
+    private static void deleteExistingFile(@NonNull Context context, @NonNull Uri collectionUri, @NonNull String fileName) {
+        try {
+            ContentResolver resolver = context.getContentResolver();
+            String selection = MediaStore.MediaColumns.DISPLAY_NAME + " = ?";
+            String[] selectionArgs = new String[]{fileName};
+            resolver.delete(collectionUri, selection, selectionArgs);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Helper to resolve the correct platform collection Uri.
+     */
+    @NonNull
+    private static Uri getCollectionUri() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            return MediaStore.Downloads.EXTERNAL_CONTENT_URI;
+        } else {
+            return MediaStore.Files.getContentUri("external");
+        }
+    }
+
+    /**
+     * Generates a single individual thermal-style bill slip.
+     */
+    /**
+     * Generates a single individual thermal-style bill slip.
+     * @return The exact Uri where the PDF was written, or null if generation failed.
+     */
+    public static Uri generateSingleBillSlip(@NonNull Context context, @NonNull BillReportDto targetBill, @NonNull String outputFileName) {
         PdfDocument pdfDocument = new PdfDocument();
         PdfDocument.PageInfo pageInfo = new PdfDocument.PageInfo.Builder(SLIP_WIDTH, SLIP_HEIGHT, 1).create();
         PdfDocument.Page page = pdfDocument.startPage(pageInfo);
@@ -84,9 +115,7 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
         canvas.drawLine(sidePadding, currentY, rightMarginEdge, currentY, paint);
         currentY += 14;
 
-        // --- Consumption Computations ---
         double unitsConsumed = targetBill.getCurrentReading() - targetBill.getPreviousReading();
-
         canvas.drawText("Current Reading", sidePadding, currentY, paint);
         paint.setTextAlign(Paint.Align.RIGHT);
         canvas.drawText(String.valueOf((int) targetBill.getCurrentReading()), rightMarginEdge, currentY, paint);
@@ -108,10 +137,8 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
         canvas.drawLine(sidePadding, currentY, rightMarginEdge, currentY, paint);
         currentY += 14;
 
-        // --- Charges Broken Down ---
-        String amountFormat = "%.2f";
-
         paint.setTextAlign(Paint.Align.LEFT);
+        String amountFormat = "%.2f";
         canvas.drawText("Rate per Unit", sidePadding, currentY, paint);
         paint.setTextAlign(Paint.Align.RIGHT);
         canvas.drawText(String.format(Locale.getDefault(), amountFormat, targetBill.getRatePerUnit()), rightMarginEdge, currentY, paint);
@@ -129,7 +156,6 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
         canvas.drawText(String.format(Locale.getDefault(), amountFormat, targetBill.getExtraCharge()), rightMarginEdge, currentY, paint);
         currentY += leadingSpace + 5;
 
-        // --- Final Invoice Total ---
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
         canvas.drawText("Total Amount", sidePadding, currentY, paint);
@@ -141,6 +167,7 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
         canvas.drawLine(sidePadding, currentY, rightMarginEdge, currentY, paint);
         currentY += 14;
 
+        paint.setTextAlign(Paint.Align.LEFT);
         if (targetBill.getNote() != null && !targetBill.getNote().trim().isEmpty()) {
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.ITALIC));
             canvas.drawText("Notes: " + targetBill.getNote(), sidePadding, currentY, paint);
@@ -150,14 +177,12 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
             currentY += 15;
         }
 
-        // --- Payment Status Verification ---
         paint.setTextAlign(Paint.Align.LEFT);
         canvas.drawText("STATUS:", sidePadding, currentY, paint);
-
         if (targetBill.getPaymentStatus() != null && targetBill.getPaymentStatus().equalsIgnoreCase("PAID")) {
-            paint.setColor(Color.parseColor("#008000")); // Clean green token
+            paint.setColor(Color.parseColor("#008000"));
         } else {
-            paint.setColor(Color.parseColor("#800000")); // Deep alert maroon token
+            paint.setColor(Color.parseColor("#800000"));
         }
 
         paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
@@ -165,18 +190,42 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
 
         pdfDocument.finishPage(page);
 
-        File pdfOutputFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), outputFileName);
-        try (FileOutputStream outputStream = new FileOutputStream(pdfOutputFile)) {
-            pdfDocument.writeTo(outputStream);
-            Toast.makeText(context, "Bill Slip Generated Successfully", Toast.LENGTH_LONG).show();
+        Uri collectionUri = getCollectionUri();
+
+        // CRUCIAL: Delete the old index first so MediaStore doesn't create (1).pdf
+        deleteExistingFile(context, collectionUri, outputFileName);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, outputFileName);
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+        } else {
+            java.io.File legacyDownloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            java.io.File targetLegacyFile = new java.io.File(legacyDownloadDir, outputFileName);
+            contentValues.put(MediaStore.MediaColumns.DATA, targetLegacyFile.getAbsolutePath());
+        }
+
+        Uri targetUri = context.getContentResolver().insert(collectionUri, contentValues);
+        if (targetUri == null) {
+            pdfDocument.close();
+            return null;
+        }
+
+        try (OutputStream outputStream = context.getContentResolver().openOutputStream(targetUri)) {
+            if (outputStream != null) {
+                pdfDocument.writeTo(outputStream);
+                Toast.makeText(context, "Bill Slip Generated Successfully", Toast.LENGTH_LONG).show();
+                return targetUri; // Return the exact newly generated file URI!
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(context, "Failed to export bill: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         } finally {
             pdfDocument.close();
         }
+        return null;
     }
-
     /**
      * Packages a collection of items into an A4 document grid arrangement (Exactly 8 bills per page).
      */
@@ -225,7 +274,6 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
             int cellRightEdge = horizontalOffset + ITEM_SLOT_WIDTH - cellIndent;
             int currentY = verticalOffset + 16;
 
-            // Header info
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.BOLD));
             paint.setTextSize(titleTextSize);
             paint.setTextAlign(Paint.Align.CENTER);
@@ -253,7 +301,6 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
             currentY += 11;
 
             double calculationUnits = specificBill.getCurrentReading() - specificBill.getPreviousReading();
-
             canvas.drawText("Current Reading", horizontalOffset + cellIndent, currentY, paint);
             paint.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(String.valueOf((int) specificBill.getCurrentReading()), cellRightEdge, currentY, paint);
@@ -275,9 +322,8 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
             canvas.drawLine(horizontalOffset + cellIndent, currentY, cellRightEdge, currentY, paint);
             currentY += 11;
 
-            String cellAmountFormat = "%.2f";
-
             paint.setTextAlign(Paint.Align.LEFT);
+            String cellAmountFormat = "%.2f";
             canvas.drawText("Rate per Unit", horizontalOffset + cellIndent, currentY, paint);
             paint.setTextAlign(Paint.Align.RIGHT);
             canvas.drawText(String.format(Locale.getDefault(), cellAmountFormat, specificBill.getRatePerUnit()), cellRightEdge, currentY, paint);
@@ -305,6 +351,7 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
 
             canvas.drawLine(horizontalOffset + cellIndent, currentY, cellRightEdge, currentY, paint);
             currentY += 11;
+            paint.setTextAlign(Paint.Align.LEFT);
 
             if (specificBill.getNote() != null && !specificBill.getNote().trim().isEmpty()) {
                 paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.ITALIC));
@@ -315,7 +362,6 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
 
             paint.setTextAlign(Paint.Align.LEFT);
             canvas.drawText("STATUS:", horizontalOffset + cellIndent, currentY, paint);
-
             if (specificBill.getPaymentStatus() != null && specificBill.getPaymentStatus().equalsIgnoreCase("PAID")) {
                 paint.setColor(Color.parseColor("#008000"));
             } else {
@@ -328,7 +374,6 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
             paint.setColor(Color.BLACK);
             paint.setTypeface(Typeface.create(Typeface.MONOSPACE, Typeface.NORMAL));
 
-            // Grid framing vectors
             paint.setColor(Color.LTGRAY);
             paint.setStrokeWidth(0.5f);
             canvas.drawLine(horizontalOffset, verticalOffset + ITEM_SLOT_HEIGHT, horizontalOffset + ITEM_SLOT_WIDTH, verticalOffset + ITEM_SLOT_HEIGHT, paint);
@@ -340,13 +385,26 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
             pdfDocument.finishPage(currentA4Page);
         }
 
-        File bulkExportFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), outputFileName);
-        try (FileOutputStream stream = new FileOutputStream(bulkExportFile)) {
-            pdfDocument.writeTo(stream);
-            Toast.makeText(context, "Batch Invoices Grid Document Exported (" + sequentialPageCounter + " Pages)", Toast.LENGTH_LONG).show();
+        Uri collectionUri = getCollectionUri();
+        deleteExistingFile(context, collectionUri, outputFileName);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, outputFileName);
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+        }
+
+        Uri targetUri = context.getContentResolver().insert(collectionUri, contentValues);
+        if (targetUri == null) return;
+
+        try (OutputStream stream = context.getContentResolver().openOutputStream(targetUri)) {
+            if (stream != null) {
+                pdfDocument.writeTo(stream);
+                Toast.makeText(context, "Batch Invoices Grid Document Exported", Toast.LENGTH_LONG).show();
+            }
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(context, "Batch grid export error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         } finally {
             pdfDocument.close();
         }
@@ -359,10 +417,23 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
         if (fullBillList == null || fullBillList.isEmpty()) return;
 
         Document textDocumentInstance = new Document(PageSize.A4.rotate());
-        File reportDestinationFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "Billing_Report_" + queryStartDate + "_to_" + queryEndDate + ".pdf");
+        String outputFileName = "Billing_Report_" + queryStartDate + "_to_" + queryEndDate + ".pdf";
 
-        try {
-            PdfWriter.getInstance(textDocumentInstance, new FileOutputStream(reportDestinationFile));
+        Uri collectionUri = getCollectionUri();
+        deleteExistingFile(context, collectionUri, outputFileName);
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, outputFileName);
+        contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "application/pdf");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            contentValues.put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS);
+        }
+
+        Uri targetUri = context.getContentResolver().insert(collectionUri, contentValues);
+        if (targetUri == null) return;
+
+        try (OutputStream outputStream = context.getContentResolver().openOutputStream(targetUri)) {
+            PdfWriter.getInstance(textDocumentInstance, outputStream);
             textDocumentInstance.open();
 
             Font headerTitleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
@@ -410,7 +481,6 @@ public class BillPdfEngine { // Explicitly named for its domain purpose
 
         } catch (Exception e) {
             e.printStackTrace();
-            Toast.makeText(context, "Report table assembly broken: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         } finally {
             if (textDocumentInstance.isOpen()) {
                 textDocumentInstance.close();

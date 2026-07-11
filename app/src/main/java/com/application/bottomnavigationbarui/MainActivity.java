@@ -47,13 +47,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onAllPermissionsGranted() {
                 // Find your active QrScanFragment and let it know
-                ui.showSuccessAlert("Permission Granted",new Exception("Permission Granted"));
+                ui.showSuccessAlert("All Permission are Granted");
             }
 
             @Override
             public void onPermissionsDenied(List<String> deniedPermissions) {
                 // Show Dialog
-                ui.showWarningAlert("Permission Not Granted",new Exception("Permission Not Granted"));
+
+                String deniedPermsString = String.join(", ", deniedPermissions);
+                ui.showWarningAlert("Permission Not Granted" + deniedPermsString);
             }
         });
 

@@ -47,7 +47,13 @@ public class ToastMessage {
         createSafeToast(fullMsg, "#FF9800", Toast.LENGTH_LONG).show();
         System.err.println(fullMsg);
         e.printStackTrace();
+    }
 
+    public void showWarningAlert(String message){
+        // #FF9800 is Orange
+        String fullMsg = "" + message;
+        createSafeToast(fullMsg, "#FF9800", Toast.LENGTH_LONG).show();
+        System.err.println(fullMsg);
     }
 
     public void showErrorAlert(String message, Exception e){
@@ -65,5 +71,12 @@ public class ToastMessage {
         createSafeToast(fulMsg, "#4CAF50", Toast.LENGTH_SHORT).show();
         System.out.println(fulMsg);
         e.printStackTrace();
+    }
+
+    public void showSuccessAlert(String message){
+        // #4CAF50 is Green
+        String fulMsg = "" + message ;
+        createSafeToast(fulMsg, "#4CAF50", Toast.LENGTH_SHORT).show();
+        System.out.println(fulMsg);
     }
 }
