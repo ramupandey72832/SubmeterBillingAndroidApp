@@ -1,0 +1,16 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Bed Frame and Ladder structures -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M4,17 h16 v3 h2 V10 c0,-1.65 -1.35,-3 -3,-3 h-7 c-0.55,0 -1,0.45 -1,1 v7 H4 V5 H2 v15 h2 z M13,9 h6 c0.55,0 1,0.45 1,1 v5 h-7 z"/>
+
+    <!-- Pillow / Head Graphic -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M7.5,9 a2.5,2.5 0,1 0,0 5 a2.5,2.5 0,1 0,0 -5"/>
+</vector>

@@ -19,6 +19,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.application.android_ui_templete1.templates.nav_activity.bottom_nav_activity.BottomNavActivityConstant;
 import com.application.baselibrary.media.MediaStoreHelper;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.adapters.BillingBillsAdapter;
@@ -140,7 +141,7 @@ public class BillsFragment extends Fragment {
                                 android.R.anim.slide_in_left,
                                 android.R.anim.slide_out_right
                         )
-                        .replace(R.id.frame_layout, editBillFragment) // Maps over layout screen viewport
+                        .replace( BottomNavActivityConstant.MAIN_CONTAINER , editBillFragment) // Maps over layout screen viewport
                         .addToBackStack(null) // Restores back stack button navigation traces
                         .commit();
             }

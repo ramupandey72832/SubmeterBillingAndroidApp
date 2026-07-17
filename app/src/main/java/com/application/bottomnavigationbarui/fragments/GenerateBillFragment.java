@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.application.android_ui_templete1.templates.nav_activity.bottom_nav_activity.BottomNavActivityConstant;
 import com.application.baselibrary.ui.utils.NavigationUtils;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.BillsFragment;
@@ -167,7 +168,7 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
         }finally {
             if(!isException) {
                 ui.showSuccessAlert("Bill Generated SuccessFully : ", new Exception(""));
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new BillsFragment(), R.id.frame_layout);
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new BillsFragment(), BottomNavActivityConstant.MAIN_CONTAINER);
             }
         }
     }

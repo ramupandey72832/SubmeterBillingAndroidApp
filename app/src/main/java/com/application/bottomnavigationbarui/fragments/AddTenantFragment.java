@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.android_ui_templete1.templates.nav_activity.bottom_nav_activity.BottomNavActivityConstant;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.R;
@@ -21,6 +22,10 @@ import com.application.bottomnavigationbarui.databinding.FragmentAddTenantBindin
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.baselibrary.ui.utils.NavigationUtils;
 
+import com.application.bottomnavigationbarui.validation.RoomValidator;
+import com.application.bottomnavigationbarui.validation.TenancyValidator;
+import com.application.bottomnavigationbarui.validation.TenantValidator;
+import com.application.bottomnavigationbarui.validation.ValidationResult;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
@@ -69,7 +74,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
 
         binding.layoutAddTenant.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(), R.id.frame_layout);
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(), BottomNavActivityConstant.MAIN_CONTAINER);
         });
 
 
@@ -122,8 +127,13 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
             String roomNumber = binding.layoutAddTenant.actvRoomDropdown.getText().toString();
             String startDate = binding.layoutAddTenant.etStartDate.getText().toString();
 
-            if (tenantName.isEmpty() || aadharNumber.isEmpty() || tenantMobile.isEmpty()
-                    || tenantAddress.isEmpty() || roomNumber.isEmpty() || startDate.isEmpty()) {
+            ValidationResult tenantValidationResult = TenantValidator.validate(tenantName, aadharNumber, tenantMobile);
+            if (!tenantValidationResult.isValid()) {
+                Toast.makeText(getContext(), tenantValidationResult.getJoinedErrors(), Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if ( tenantAddress.isEmpty() || roomNumber.isEmpty() || startDate.isEmpty()) {
                 Toast.makeText(getContext(), "Please complete all field requirements.", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -174,7 +184,7 @@ public class AddTenantFragment extends Fragment implements VerifyMpinDialogFragm
 
         // 3. Wring out inputs exclusively upon structural commitment confirmations
         if (viewModel.isOperationSuccess()) {
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment(),R.id.frame_layout);
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment(), BottomNavActivityConstant.MAIN_CONTAINER);
             String tenantName = binding.layoutAddTenant.etTenantName.getText().toString();
             Toast.makeText(getContext(), "Tenant : " + tenantName + " added successfully", Toast.LENGTH_SHORT).show();
             clearInputs();

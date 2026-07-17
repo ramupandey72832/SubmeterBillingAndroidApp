@@ -11,12 +11,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.android_ui_templete1.templates.nav_activity.bottom_nav_activity.BottomNavActivityConstant;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentMeterReadingBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.baselibrary.ui.utils.NavigationUtils;
 
+import com.application.bottomnavigationbarui.validation.MeterReadingValidator;
+import com.application.bottomnavigationbarui.validation.ValidationResult;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
@@ -130,7 +133,7 @@ public class MeterReadingFragment extends Fragment {
                         extraCharge, // Passed here
                         notes        // Passed here
                 );
-                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment, R.id.frame_layout);
+                NavigationUtils.replaceFragmentWithBackStack(requireActivity(), targetFragment, BottomNavActivityConstant.MAIN_CONTAINER);
             }
         });
     }

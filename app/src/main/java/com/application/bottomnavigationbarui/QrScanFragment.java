@@ -26,6 +26,8 @@ import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.viewmodel.QrScanViewModel;
 
+import com.application.android_ui_templete1.R;
+
 public class QrScanFragment extends Fragment {
 
     private static final String TAG = "QrScanFragment";
@@ -284,7 +286,7 @@ public class QrScanFragment extends Fragment {
         View root = getView();
         if (root == null || cameraHelper == null || getContext() == null) return;
 
-        androidx.camera.view.PreviewView previewView = root.findViewById(R.id.previewView);
+        androidx.camera.view.PreviewView previewView = root.findViewById(com.application.bottomnavigationbarui.R.id.previewView);
         if (previewView != null) {
             viewModel.resetVerificationState();
             cameraHelper.restartScanning(requireContext(), previewView, this);
@@ -299,7 +301,7 @@ public class QrScanFragment extends Fragment {
         bundle.putString("ARG_QR_DATA", result);
 
         MeterReadingFragment resultFragment = new MeterReadingFragment();
-        NavigationUtils.navigateTo(getActivity(), resultFragment, R.id.frame_layout, bundle);
+        NavigationUtils.navigateTo(getActivity(), resultFragment, R.id.bottom_nav_activity_main_frame_layout, bundle);
     }
 
     public void sendToResultFragment(String result) {
@@ -309,7 +311,7 @@ public class QrScanFragment extends Fragment {
         bundle.putString("ARG_QR_DATA", result);
 
         MeterReadingFragment resultFragment = new MeterReadingFragment();
-        NavigationUtils.navigateTo(getActivity(), resultFragment, R.id.frame_layout, bundle);
+        NavigationUtils.navigateTo(getActivity(), resultFragment, R.id.bottom_nav_activity_main_frame_layout, bundle);
     }
 
     @Override

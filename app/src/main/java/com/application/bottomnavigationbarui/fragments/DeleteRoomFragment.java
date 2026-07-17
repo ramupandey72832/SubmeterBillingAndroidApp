@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.android_ui_templete1.templates.nav_activity.bottom_nav_activity.BottomNavActivityConstant;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.R;
@@ -61,7 +62,7 @@ public class DeleteRoomFragment extends Fragment implements VerifyMpinDialogFrag
 
         binding.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(), R.id.frame_layout);
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(), BottomNavActivityConstant.MAIN_CONTAINER);
         });
 
         binding.btnDeleteRoom.setOnClickListener(v -> {

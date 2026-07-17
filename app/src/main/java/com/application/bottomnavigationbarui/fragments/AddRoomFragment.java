@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.application.android_ui_templete1.templates.nav_activity.bottom_nav_activity.BottomNavActivityConstant;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.DashboardFragment;
 import com.application.bottomnavigationbarui.R;
@@ -18,6 +19,8 @@ import com.application.bottomnavigationbarui.databinding.FragmentAddRoomBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.baselibrary.ui.utils.NavigationUtils;
 
+import com.application.bottomnavigationbarui.validation.RoomValidator;
+import com.application.bottomnavigationbarui.validation.ValidationResult;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.viewmodel.RoomMeterViewModel;
@@ -65,7 +68,7 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
 
         binding.layoutAddroom.btnBack.setOnClickListener(v -> {
             clearInputs();
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(),R.id.frame_layout);
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DashboardFragment(),BottomNavActivityConstant.MAIN_CONTAINER);
         });
 
 
@@ -77,10 +80,16 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
                 String meterSerial = binding.layoutAddroom.etMeterSerial.getText().toString();
                 String initialReading = binding.layoutAddroom.etInitialReading.getText().toString();
 
-                if (roomNumber.isEmpty() || roomType.isEmpty() || meterSerial.isEmpty() || initialReading.isEmpty()) {
-                    Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                ValidationResult validationResult = RoomValidator.validate(roomNumber, roomType, meterSerial, initialReading);
+                if (!validationResult.isValid()) {
+                    Toast.makeText(getContext(), validationResult.getJoinedErrors(), Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+//                if (roomNumber.isEmpty() || roomType.isEmpty() || meterSerial.isEmpty() || initialReading.isEmpty()) {
+//                    Toast.makeText(getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
                 String message = "Room: " + roomNumber + "\nRoom Type: " + roomType +
                         "\nMeter Serial: " + meterSerial + "\nInitial Reading: " + initialReading;
                 // LAUNCH THE POPUP DIALOG GATE HERE
@@ -129,7 +138,7 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
 
         // 3. Clear data input layouts only on successful processing confirmation
         if (viewModel.isOperationSuccess()) {
-            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment(),R.id.frame_layout);
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new RoomsFragment(), BottomNavActivityConstant.MAIN_CONTAINER);
             Toast.makeText(getContext(), "Room added successfully", Toast.LENGTH_SHORT).show();
             clearInputs();
         }

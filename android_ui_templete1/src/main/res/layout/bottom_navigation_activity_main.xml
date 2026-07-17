@@ -2,23 +2,21 @@
 <androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://tools.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/main"
-    android:background="?attr/android:windowBackground"
-    tools:context=".MainActivity">
+    android:id="@+id/bottom_nav_activity_main_main"
+    android:background="?attr/android:windowBackground">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/_frame_layout"
+        android:id="@+id/bottom_nav_activity_main_frame_layout"
         android:layout_marginBottom="?attr/actionBarSize"/>
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/bottomAppBar"
+        android:id="@+id/bottom_nav_activity_main_bottomAppBar"
         android:layout_gravity="bottom"
         app:backgroundTint="?attr/colorSurface"
         app:fabCradleMargin="10dp"
@@ -28,27 +26,26 @@
         <com.google.android.material.bottomnavigation.BottomNavigationView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/bottomNavigationView"
-            android:layout_marginEnd="0dp"
+            android:id="@+id/bottom_nav_activity_main_bottomNavigationView"
             app:labelVisibilityMode="labeled"
             android:background="@android:color/transparent"
             app:itemIconTint="?attr/colorOnSurfaceVariant"
             app:itemTextColor="?attr/colorOnSurfaceVariant"
             app:itemRippleColor="?attr/colorPrimary"
-            app:menu="@menu/nav_menu_items"/>
+            app:menu="@menu/bottom_navigation_activity_main_nav_menu_items"/>
 
     </com.google.android.material.bottomappbar.BottomAppBar>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/scanMeter"
+        android:id="@+id/bottom_nav_activity_main_btn_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:src="@drawable/ic_qr_scan"
         app:backgroundTint="?attr/colorPrimary"
         app:tint="?attr/colorOnPrimary"
+        android:src="@drawable/ic_qr_scan"
         app:elevation="12dp"
         app:borderWidth="0dp"
-        app:layout_anchor="@id/bottomAppBar" />
+        app:layout_anchor="@id/bottom_nav_activity_main_bottomAppBar" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
