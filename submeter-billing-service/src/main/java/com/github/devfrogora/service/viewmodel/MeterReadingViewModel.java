@@ -77,7 +77,7 @@ public class MeterReadingViewModel {
 
         new Thread(() -> {
             try {
-                // 1. Resolve hardware submeter registration payload using the Optional layout
+
                 OperationResult<SubmeterDTO> submeterOpt = roomMeterService.getSubmeterByRoomNumber(roomNumber.trim());
                 if (!submeterOpt.isSuccess()) {
                     this.errorMessage = "Asset Error: No deployed submeter found for room " + roomNumber;

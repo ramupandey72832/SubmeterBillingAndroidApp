@@ -136,24 +136,44 @@ public class RoomMeterServiceImpl implements RoomMeterService {
 
             // 1. Find and Delete (or Archive) the old meter for this room
             Optional<Submeter> oldMeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId());
+            Optional<Submeter>  newMeterOptional = DaoManager.getSubmeterDao().getSubmeterBySerialNumber(newMeterSerialNumber);
             if (oldMeter.isPresent()) {
                 // Delete the old meter reference (or mark as inactive)
-                DaoManager.getSubmeterDao().deactivateSubmeter(oldMeter.get().getMeterId());            }
-
-            // 2. Provision the new hardware
+                DaoManager.getSubmeterDao().deactivateSubmeter(oldMeter.get().getMeterId());
+            }
             Submeter newMeter = new Submeter();
             newMeter.setRoomId(room.getRoomId());
-            newMeter.setMeterSerialNumber(newMeterSerialNumber);
-            newMeter.setInitialReading(initialReading);
-            newMeter.setIsActive(1);
 
-            int newMeterId = DaoManager.getSubmeterDao().insertSubmeter(newMeter);
-            if (newMeterId < 0) {
-                throw new SQLException("Failed to insert new submeter hardware.");
+            if(newMeterOptional.isPresent()){
+                newMeter = newMeterOptional.get();
+                newMeter.setInitialReading(initialReading);
+                newMeter.setIsActive(1);
+
+                boolean isUpdated = DaoManager.getSubmeterDao().updateSubmeter(newMeter);
+                if (!isUpdated) {
+                    throw new SQLException("Failed to insert new submeter hardware.");
+                }
+
+                // 3. Record the initial reading in the readings table so billing starts fresh
+                double noCharge = 0;
+                meterBillingService.initialMeterReading(newMeter.getMeterId(), initialReading, noCharge, noCharge);
+
+            }else{
+
+                // 2. Provision the new hardware
+                newMeter.setMeterSerialNumber(newMeterSerialNumber);
+                newMeter.setInitialReading(initialReading);
+                newMeter.setIsActive(1);
+
+                int newMeterId = DaoManager.getSubmeterDao().insertSubmeter(newMeter);
+                if (newMeterId < 0) {
+                    throw new SQLException("Failed to insert new submeter hardware.");
+                }
+
+                // 3. Record the initial reading in the readings table so billing starts fresh
+                double noCharge = 0;
+                meterBillingService.initialMeterReading(newMeterId, initialReading, noCharge, noCharge);
             }
-            // 3. Record the initial reading in the readings table so billing starts fresh
-            double noCharge = 0;
-            meterBillingService.initialMeterReading(newMeterId, initialReading, noCharge, noCharge);
 
             DatabaseConnection.commitTransaction();
             return OperationResult.success(null, "Hardware replaced. New meter sequence started.");

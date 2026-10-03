@@ -14,6 +14,7 @@ public interface SubmeterDao {
     Optional<Submeter> getSubmeterById(int meterId) throws SQLException;
     Optional<Submeter> getSubmeterBySerialNumber(String serialNumber) throws SQLException;
     Optional<Submeter> getSubmeterByRoomId(int roomId) throws SQLException;
+    Optional<Submeter> getInactiveSubmeterByRoomId(int roomId) throws SQLException;
     List<Submeter> getAllSubmeters() throws SQLException;
 
     // Update

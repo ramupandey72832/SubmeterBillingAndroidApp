@@ -42,6 +42,12 @@ public class SQLiteSubmeterDao implements SubmeterDao {
     }
 
     @Override
+    public Optional<Submeter> getInactiveSubmeterByRoomId(int roomId) throws SQLException{
+        String sql = SqlLoader.get("submeter.get_inactive_by_room");
+        return DbUtils.executeQuerySingle(sql, this::mapResultSetToSubmeter, roomId);
+    }
+
+    @Override
     public boolean detachSubmeter(int meterId) throws SQLException {
         // We set room_id to null (or -1 if your schema doesn't allow nulls)
         // to "archive" the meter hardware while keeping its ID for old bills.

@@ -398,25 +398,5 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 bill.getRatePerUnit(),bill.getTotalAmount(),bill.isPaid());
     }
 
-    @Override
-    public void checkAndRunMigrations(MigrationCallback callback) {
-        // Set the listener on the data layer briefly to catch the result
-        DatabaseConnection.setMigrationListener(new DatabaseConnection.MigrationListener() {
-            @Override
-            public void onMigrationMessage(String message) {
-                callback.onMessage(message);
-            }
 
-            @Override
-            public void onMigrationError(String error, Exception e) {
-                callback.onError(error, e);
-            }
-        });
-
-        try {
-            DatabaseConnection.migrationLogic();
-        } catch (SQLException e) {
-            callback.onError("Critical migration failure", e);
-        }
-    }
 }

@@ -25,9 +25,5 @@ public interface MeterBillingService {
 
     BillDTO getBillById(int billId) throws SQLException;
 
-    void checkAndRunMigrations(MigrationCallback callback);// New interface for decoupling messages
-    interface MigrationCallback {
-        void onMessage(String msg);
-        void onError(String err, Exception e);
-    }
+
 }

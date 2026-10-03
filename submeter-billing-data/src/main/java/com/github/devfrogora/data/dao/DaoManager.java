@@ -15,6 +15,8 @@ public class DaoManager {
     private static BillDao billDao;
     private static BillSummaryDao billSummaryDao;
     private static TenancyDao tenancyDao;
+    private static DbMigrationDao dbMigrationDao;
+    private static SubmeterAllocationDao submeterAllocationDao;
 
 
     // Initialize all implementations at once
@@ -26,14 +28,18 @@ public class DaoManager {
         billDao = new SQLiteBillDao();
         billSummaryDao = new SQLiteBillSummaryDao();
         tenancyDao = new SQLiteTenancyDao();
+        dbMigrationDao = new SQLiteDbMigrationDao();
+        submeterAllocationDao = new SQLiteSubmeterAllocationDao();
     }
 
     public static TenantDao getTenantDao() { return tenantDao; }
     public static RoomDao getRoomDao() { return roomDao; }
     public static SubmeterDao getSubmeterDao() { return submeterDao; }
+    public static SubmeterAllocationDao getSubmeterAllocationDao() { return submeterAllocationDao; }
     public static MeterReadingDao getMeterReadingDao() { return meterReadingDao; }
     public static BillDao getBillDao() { return billDao; }
     public static BillSummaryDao getBillSummaryDao() { return billSummaryDao; }
+    public static DbMigrationDao getDbMigrationDao() { return dbMigrationDao; }
 
     public static TenancyDao getTenancyDao() {
         return tenancyDao;

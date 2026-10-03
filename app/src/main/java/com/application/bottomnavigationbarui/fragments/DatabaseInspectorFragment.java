@@ -25,7 +25,7 @@ public class DatabaseInspectorFragment extends Fragment {
     private GenericTableAdapter tableAdapter;
 
     private final String[] databaseTables = {
-            "ROOMS", "TENANTS", "TENANCIES", "SUBMETERS", "BILLS", "METER_READINGS"
+            "ROOMS", "TENANTS", "TENANCIES", "SUBMETERS", "SUBMETERS_ALLOCATION", "BILLS", "METER_READINGS"
     };
 
     @Nullable

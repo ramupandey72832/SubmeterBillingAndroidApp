@@ -75,6 +75,16 @@ public class DatabaseInspectorViewModel {
                     }
                     break;
 
+                case "SUBMETERS_ALLOCATION":
+                    currentHeaders.addAll(Arrays.asList("allocation_id","meter_id", "room_id", "start_date", "end_date"));
+                    // Safe fallback map handling if tables contain raw option arrays
+                    List<SubmeterAllocation> submeterJunctions = DaoManager.getSubmeterAllocationDao().getAllAllocations();
+                    for (SubmeterAllocation s : submeterJunctions) {
+                        currentRows.add(Arrays.asList(String.valueOf(s.getAllocationId()), String.valueOf(s.getMeterId()),
+                                String.valueOf(s.getRoomId()), s.getStartDate() ,s.getEndDate()));
+                    }
+                    break;
+
                 case "BILLS":
                     currentHeaders.addAll(Arrays.asList("bill_id","previous_reading_id","current_reading_id","meter_id","meter_serial_number",
                             "tenant_id","tenant_name","room_number","units_consumed",

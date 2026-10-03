@@ -21,6 +21,7 @@ import com.application.bottomnavigationbarui.fragments.AddRoomFragment;
 import com.application.bottomnavigationbarui.fragments.AddTenantFragment;
 import com.application.bottomnavigationbarui.fragments.DatabaseConfigurationFragment;
 import com.application.bottomnavigationbarui.fragments.DatabaseInspectorFragment;
+import com.application.bottomnavigationbarui.fragments.DatabaseMigrationFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteRoomFragment;
 import com.application.bottomnavigationbarui.fragments.DeleteTenantFragment;
 import com.application.bottomnavigationbarui.fragments.EndRoomTenancyFragment;
@@ -125,6 +126,10 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
             NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseInspectorFragment(),R.id.bottom_nav_activity_main_frame_layout);
         });
 
+        binding.dashboardSection.databaseMigration.setOnClickListener(v->{
+            NavigationUtils.replaceFragmentWithBackStack(requireActivity(), new DatabaseMigrationFragment(),R.id.bottom_nav_activity_main_frame_layout);
+        });
+
         // Search text filtration listeners
         binding.etSearchBills.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -175,11 +180,6 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
             billAdapter.notifyDataSetChanged();
         }
 
-        if (viewModel.getMigrationStatus() != null) {
-            Toast.makeText(getContext(), viewModel.getMigrationStatus(), Toast.LENGTH_SHORT).show();
-            // Clear it so it doesn't toast again on next state change
-             viewModel.clearMigrationStatus();
-        }
     }
 
     @Override
