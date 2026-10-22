@@ -4,8 +4,6 @@ package com.github.devfrogora.service.viewmodel;
 import com.github.devfrogora.data.config.DatabaseConnection;
 import com.github.devfrogora.data.dao.DaoManager;
 import com.github.devfrogora.data.dao.DbUtils;
-import com.github.devfrogora.data.entities.Bill;
-import com.github.devfrogora.data.entities.MeterReading;
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 

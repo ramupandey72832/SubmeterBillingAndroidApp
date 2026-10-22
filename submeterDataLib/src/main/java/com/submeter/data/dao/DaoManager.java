@@ -1,6 +1,7 @@
 package com.submeter.data.dao;
 
 import com.submeter.data.dao.impl.SqlLiteBillDao;
+import com.submeter.data.dao.impl.SqlLiteDbMigrationDao;
 import com.submeter.data.dao.impl.SqlLiteMeterReadingDao;
 import com.submeter.data.dao.impl.SqlLiteRoomDao;
 import com.submeter.data.dao.impl.SqlLiteSubmeterAllocationDao;
@@ -16,7 +17,7 @@ public class DaoManager {
     private static BillDao billDao;
     private static TenancyDao tenancyDao;
     private static SubmeterAllocationDao submeterAllocationDao;
-//    private static DbMigrationDao dbMigrationDao;
+    private static DbMigrationDao dbMigrationDao;
 
 
     // Initialize all implementations at once
@@ -28,7 +29,7 @@ public class DaoManager {
         billDao = new SqlLiteBillDao();
         tenancyDao = new SqlLiteTenancyDao();
 
-//        dbMigrationDao = new SQLiteDbMigrationDao();
+        dbMigrationDao = new SqlLiteDbMigrationDao();
         submeterAllocationDao = new SqlLiteSubmeterAllocationDao();
 
     }
@@ -43,5 +44,5 @@ public class DaoManager {
         return tenancyDao;
     }
 
-//    public static DbMigrationDao getDbMigrationDao() { return dbMigrationDao; }
+    public static DbMigrationDao getDbMigrationDao() { return dbMigrationDao; }
 }

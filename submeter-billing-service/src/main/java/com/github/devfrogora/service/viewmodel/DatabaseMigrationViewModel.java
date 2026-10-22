@@ -17,6 +17,7 @@ public class DatabaseMigrationViewModel {
     }
 
     // A simple, classic interface listener to notify the UI when fields change
+
     public interface StateListener {
         void onStateChanged();
     }
