@@ -1,13 +1,15 @@
 package com.github.devfrogora.service.impl;
 
 import com.github.devfrogora.data.dao.DaoManager;
-import com.github.devfrogora.data.entities.Room;
-import com.github.devfrogora.data.entities.Tenancy;
-import com.github.devfrogora.data.entities.Tenant;
-import com.github.devfrogora.data.utils.DateUtils;
+import com.submeter.data.entities.Room;
+import com.submeter.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Tenant;
+import com.example.rrallutilitylib.util.DateUtils;
 import com.github.devfrogora.service.dto.TenancyDTO;
 import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.exception.*;
+import com.submeter.data.entities.Tenant;
 
 import com.github.devfrogora.service.TenancyManagementService;
 
@@ -25,7 +27,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         if (existing.isEmpty()) {
             Tenant tenantEntity = new Tenant();
             tenantEntity.setName(tenantDto.getName());
-            tenantEntity.setAadharNumber(tenantDto.getAadharNumber());
+            tenantEntity.setAadhaarNumber(tenantDto.getAadharNumber());
             tenantEntity.setPhoneNumber(tenantDto.getPhoneNumber());
             tenantEntity.setAddress(tenantDto.getAddress());
 
@@ -36,9 +38,9 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
 
             tenantId = DaoManager.getTenantDao().getTenantByAadhar(tenantDto.getAadharNumber())
                     .orElseThrow(() -> new ResourceNotFoundException("Tenant registration failed to verify in database records."))
-                    .getTenantId();
+                    .getId();
         } else {
-            tenantId = existing.get().getTenantId();
+            tenantId = existing.get().getId();
         }
 
         // Resolving the latest room allocation
@@ -46,7 +48,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         if (!room.isPresent()) {
             throw new ResourceNotFoundException("Room does not exist!!");
         }
-        int activeRoomId = room.get().getRoomId();
+        int activeRoomId = room.get().getId();
 
         // Check if room is already occupied
         Optional<Tenancy> currentLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(activeRoomId);
@@ -71,7 +73,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " does not exist."));
 
-        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
+        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getId());
         if (activeTenancyOpt.isEmpty()) {
             throw new BusinessRuleException("Room " + roomNumber + " is already vacant. No action taken.");
         }
@@ -80,7 +82,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         String endDate = DateUtils.validateDate(endTenancyDate);
 
         boolean isCheckedOut = DaoManager.getTenancyDao().endContract(
-                room.getRoomId(),
+                room.getId(),
                 activeTenancy.getTenantId(),
                 endDate
         );
@@ -97,14 +99,14 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
 
         // Optimized verification query to see if the client has any open contracts
         boolean hasActiveContracts = DaoManager.getTenancyDao().getAllTenancies().stream()
-                .anyMatch(t -> t.getTenantId() == tenant.getTenantId() && t.getEndDate() == null);
+                .anyMatch(t -> t.getTenantId() == tenant.getId() && t.getEndDate() == null);
 
         if (hasActiveContracts) {
             throw new BusinessRuleException("Cannot delete tenant profile '" + tenant.getName()
                     + "' because they are currently checked into an active room contract.");
         }
 
-        boolean isDeleted = DaoManager.getTenantDao().deleteTenant(tenant.getTenantId());
+        boolean isDeleted = DaoManager.getTenantDao().deleteTenant(tenant.getId());
         if (!isDeleted) {
             throw new BusinessRuleException("Database write failure occurred while trying to drop tenant profile.");
         }
@@ -123,7 +125,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
     public TenancyDTO findActiveTenancyByRoomNumber(String roomNumber)throws SQLException{
         Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " does not exist."));
-        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
+        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getId());
         if (activeTenancyOpt.isEmpty()) {
 //            throw new BusinessRuleException("Room " + roomNumber + " is  vacant ");
             return null;
@@ -132,14 +134,14 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         Optional<Tenant> tenant = DaoManager.getTenantDao().getTenantById(activeTenancy.getTenantId());
 
 
-        return new TenancyDTO( activeTenancy.getTenancyId(),activeTenancy.getRoomId(),activeTenancy.getTenantId(),roomNumber,
-                tenant.get().getAadharNumber(),activeTenancy.getStartDate(),activeTenancy.getEndDate());
+        return new TenancyDTO( activeTenancy.getId(),activeTenancy.getRoomId(),activeTenancy.getTenantId(),roomNumber,
+                tenant.get().getAadhaarNumber(),activeTenancy.getStartDate(),activeTenancy.getEndDate());
     }
 
     public TenancyDTO findActiveTenancyByTenantAadhar(String aadharNumber)throws SQLException{
         Tenant tenant = DaoManager.getTenantDao().getTenantByAadhar(aadharNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("No tenant client matches the given identity key."));
-        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(tenant.getTenantId());
+        Optional<Tenancy> activeTenancyOpt = DaoManager.getTenancyDao().getActiveTenancyByRoomId(tenant.getId());
 
         if (activeTenancyOpt.isEmpty()) {
 //            throw new BusinessRuleException("Tenant " + aadharNumber + " is  not exist ");
@@ -148,8 +150,8 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         Tenancy activeTenancy = activeTenancyOpt.get();
         Optional<Room> room = DaoManager.getRoomDao().getRoomById(activeTenancy.getRoomId());
 
-        return new TenancyDTO( activeTenancy.getTenancyId(),activeTenancy.getRoomId(),activeTenancy.getTenantId(),room.get().getRoomNumber(),
-                tenant.getAadharNumber(),activeTenancy.getStartDate(),activeTenancy.getEndDate());
+        return new TenancyDTO( activeTenancy.getId(),activeTenancy.getRoomId(),activeTenancy.getTenantId(),room.get().getRoomNumber(),
+                tenant.getAadhaarNumber(),activeTenancy.getStartDate(),activeTenancy.getEndDate());
 
     }
 
@@ -158,7 +160,7 @@ public class TenancyManagementServiceImpl implements TenancyManagementService {
         return DaoManager.getTenantDao().getTenantByAadhar(aadhar)
                 .map(entity -> new TenantDTO(
                         entity.getName(),
-                        entity.getAadharNumber(),
+                        entity.getAadhaarNumber(),
                         entity.getPhoneNumber(),
                         entity.getAddress()
                 ));

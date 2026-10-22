@@ -2,8 +2,17 @@ package com.github.devfrogora.service.impl;
 
 import com.github.devfrogora.data.config.DatabaseConnection;
 import com.github.devfrogora.data.dao.DaoManager;
-import com.github.devfrogora.data.entities.*;
-import com.github.devfrogora.data.utils.DateUtils;
+import com.submeter.data.entities.Bill;
+//import com.github.devfrogora.data.entities.MeterReading;
+import com.submeter.data.entities.Room;
+import com.submeter.data.entities.Submeter;
+import com.submeter.data.entities.MeterReading;
+import com.submeter.data.entities.Tenant;
+import com.submeter.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Tenant;
+
+import com.example.rrallutilitylib.util.DateUtils;
 import com.github.devfrogora.service.dto.BillDTO;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.exception.*;
@@ -33,7 +42,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         List<MeterReading> historicalReadings = DaoManager.getMeterReadingDao().getReadingsByMeterId(meterId);
 
         boolean monthAlreadyRecorded = historicalReadings.stream().anyMatch(reading -> {
-            LocalDate existingDate = LocalDate.parse(reading.getReadingDate(), DATE_FORMATTER);
+            LocalDate existingDate = LocalDate.parse(reading.getDate(), DATE_FORMATTER);
             return existingDate.getYear() == incomingYear && existingDate.getMonthValue() == incomingMonth;
         });
 
@@ -44,7 +53,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
-    public void initialMeterReading(int submeterId, double initialReading , double fixedCharge, double rate) throws SQLException {
+    public void initialMeterReading(int submeterId, long initialReading , double fixedCharge, double rate) throws SQLException {
         Optional<Submeter> submeter = DaoManager.getSubmeterDao().getSubmeterById(submeterId);
 
         if(submeter.isEmpty()){
@@ -53,22 +62,23 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         String todayIsoString = LocalDate.now().toString();
         todayIsoString = DateUtils.validateDate(todayIsoString);
         MeterReading currentReading = new MeterReading();
-        currentReading.setMeterId(submeter.get().getMeterId());
+        currentReading.setMeterId(submeter.get().getId());
         currentReading.setReadingValue(initialReading);
         currentReading.setImageUrlOrPath(null);
-        currentReading.setReadingDate(todayIsoString);
+        currentReading.setDate(todayIsoString);
 
         int insertedReadingId = DaoManager.getMeterReadingDao().insertReading(currentReading);
-        Room room = DaoManager.getRoomDao().getRoomById(submeter.get().getRoomId())
-                .orElseThrow(() -> new ResourceNotFoundException("Room ID " + submeter.get().getRoomId() + " not found."));
-        String roomNumber = room.getRoomNumber();
-
-        addIntialMeterReading(submeterId, submeter.get().getMeterSerialNumber()  ,submeter.get().getRoomId(),roomNumber,
-                insertedReadingId, initialReading, fixedCharge , rate);
+        // use SubMeterAllocation Table to get the room Number
+//        Room room = DaoManager.getRoomDao().getRoomById(submeter.get().getRoomId())
+//                .orElseThrow(() -> new ResourceNotFoundException("Room ID " + submeter.get().getRoomId() + " not found."));
+//        String roomNumber = room.getRoomNumber();
+//
+//        addIntialMeterReading(submeterId, submeter.get().getMeterSerialNumber()  ,submeter.get().getRoomId(),roomNumber,
+//                insertedReadingId, initialReading, fixedCharge , rate);
     }
 
     void addIntialMeterReading(int submeterId, String submeterSerialNumber, int roomId,String roomNumber,int currentReadingId ,
-                               double currentMeterReading , double fixedCharge, double rate  ) throws SQLException{
+                               long currentMeterReading , double fixedCharge, double rate  ) throws SQLException{
         // 5. Query active lease profile for tenant details
         Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(roomId);
         String tenantName = "Vacant Unit Asset";
@@ -79,7 +89,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         }
 
         // 6. Pass values directly down to the billing engine
-        int billId = generateBill(
+        long billId = generateBill(
                 tenantName,
                 roomNumber,
                 currentReadingId,
@@ -95,22 +105,22 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 ""
         );
 
-        updateBillPaymentStatus(billId,true);
+        updateBillPaymentStatus(billId,"put the paymentDate here ");
     }
 
-    public void addMeterReadingAndGenerateBill(String roomNumber, double currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes)throws SQLException  {
+    public void addMeterReadingAndGenerateBill(String roomNumber, long currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes)throws SQLException  {
         // 1. Resolve room and submeter
         Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                 .orElseThrow(() -> new ResourceNotFoundException("Target unit identification code not found: " + roomNumber));
 
-        Submeter submeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId())
+        Submeter submeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No hardware meter profiles bound to unit number: " + roomNumber));
 
         // 2. Resolve historical readings and baseline properties
-        Optional<MeterReading> latestDbReading = DaoManager.getMeterReadingDao().getLatestReadingByMeterId(submeter.getMeterId());
+        Optional<MeterReading> latestDbReading = DaoManager.getMeterReadingDao().getLatestReadingByMeterId(submeter.getId());
 
-        Integer previousReadingId = latestDbReading.map(MeterReading::getReadingId).orElse(null);
-        double previousValue = latestDbReading.map(MeterReading::getReadingValue).orElse(submeter.getInitialReading());
+        Integer previousReadingId = latestDbReading.map(MeterReading::getId).orElse(null);
+        long previousValue = latestDbReading.map(MeterReading::getReadingValue).orElse(submeter.getInitialReading());
 
         // Business Validation: Prevent negative utility consumption processing
         if (currentMeterReading < previousValue) {
@@ -126,22 +136,22 @@ public class MeterBillingServiceImpl implements MeterBillingService {
 
         // 4. Record current tracking entries
         MeterReading currentReading = new MeterReading();
-        currentReading.setMeterId(submeter.getMeterId());
+        currentReading.setMeterId(submeter.getId());
         currentReading.setReadingValue(currentMeterReading);
         currentReading.setImageUrlOrPath(null);
-        currentReading.setReadingDate(todayIsoString);
+        currentReading.setDate(todayIsoString);
 
         boolean isReadingSaved = DaoManager.getMeterReadingDao().insertReading(currentReading) > 0;
         if (!isReadingSaved) {
             throw new BusinessRuleException("Failed to persist current utility meter reading in the ledger database.");
         }
 
-        int currentReadingId = DaoManager.getMeterReadingDao().getLatestReadingByMeterId(submeter.getMeterId())
+        int currentReadingId = DaoManager.getMeterReadingDao().getLatestReadingByMeterId(submeter.getId())
                 .orElseThrow(() -> new BusinessRuleException("Database verification routine failed to fetch active reading ID."))
-                .getReadingId();
+                .getId();
 
         // 5. Query active lease profile for tenant details
-        Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
+        Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getId());
         String tenantName = "Vacant Unit Asset";
         if (activeLease.isPresent()) {
             Tenant currentOccupant = DaoManager.getTenantDao().getTenantById(activeLease.get().getTenantId())
@@ -156,7 +166,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 currentReadingId,
                 currentMeterReading,
                 previousReadingId,
-                submeter.getMeterId(),
+                submeter.getId(),
                 activeLease.map(Tenancy::getTenantId).orElse(null),
                 submeter.getMeterSerialNumber(),
                 previousValue,
@@ -170,10 +180,10 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     /**
      * Core Invoice Processing Component.
      */
-    private int generateBill(String tenantName, String roomNumber, int currentReadingId, double currentReading,
-                              Integer previousReadingId, int meterId, Integer tenantId, String submeterSerialNumber, double previousReading, double fixedCharge, double extraCharge, double ratePerUnit, String note) throws SQLException {
+    private long generateBill(String tenantName, String roomNumber, int currentReadingId, long currentReading,
+                              Integer previousReadingId, int meterId, Integer tenantId, String submeterSerialNumber, long previousReading, double fixedCharge, double extraCharge, double ratePerUnit, String note) throws SQLException {
 
-        double consumption = currentReading - previousReading;
+        long consumption = currentReading - previousReading;
         double usageCost = consumption * ratePerUnit;
         double totalDue = usageCost + fixedCharge +extraCharge ;
 
@@ -192,8 +202,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         bill.setBillingDate(LocalDate.now().toString());
         bill.setNote(note);
         bill.setRoomNumber(roomNumber);
-        bill.setPaid(false);
-        int billId = DaoManager.getBillDao().insertBill(bill);
+        long billId = DaoManager.getBillDao().insert(bill);
         if ( billId < 0 ) {
             throw new BusinessRuleException("Database transactional error: Failed to generate invoice statement ledger for unit " + roomNumber);
         }
@@ -201,16 +210,15 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
-    public void updateBillPaymentStatus(int billId, boolean isPaid) throws SQLException{
-        Bill bill = DaoManager.getBillDao().getBillById(billId)
+    public void updateBillPaymentStatus(long billId, String paymentDate) throws SQLException{
+        Bill bill = DaoManager.getBillDao().findById(billId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot update payment status. Bill ID " + billId + " not found."));
 
         // Optimization Check: Skip database write if the status matches the intent
-        if (bill.isPaid() == isPaid) {
-            return;
-        }
 
-        boolean isUpdated = DaoManager.getBillDao().updatePaymentStatus(billId, isPaid);
+
+//        boolean isUpdated = DaoManager.getBillDao().markAsPaid(billId, paymentDate);
+        boolean isUpdated = false; /// wait let me review
         if (!isUpdated) {
             throw new BusinessRuleException("Failed to update database payment tracking record for Bill ID: " + billId);
         }
@@ -221,14 +229,14 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         Optional<Bill> latestBill = DaoManager.getBillDao().getLatestBill(roomNumber);
         if (latestBill.isPresent()) {
             Bill bill= latestBill.get();
-            double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
+            long previousReading = bill.getPreviousReadingId() != -1 ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
                     0;
 //            double currentReading = getLatestReading(submeter.get().getMeterSerialNumber());
 
-            double currentReading = bill.getCurrentReadingId() > 0   ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
+            long currentReading = bill.getCurrentReadingId() > 0   ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
 
-            return new BillReportDto( bill.getBillId(), bill.getRoomNumber(), bill.getMeterSerialNumber(), previousReading, currentReading,
-                    bill.getRatePerUnit(), bill.getFixedCharge(),bill.getExtraCharge(), bill.getTenantName(), bill.getNote(), bill.getTotalAmount(),bill.getBillingDate(),bill.getPaymentDate(), bill.isPaid() ? "PAID" : "UNPAID");
+            return new BillReportDto( bill.getId(), bill.getRoomNumber(), bill.getMeterSerialNumber(), previousReading, currentReading,
+                    bill.getRatePerUnit(), bill.getFixedCharge(),bill.getExtraCharge(), bill.getTenantName(), bill.getNote(), bill.getTotalAmount(),bill.getBillingDate());
         }
         return null;
     }
@@ -247,20 +255,21 @@ public class MeterBillingServiceImpl implements MeterBillingService {
             if (reading.isPresent()) {
                  submeter = DaoManager.getSubmeterDao().getSubmeterById(reading.get().getMeterId());
                 if (submeter.isPresent()) {
-                    Optional<Room> room = DaoManager.getRoomDao().getRoomById(submeter.get().getRoomId());
-                    if (room.isPresent()) {
-                        roomNumber = room.get().getRoomNumber();
-                    }
+                    //use SubmeterAllocation Table here
+//                    Optional<Room> room = DaoManager.getRoomDao().getRoomById(submeter.get().getRoomId());
+//                    if (room.isPresent()) {
+//                        roomNumber = room.get().getRoomNumber();
+//                    }
                 }
             }
-            double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
+            long previousReading = bill.getPreviousReadingId() != -1 ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
                     0;
 //            double currentReading = getLatestReading(submeter.get().getMeterSerialNumber());
 
-            double currentReading = bill.getCurrentReadingId() > 0   ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
+            long currentReading = bill.getCurrentReadingId() > 0   ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
 
             reportList.add(new BillReportDto(
-                    bill.getBillId(),
+                    bill.getId(),
                     bill.getRoomNumber(),
                     bill.getMeterSerialNumber(),
                     previousReading,
@@ -271,9 +280,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     bill.getTenantName(),
                     bill.getNote(),
                     bill.getTotalAmount(),
-                    bill.getBillingDate(),
-                    bill.getPaymentDate(),
-                    bill.isPaid() ? "PAID" : "UNPAID"
+                    bill.getBillingDate()
             ));
         }
         return reportList;
@@ -283,15 +290,15 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     public List<BillReportDto> getAllPendingBills() throws SQLException {
         List<Bill> bills = DaoManager.getBillDao().getAllBills();
 
-        long pendingCount = bills.stream().filter(b -> !b.isPaid()).count();
-        if (pendingCount == 0) {
-            return null;
-        }
+//        long pendingCount = bills.stream().filter(b -> !b.isPaid()).count();
+//        if (pendingCount == 0) {
+//            return null;
+//        }
         // Change .toList() to .collect(Collectors.toList())
         return bills.stream()
-                .filter(b -> !b.isPaid())
+//                .filter(b -> !b.isPaid())
                 .map(b -> new BillReportDto(
-                        b.getBillId(),
+                        b.getId(),
                         b.getRoomNumber(),
                         b.getMeterSerialNumber(),
                         b.getPreviousReadingId(),
@@ -302,16 +309,14 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                         b.getTenantName(),
                         b.getNote(),
                         b.getTotalAmount(),
-                        b.getBillingDate(),
-                        b.getPaymentDate(),
-                        b.isPaid() ? "PAID" : "UNPAID"
+                        b.getBillingDate()
                 ))
                 .collect(Collectors.toList());
     }
 
     public double getLatestReading(String submeterSerialNumber) throws SQLException{
         Optional<Submeter> submeter = DaoManager.getSubmeterDao().getSubmeterBySerialNumber(submeterSerialNumber);
-        Optional<MeterReading> latestReading = DaoManager.getMeterReadingDao().getLatestReadingByMeterId(submeter.get().getMeterId());
+        Optional<MeterReading> latestReading = DaoManager.getMeterReadingDao().getLatestReadingByMeterId(submeter.get().getId());
 
         if(latestReading.isEmpty()){
             return submeter.get().getInitialReading();
@@ -325,12 +330,12 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         List<BillReportDto> reportList = new ArrayList<>();
         for( Bill bill : bills) {
 
-            double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
+            long previousReading = bill.getPreviousReadingId() != -1 ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
                     0;
 
-            double currentReading = bill.getCurrentReadingId() > 0 ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
+            long currentReading = bill.getCurrentReadingId() > 0 ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
             reportList.add(new BillReportDto(
-                    bill.getBillId(),
+                    bill.getId(),
                     bill.getRoomNumber(),
                     bill.getMeterSerialNumber(),
                     previousReading,
@@ -341,9 +346,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     bill.getTenantName(),
                     bill.getNote(),
                     bill.getTotalAmount(),
-                    bill.getBillingDate(),
-                    bill.getPaymentDate(),
-                    bill.isPaid() ? "PAID" : "UNPAID"
+                    bill.getBillingDate()
             ));
         }
         return reportList;
@@ -365,12 +368,12 @@ public class MeterBillingServiceImpl implements MeterBillingService {
         List<BillReportDto> reportList = new ArrayList<>();
         for( Bill bill : bills) {
 
-            double previousReading = bill.getPreviousReadingId() != null ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
+            long previousReading = bill.getPreviousReadingId() != -1 ? DaoManager.getMeterReadingDao().getReadingById(bill.getPreviousReadingId()).get().getReadingValue() :
                     0;
 
-            double currentReading = bill.getCurrentReadingId() > 0 ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
+            long currentReading = bill.getCurrentReadingId() > 0 ? DaoManager.getMeterReadingDao().getReadingById(bill.getCurrentReadingId()).get().getReadingValue() : 0;
             reportList.add(new BillReportDto(
-                    bill.getBillId(),
+                    bill.getId(),
                     bill.getRoomNumber(),
                     bill.getMeterSerialNumber(),
                     previousReading,
@@ -381,21 +384,18 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                     bill.getTenantName(),
                     bill.getNote(),
                     bill.getTotalAmount(),
-                    bill.getBillingDate(),
-                    bill.getPaymentDate(),
-                    bill.isPaid() ? "PAID" : "UNPAID"
+                    bill.getBillingDate()
             ));
         }
-
         return reportList;
     }
 
     @Override
     public BillDTO getBillById(int billId) throws SQLException {
-        Bill bill = DaoManager.getBillDao().getBillById(billId)
+        Bill bill = DaoManager.getBillDao().findById(billId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bill ID " + billId + " not found."));
-        return new BillDTO(bill.getBillId(),bill.getBillingDate(),bill.getUnitsConsumed(),
-                bill.getRatePerUnit(),bill.getTotalAmount(),bill.isPaid());
+        return new BillDTO(bill.getId(),bill.getBillingDate(),bill.getUnitsConsumed(),
+                bill.getRatePerUnit(),bill.getTotalAmount());
     }
 
 

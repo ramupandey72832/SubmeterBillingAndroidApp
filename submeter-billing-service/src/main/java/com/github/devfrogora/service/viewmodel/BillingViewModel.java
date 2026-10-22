@@ -117,7 +117,7 @@ public class BillingViewModel {
     /**
      * Pushes adjusted calculations into storage cleanly using inline database updates.
      */
-    public void updateExistingBillMetrics(int billId, double currentReading, double previousReading, double rate, double fixed,double extra, double total, String note) {
+    public void updateExistingBillMetrics(int billId, long currentReading, long previousReading, double rate, double fixed,double extra, double total, String note) {
         this.isLoading = true;
         this.isOperationSuccess = false;
         this.errorMessage = null;
@@ -129,7 +129,7 @@ public class BillingViewModel {
                 DatabaseConnection.beginTransaction();
 
                 // 1. Fetch and update the Bill Aggregate entry
-                Bill bill =DaoManager.getBillDao().getBillById(billId)
+                com.submeter.data.entities.Bill bill =DaoManager.getBillDao().findById(billId)
                         .orElseThrow(() -> new java.sql.SQLException("Bill target entity reference point missing."));
 
                 bill.setTotalAmount(total);
@@ -138,7 +138,7 @@ public class BillingViewModel {
                 bill.setExtraCharge(extra);
                 bill.setNote(note);
                 bill.setUnitsConsumed(currentReading-previousReading);
-                DaoManager.getBillDao().updateBill(bill);
+                DaoManager.getBillDao().update(bill);
 
                 // 2. FIX: Direct transaction update to bypass missing DAO interface methods completely
                 String sqlUpdateReading = "UPDATE meter_readings SET reading_value = ? WHERE reading_id = ?";

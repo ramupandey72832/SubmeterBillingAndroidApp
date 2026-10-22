@@ -226,19 +226,37 @@ class DocumentHelper {
         long size = 0;
         long dateModified = 0;
 
-        try (Cursor cursor = context.getContentResolver().query(uri, null, null, null, null)) {
+        try (Cursor cursor = context.getContentResolver()
+                .query(uri, null, null, null, null)) {
+
             if (cursor != null && cursor.moveToFirst()) {
-                name = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                size = cursor.getLong(cursor.getColumnIndex(OpenableColumns.SIZE));
+
+                int nameIdx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                if (nameIdx != -1) {
+                    name = cursor.getString(nameIdx);
+                }
+
+                int sizeIdx = cursor.getColumnIndex(OpenableColumns.SIZE);
+                if (sizeIdx != -1 && !cursor.isNull(sizeIdx)) {
+                    size = cursor.getLong(sizeIdx);
+                }
 
                 int dateIdx = cursor.getColumnIndex("last_modified");
-                if (dateIdx == -1)
+
+                if (dateIdx == -1) {
                     dateIdx = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
-                if (dateIdx != -1) dateModified = normalizeDate(cursor.getLong(dateIdx));
+                }
+
+                if (dateIdx != -1 && !cursor.isNull(dateIdx)) {
+                    dateModified = normalizeDate(cursor.getLong(dateIdx));
+                }
             }
+
         } catch (Exception e) {
             Log.w(TAG, "Failed to read metadata for uri: " + uri, e);
         }
+
+
         return new DocumentInfo(name, uri.toString(), size, dateModified);
     }
 }

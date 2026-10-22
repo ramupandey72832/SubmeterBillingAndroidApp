@@ -16,13 +16,13 @@ public interface RoomMeterService {
      * Provisions a room asset and attaches a submeter to it atomically.
      * Reports an OperationResult containing the verified room number back to the ViewModel.
      */
-    OperationResult<String> addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, double meterInitialReading);
+    OperationResult<String> addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, long meterInitialReading);
 
     /**
      * Modifies the hardware submeter serial numbers.
      * Reports an OperationResult confirming execution status back to the ViewModel.
      */
-    OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber,double initialReading);
+    OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber,long initialReading);
 
 
     /**

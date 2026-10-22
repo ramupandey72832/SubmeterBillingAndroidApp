@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentDatabaseConfigurationBinding;
 import com.github.devfrogora.service.DatabaseSetup;
-import com.github.devfrogora.service.utils.CryptoHelper;
+import com.example.rrallutilitylib.util.CryptoHelper;
 
 import java.io.File;
 import java.util.ArrayList;

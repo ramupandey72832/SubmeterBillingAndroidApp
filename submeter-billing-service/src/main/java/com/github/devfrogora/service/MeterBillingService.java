@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface MeterBillingService {
 
-    public void initialMeterReading(int submeterId, double initialReading , double fixedCharge, double rate) throws SQLException;
-    void addMeterReadingAndGenerateBill(String roomNumber, double currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes) throws SQLException;
-    void updateBillPaymentStatus(int billId, boolean isPaid) throws SQLException;
+    public void initialMeterReading(int submeterId, long initialReading , double fixedCharge, double rate) throws SQLException;
+    void addMeterReadingAndGenerateBill(String roomNumber, long currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes) throws SQLException;
+    void updateBillPaymentStatus(long billId, String paymentDate) throws SQLException;
 
     BillReportDto getLatestBill(String roomNumber) throws SQLException;
     List<BillReportDto> getAllBillsReport() throws SQLException;
@@ -24,6 +24,4 @@ public interface MeterBillingService {
     List<BillReportDto> getBillsByRange(String start,String end) throws SQLException;
 
     BillDTO getBillById(int billId) throws SQLException;
-
-
 }

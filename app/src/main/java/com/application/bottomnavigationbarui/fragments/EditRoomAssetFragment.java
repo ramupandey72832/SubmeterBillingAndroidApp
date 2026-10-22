@@ -13,7 +13,6 @@ import androidx.fragment.app.Fragment;
 
 import com.application.bottomnavigationbarui.R;
 import com.application.bottomnavigationbarui.databinding.FragmentEditRoomAssetBinding;
-import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
@@ -86,7 +85,7 @@ public class EditRoomAssetFragment extends Fragment {
                 return;
             }
 
-            double readingValue = Double.parseDouble(rawReading);
+            long readingValue = Long.parseLong(rawReading);
             String tName = binding.etEditTenantName.getText().toString().trim();
             String tMobile = binding.etEditTenantMobile.getText().toString().trim();
             String tAadhaar = binding.etEditTenantAadhaar.getText().toString().trim();

@@ -3,10 +3,13 @@ package com.github.devfrogora.service.viewmodel;
 
 import com.github.devfrogora.data.config.DatabaseConnection;
 import com.github.devfrogora.data.dao.DaoManager;
-import com.github.devfrogora.data.entities.Room;
-import com.github.devfrogora.data.entities.Submeter;
-import com.github.devfrogora.data.entities.Tenancy;
-import com.github.devfrogora.data.entities.Tenant;
+import com.submeter.data.entities.Room;
+import com.submeter.data.entities.Submeter;
+import com.submeter.data.entities.Tenant;
+import com.submeter.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Submeter;
+//import com.github.devfrogora.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Tenant;
 import com.github.devfrogora.service.TenancyManagementService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.MeterBillingService;
@@ -180,16 +183,16 @@ public class TenancyViewModel {
             try {
                 Optional<Room> roomOpt = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
                 if (roomOpt.isPresent()) {
-                    Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(roomOpt.get().getRoomId());
+                    Optional<Tenancy> activeLease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(roomOpt.get().getId());
                     if (activeLease.isPresent()) {
                         Optional<Tenant> tenantOpt = DaoManager.getTenantDao().getTenantById(activeLease.get().getTenantId());
                         if (tenantOpt.isPresent()) {
                             Tenant tenant = tenantOpt.get();
-                            this.internalTenantId = tenant.getTenantId();
+                            this.internalTenantId = tenant.getId();
 
                             this.currentEditingTenant = new TenantDTO(
                                     tenant.getName(),
-                                    tenant.getAadharNumber(),
+                                    tenant.getAadhaarNumber(),
                                     tenant.getPhoneNumber(),
                                     tenant.getAddress()
                             );
@@ -232,7 +235,7 @@ public class TenancyViewModel {
                 tenant.setName(name);
                 tenant.setPhoneNumber(mobile);
                 tenant.setAddress(address);
-                tenant.setAadharNumber(aaddharNumber);
+                tenant.setAadhaarNumber(aaddharNumber);
 
                 boolean isUpdated = DaoManager.getTenantDao().updateTenant(tenant);
                 if (isUpdated) {
@@ -273,20 +276,19 @@ public class TenancyViewModel {
                 Optional<Room> roomOpt = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
                 if (roomOpt.isPresent()) {
                     Room room = roomOpt.get();
-                    this.internalRoomId = room.getRoomId();
+                    this.internalRoomId = room.getId();
 
                     // Map to DTO
-                    this.loadedRoomDto = new RoomDTO(room.getRoomNumber(), room.getRentAmount(),room.getRoomType());
+                    this.loadedRoomDto = new RoomDTO(room.getRoomNumber(),room.getRoomType());
 
                     Optional<Submeter> submeterOpt = DaoManager.getSubmeterDao().getSubmeterByRoomId(internalRoomId);
                     if (submeterOpt.isPresent()) {
                         Submeter submeter = submeterOpt.get();
-                        this.internalSubmeterId = submeter.getMeterId();
+                        this.internalSubmeterId = submeter.getId();
 
                         // Map to DTO
                         this.loadedSubmeterDto = new SubmeterDTO(
-                                submeter.getMeterId(),
-                                submeter.getRoomId(),
+                                submeter.getId(),
                                 submeter.getMeterSerialNumber(),
                                 submeter.getInitialReading()
                         );
@@ -297,12 +299,12 @@ public class TenancyViewModel {
                         Optional<Tenant> tenantOpt = DaoManager.getTenantDao().getTenantById(activeLease.get().getTenantId());
                         if (tenantOpt.isPresent()) {
                             Tenant tenant = tenantOpt.get();
-                            this.trackingTenantId = tenant.getTenantId();
+                            this.trackingTenantId = tenant.getId();
 
                             // Map to DTO
                             this.loadedTenantDto = new TenantDTO(
                                     tenant.getName(),
-                                    tenant.getAadharNumber(),
+                                    tenant.getAadhaarNumber(),
                                     tenant.getPhoneNumber(),
                                     tenant.getAddress()
                             );
@@ -321,7 +323,7 @@ public class TenancyViewModel {
         }).start();
     }
 
-    public void saveAllAssetChanges(String targetRoomNum, String roomType, String meterSerial, double initialReading,
+    public void saveAllAssetChanges(String targetRoomNum, String roomType, String meterSerial, long initialReading,
                                     String tenantName, String tenantMobile, String tenantAadhaar, String tenantAddress) {
         if (internalRoomId == -1) {
             this.feedbackMessage = "Cannot save: No active configuration instance initialized.";
@@ -347,7 +349,7 @@ public class TenancyViewModel {
 
                 // 2. Re-fetch and update Submeter Entity via cached primary key index
                 if (internalSubmeterId != -1) {
-                    Optional<Submeter> submeterOpt = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId());
+                    Optional<Submeter> submeterOpt = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getId());
                     if (submeterOpt.isPresent()) {
                         Submeter submeter = submeterOpt.get();
                         submeter.setMeterSerialNumber(meterSerial);
@@ -363,7 +365,7 @@ public class TenancyViewModel {
                         Tenant t = tenantOpt.get();
                         t.setName(tenantName);
                         t.setPhoneNumber(tenantMobile);
-                        t.setAadharNumber(tenantAadhaar);
+                        t.setAadhaarNumber(tenantAadhaar);
                         t.setAddress(tenantAddress);
                         DaoManager.getTenantDao().updateTenant(t);
                     }

@@ -2,7 +2,7 @@
 package com.github.devfrogora.service.viewmodel;
 
 import com.github.devfrogora.service.RoomMeterService;
-import com.github.devfrogora.service.utils.CryptoHelper;
+import com.example.rrallutilitylib.util.CryptoHelper;
 
 public class QrScanViewModel {
 

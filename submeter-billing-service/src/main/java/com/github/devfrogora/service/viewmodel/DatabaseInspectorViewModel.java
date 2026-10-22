@@ -1,7 +1,16 @@
 package com.github.devfrogora.service.viewmodel;
 
 import com.github.devfrogora.data.dao.DaoManager;
-import com.github.devfrogora.data.entities.*;
+import com.submeter.data.entities.Bill;
+//import com.github.devfrogora.data.entities.MeterReading;
+import com.submeter.data.entities.Room;
+import com.submeter.data.entities.Submeter;
+import com.submeter.data.entities.Tenant;
+import com.submeter.data.entities.MeterReading;
+//import com.github.devfrogora.data.entities.Submeter;
+import com.submeter.data.entities.SubmeterAllocation;
+import com.submeter.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Tenant;
 import com.github.devfrogora.service.utils.OperationResult;
 
 import java.sql.SQLException;
@@ -43,35 +52,35 @@ public class DatabaseInspectorViewModel {
         try {
             switch (tableName.toUpperCase()) {
                 case "ROOMS":
-                    currentHeaders.addAll(Arrays.asList("Room ID", "Room Number", "Room Type", "Rent Amount"));
+                    currentHeaders.addAll(Arrays.asList("Room ID", "Room Number", "Room Type"));
                     for (Room r : DaoManager.getRoomDao().getAllRooms()) {
-                        currentRows.add(Arrays.asList(String.valueOf(r.getRoomId()), r.getRoomNumber(), r.getRoomType(), "₹" + r.getRentAmount()));
+                        currentRows.add(Arrays.asList(String.valueOf(r.getId()), r.getRoomNumber(), r.getRoomType()));
                     }
                     break;
 
                 case "TENANTS":
                     currentHeaders.addAll(Arrays.asList("Tenant ID", "Name", "Aadhaar", "Mobile", "Address"));
                     for (Tenant t : DaoManager.getTenantDao().getAllTenants()) {
-                        currentRows.add(Arrays.asList(String.valueOf(t.getTenantId()), t.getName(), t.getAadharNumber(), t.getPhoneNumber(), t.getAddress()));
+                        currentRows.add(Arrays.asList(String.valueOf(t.getId()), t.getName(), t.getAadhaarNumber(), t.getPhoneNumber(), t.getAddress()));
                     }
                     break;
 
                 case "TENANCIES":
                     currentHeaders.addAll(Arrays.asList("Tenancy ID", "Room ID", "Tenant ID", "Start Date", "End Date", "Is Active"));
                     for (Tenancy ty : DaoManager.getTenancyDao().getAllTenancies()) {
-                        currentRows.add(Arrays.asList(String.valueOf(ty.getTenancyId()), String.valueOf(ty.getRoomId()),
+                        currentRows.add(Arrays.asList(String.valueOf(ty.getId()), String.valueOf(ty.getRoomId()),
                                 String.valueOf(ty.getTenantId()), ty.getStartDate(),
                                 ty.getEndDate() != null ? ty.getEndDate() : "--", ty.getEndDate() == null ? "YES" : "NO"));
                     }
                     break;
 
                 case "SUBMETERS":
-                    currentHeaders.addAll(Arrays.asList("Meter ID", "Room ID", "Serial Number", "Initial Reading","Is Active"));
+                    currentHeaders.addAll(Arrays.asList("Meter ID", "Room ID", "Serial Number", "Initial Reading"));
                     // Safe fallback map handling if tables contain raw option arrays
                     List<Submeter> allSubmeters = DaoManager.getSubmeterDao().getAllSubmeters();
                     for (Submeter s : allSubmeters) {
-                        currentRows.add(Arrays.asList(String.valueOf(s.getMeterId()), String.valueOf(s.getRoomId()),
-                                s.getMeterSerialNumber(), s.getInitialReading() + " kWh",s.getIsActive() == 1 ? "YES" : "NO"));
+                        currentRows.add(Arrays.asList(String.valueOf(s.getId()), String.valueOf("s.getRoomId()"),
+                                s.getMeterSerialNumber(), s.getInitialReading() + " kWh"));
                     }
                     break;
 
@@ -80,28 +89,28 @@ public class DatabaseInspectorViewModel {
                     // Safe fallback map handling if tables contain raw option arrays
                     List<SubmeterAllocation> submeterJunctions = DaoManager.getSubmeterAllocationDao().getAllAllocations();
                     for (SubmeterAllocation s : submeterJunctions) {
-                        currentRows.add(Arrays.asList(String.valueOf(s.getAllocationId()), String.valueOf(s.getMeterId()),
-                                String.valueOf(s.getRoomId()), s.getStartDate() ,s.getEndDate()));
+                        currentRows.add(Arrays.asList(String.valueOf(s.getId()), String.valueOf(s.getMeterId()),
+                                String.valueOf(s.getRoomId()), s.getStartingDate() ,s.getEndingDate()));
                     }
                     break;
 
                 case "BILLS":
                     currentHeaders.addAll(Arrays.asList("bill_id","previous_reading_id","current_reading_id","meter_id","meter_serial_number",
                             "tenant_id","tenant_name","room_number","units_consumed",
-                            "rate_per_unit", "fixed_charge","extra_charge", "total_amount", "note", "billing_date", "payment_date", "paid"));
+                            "rate_per_unit", "fixed_charge","extra_charge", "total_amount", "note", "billing_date"));
                     for (Bill b : DaoManager.getBillDao().getAllBills()) {
-                        currentRows.add(Arrays.asList(String.valueOf(b.getBillId()), String.valueOf(b.getPreviousReadingId()),
+                        currentRows.add(Arrays.asList(String.valueOf(b.getId()), String.valueOf(b.getPreviousReadingId()),
                                 String.valueOf(b.getCurrentReadingId()), String.valueOf(b.getMeterId()), b.getMeterSerialNumber(),
                                 String.valueOf(b.getTenantId()), b.getTenantName(), b.getRoomNumber(), String.valueOf(b.getUnitsConsumed()),
                                 String.valueOf(b.getRatePerUnit()), String.valueOf(b.getFixedCharge()),String.valueOf(b.getExtraCharge()),
-                                 "₹" + b.getTotalAmount(), b.getNote(), b.getBillingDate(), b.getPaymentDate(),b.isPaid() ? "PAID" : "UNPAID"));
+                                 "₹" + b.getTotalAmount(), b.getNote(), b.getBillingDate()));
                     }
                     break;
 
                 case "METER_READINGS":
                     currentHeaders.addAll(Arrays.asList("Reading ID", "Meter ID", "Reading Value", "Reading_date"));
                     for (MeterReading mr : DaoManager.getMeterReadingDao().getAllReadings()) {
-                        currentRows.add(Arrays.asList(String.valueOf(mr.getReadingId()), String.valueOf(mr.getMeterId()), mr.getReadingValue() + " kWh", mr.getReadingDate()));
+                        currentRows.add(Arrays.asList(String.valueOf(mr.getId()), String.valueOf(mr.getMeterId()), mr.getReadingValue() + " kWh", mr.getDate()));
                     }
                     break;
 

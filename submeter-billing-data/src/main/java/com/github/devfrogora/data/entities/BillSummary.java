@@ -1,6 +1,6 @@
 package com.github.devfrogora.data.entities;
 
-
+// this class is not being used , it will be deleted soon ( Bill table is doing the same JOB )
 public class BillSummary {
     private int billId;
     private String roomNumber;

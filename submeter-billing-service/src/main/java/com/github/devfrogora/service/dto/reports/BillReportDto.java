@@ -4,6 +4,7 @@ import java.io.Serializable;
 
 // FIX: Append "implements Serializable" to the class header declaration
 
+
 public class BillReportDto implements Serializable {
 
     // It is highly recommended to declare a stable version ID for safe serialization
@@ -11,7 +12,7 @@ public class BillReportDto implements Serializable {
     private int billId;
     private String roomNumber;
     private String meterSerialNumber;
-    private double previousReading;
+    private long previousReading;
     private double currentReading;
     private double ratePerUnit;
     private double fixedCharge;
@@ -21,13 +22,12 @@ public class BillReportDto implements Serializable {
     private String paymentDate;
     private double extraCharge;
     private String note;
-    private String paymentStatus; // e.g., "PAID" or "UNPAID"
 
     // Constructor, Getters, and Setters
 
-    public BillReportDto(int billId, String roomNumber, String meterSerialNumber, double previousReading,
-                         double currentReading, double ratePerUnit, double fixedCharge,double extraCharge, String tenantName,
-                         String note,double totalAmount,String billingDate,String paymentDate , String paymentStatus) {
+    public BillReportDto(int billId, String roomNumber, String meterSerialNumber, long previousReading,
+                         long currentReading, double ratePerUnit, double fixedCharge,double extraCharge, String tenantName,
+                         String note,double totalAmount,String billingDate) {
         this.billId = billId;
         this.roomNumber = roomNumber;
         this.meterSerialNumber = meterSerialNumber;
@@ -41,7 +41,6 @@ public class BillReportDto implements Serializable {
         this.totalAmount = totalAmount;
         this.billingDate = billingDate;
         this.paymentDate = paymentDate;
-        this.paymentStatus = paymentStatus;
     }
 
     public int getBillId() { return billId; }
@@ -49,7 +48,6 @@ public class BillReportDto implements Serializable {
     public String getTenantName() { return tenantName; }
     public String getBillingDate() { return billingDate; }
     public double getTotalAmount() { return totalAmount; }
-    public String getPaymentStatus() { return paymentStatus; }
 
     public String getMeterSerialNumber() {
         return meterSerialNumber;
@@ -59,11 +57,11 @@ public class BillReportDto implements Serializable {
         this.meterSerialNumber = meterSerialNumber;
     }
 
-    public double getPreviousReading() {
+    public long getPreviousReading() {
         return previousReading;
     }
 
-    public void setPreviousReading(double previousReading) {
+    public void setPreviousReading(long previousReading) {
         this.previousReading = previousReading;
     }
 
@@ -91,9 +89,6 @@ public class BillReportDto implements Serializable {
         this.fixedCharge = fixedCharge;
     }
 
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
 
 
 
@@ -122,7 +117,6 @@ public class BillReportDto implements Serializable {
                 ", totalAmount=" + totalAmount +
                 ", note=" + note +
                 ", paymentDate=" + paymentDate +
-                ", paymentStatus='" + paymentStatus + '\'' +
                 '}';
     }
 }

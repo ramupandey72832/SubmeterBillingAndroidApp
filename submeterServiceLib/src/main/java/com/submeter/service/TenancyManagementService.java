@@ -1,0 +1,25 @@
+package com.submeter.service;
+
+import com.submeter.commonlib.dto.TenancyDTO;
+import com.submeter.commonlib.dto.TenantDTO;
+
+import java.sql.SQLException;
+import java.util.Optional;
+
+public interface TenancyManagementService {
+    public void addTenantWithTenancy(TenantDTO tenant, String roomNumber, String startDate) throws SQLException;
+
+    Optional<TenantDTO> findTenantByAadhar(String aadhar) throws SQLException;
+    public TenancyDTO findActiveTenancyByTenantAadhar(String aadharNumber)throws SQLException;
+    public TenancyDTO findActiveTenancyByRoomNumber(String roomNumber)throws SQLException;
+    /**
+     * Terminates the active tenancy for a given room, marking it vacant.
+     * @param roomNumber The physical identifier code of the room (e.g., "302-C").
+     * @return true if the room was successfully checked out and marked vacant.
+     */
+    void vacateRoom(String roomNumber,String endTenancyDate) throws SQLException;
+    public void deleteTenantIfNoActiveTenancy(String aadharNumber) throws SQLException;
+
+    void terminateTenancyOfRoom(String roomNumber,String endTenancyDate) throws SQLException;
+
+}

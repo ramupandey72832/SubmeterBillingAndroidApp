@@ -19,7 +19,6 @@ import com.application.bottomnavigationbarui.databinding.FragmentEndRoomTenancyB
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
 import com.application.baselibrary.ui.utils.NavigationUtils;
 
-import com.github.devfrogora.service.dto.TenantDTO;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
 import com.github.devfrogora.service.impl.TenancyManagementServiceImpl;
@@ -132,7 +131,7 @@ public class EndRoomTenancyFragment extends Fragment implements VerifyMpinDialog
 
         // 3. Populate container details if valid tenant configurations are present
         if (viewModel.areDetailsLoaded() && viewModel.getLoadedTenant() != null) {
-            TenantDTO tenant = viewModel.getLoadedTenant();
+            var tenant = viewModel.getLoadedTenant();
             binding.tvTenantName.setText(tenant.getName());
             binding.tvAadhaarNumber.setText(tenant.getAadharNumber());
             binding.tvMobileNumber.setText(tenant.getPhoneNumber());

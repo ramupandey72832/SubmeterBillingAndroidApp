@@ -43,7 +43,6 @@ public class ExcelGenerator {
                 sheet.addCell(new Number(7, row, item.getRatePerUnit()));
                 sheet.addCell(new Number(8, row, item.getFixedCharge()));
                 sheet.addCell(new Number(9, row, item.getTotalAmount()));
-                sheet.addCell(new Label(10, row, item.getPaymentStatus()));
                 row++;
             }
 

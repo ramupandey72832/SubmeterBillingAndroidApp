@@ -13,13 +13,12 @@ public class BillDTO {
     private String note;
 
 
-    public BillDTO(int billId, String billingDate, double unitsConsumed, double ratePerUnit, double totalAmount, boolean isPaid) {
+    public BillDTO(int billId, String billingDate, long unitsConsumed, double ratePerUnit, double totalAmount) {
         this.billId = billId;
         this.billingDate = billingDate;
         this.unitsConsumed = unitsConsumed;
         this.ratePerUnit = ratePerUnit;
         this.totalAmount = totalAmount;
-        this.isPaid = isPaid;
     }
 
     // Getters

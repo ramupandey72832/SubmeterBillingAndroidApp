@@ -6,14 +6,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class SharedSchemaConfigurator {
-//    private static final String PROPERTIES_FILE = "/database_schema.properties";
     public static void initializeSchema() throws Exception{
-
-        //Loads the schema SQL strings from the properties file.
-
-        // bomber :-- Uncomment this to drop all the tables and create them again
-//        dropAllTables();
-
 
         // The exact same order executed on whatever platform you are running
             DbUtils.executeUpdate(SqlLoader.get("schema.enable_foreign_keys"));
@@ -40,5 +33,4 @@ public class SharedSchemaConfigurator {
         DbUtils.executeUpdate(SqlLoader.get("schema.drop_rooms_table"));
         DbUtils.executeUpdate(SqlLoader.get("schema.drop_tenants_table"));
     }
-
 }

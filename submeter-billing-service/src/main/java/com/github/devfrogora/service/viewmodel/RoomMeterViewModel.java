@@ -49,7 +49,7 @@ public class RoomMeterViewModel {
 
     // --- UI Actions ---
 
-    public void createRoom(String num, String type, String serial, double reading) {
+    public void createRoom(String num, String type, String serial, long reading) {
         // Reset states before starting the work
         this.isLoading = true;
         this.errorMessage = null;
@@ -101,7 +101,7 @@ public class RoomMeterViewModel {
 
 
     // --- New Submeter Replacement Action ---
-    public void replaceSubmeter(String roomNumber, String oldSerialNumber, String newSerialNumber,double initialReading) {
+    public void replaceSubmeter(String roomNumber, String oldSerialNumber, String newSerialNumber,long initialReading) {
         this.isLoading = true;
         this.errorMessage = null;
         this.isOperationSuccess = false;

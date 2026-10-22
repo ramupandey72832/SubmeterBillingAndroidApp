@@ -2,7 +2,9 @@ package com.github.devfrogora.service.impl;
 
 import com.github.devfrogora.data.config.DatabaseConnection;
 import com.github.devfrogora.data.dao.DaoManager;
-import com.github.devfrogora.data.entities.*;
+//import com.github.devfrogora.data.entities.Submeter;
+//import com.github.devfrogora.data.entities.Tenancy;
+//import com.github.devfrogora.data.entities.Tenant;
 import com.github.devfrogora.service.MeterBillingService;
 import com.github.devfrogora.service.RoomMeterService;
 import com.github.devfrogora.service.dto.RoomDTO;
@@ -11,6 +13,10 @@ import com.github.devfrogora.service.dto.SubmeterDTO;
 import com.github.devfrogora.service.exception.ResourceNotFoundException;
 import com.github.devfrogora.service.exception.RoomOccupiedException;
 import com.github.devfrogora.service.utils.OperationResult;
+import com.submeter.data.entities.Room;
+import com.submeter.data.entities.Submeter;
+import com.submeter.data.entities.Tenancy;
+import com.submeter.data.entities.Tenant;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -22,69 +28,59 @@ public class RoomMeterServiceImpl implements RoomMeterService {
 
     private final MeterBillingService meterBillingService;
 
-    // Decoupled construction dependency injection pattern
     public RoomMeterServiceImpl(MeterBillingService meterBillingService) {
         this.meterBillingService = meterBillingService;
     }
 
     @Override
-    public OperationResult<String> addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, double meterInitialReading) {
+    public OperationResult<String> addRoomWithMeter(String roomNumber, String roomType, String meterSerialNumber, long meterInitialReading) {
         try {
-            // Establish atomic transaction boundary
             DatabaseConnection.beginTransaction();
 
-            Optional<Room> existingRoom = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
-            if (existingRoom.isPresent()) {
+            // 1. Check if room exists
+            if (DaoManager.getRoomDao().getRoomByNumber(roomNumber).isPresent()) {
                 DatabaseConnection.rollbackTransaction();
-                return OperationResult.failure("Room " + roomNumber + " already exists with room id: " + existingRoom.get().getRoomId());
+                return OperationResult.failure("Room " + roomNumber + " already exists.");
             }
 
+            // 2. Insert Room
             Room room = new Room();
             room.setRoomNumber(roomNumber);
             room.setRoomType(roomType);
-            room.setRentAmount(0);
 
-            boolean inserted = DaoManager.getRoomDao().insertRoom(room);
-            if (!inserted) {
+            if (!DaoManager.getRoomDao().insertRoom(room)) {
                 DatabaseConnection.rollbackTransaction();
-                return OperationResult.failure("Failed to provision room asset in the database.");
+                return OperationResult.failure("Failed to provision room asset.");
             }
 
+            // 3. Get Room ID
             int roomId = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
-                    .orElseThrow(() -> new ResourceNotFoundException("Room registration failed to verify."))
-                    .getRoomId();
+                    .orElseThrow(() -> new ResourceNotFoundException("Room not found after insert."))
+                    .getId();
 
-            Optional<Submeter> linkedMeters = DaoManager.getSubmeterDao().getSubmeterByRoomId(roomId);
-
-            if (linkedMeters.isEmpty()) {
+            // 4. Handle Submeter
+            Optional<Submeter> existingMeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(roomId);
+            if (existingMeter.isEmpty()) {
                 Submeter meter = new Submeter();
-                meter.setRoomId(roomId);
                 meter.setMeterSerialNumber(meterSerialNumber);
                 meter.setInitialReading(meterInitialReading);
-                meter.setIsActive(1);
 
                 int meterId = DaoManager.getSubmeterDao().insertSubmeter(meter);
                 if (meterId < 0) {
                     DatabaseConnection.rollbackTransaction();
-                    return OperationResult.failure("Failed to attach hardware submeter registry.");
+                    return OperationResult.failure("Failed to attach submeter.");
                 }
-
-                double noCharge = 0;
-                meterBillingService.initialMeterReading(meterId, meterInitialReading, noCharge, noCharge);
+                meterBillingService.initialMeterReading(meterId, meterInitialReading, 0, 0);
             } else {
-                meterBillingService.initialMeterReading(linkedMeters.get().getMeterId(), meterInitialReading, 50, 10);
+                meterBillingService.initialMeterReading(existingMeter.get().getId(), meterInitialReading, 50, 10);
             }
 
-            // Commit transaction on clean processing execution loops
             DatabaseConnection.commitTransaction();
             return OperationResult.success(roomNumber, "Room and Submeter successfully provisioned.");
 
-        } catch (ResourceNotFoundException e) {
+        } catch (Exception e) {
             DatabaseConnection.rollbackTransaction();
-            return OperationResult.failure("Verification Failure: " + e.getMessage());
-        } catch (SQLException e) {
-            DatabaseConnection.rollbackTransaction();
-            return OperationResult.failure("Critical Database error: " + e.getMessage());
+            return OperationResult.failure("Error: " + e.getMessage());
         }
     }
 
@@ -93,124 +89,115 @@ public class RoomMeterServiceImpl implements RoomMeterService {
         try {
             DatabaseConnection.beginTransaction();
 
-            Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+            com.submeter.data.entities.Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                     .orElseThrow(() -> new ResourceNotFoundException("Room " + roomNumber + " does not exist."));
 
-            Optional<Tenancy> activeTenancy = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
+            Optional<Tenancy> activeTenancy = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getId());
             if (activeTenancy.isPresent()) {
                 DatabaseConnection.rollbackTransaction();
-                RoomOccupiedException exception = new RoomOccupiedException(roomNumber, activeTenancy.get().getTenantId());
-                return OperationResult.failure(exception.getMessage());
+                RoomOccupiedException ex = new RoomOccupiedException(roomNumber, activeTenancy.get().getTenantId());
+                return OperationResult.failure(ex.getMessage());
             }
 
-            Optional<Submeter> linkedMeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId());
-            if (linkedMeter.isPresent()) {
-                DaoManager.getSubmeterDao().deleteSubmeter(linkedMeter.get().getMeterId());
-            }
+            DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getId())
+                    .ifPresent(meter -> {
+                        try {
+                            DaoManager.getSubmeterDao().deactivateSubmeter(meter.getId());
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
 
-            boolean isDeleted = DaoManager.getRoomDao().deleteRoom(room.getRoomId());
-            if (!isDeleted) {
+            if (!DaoManager.getRoomDao().deleteRoom(room.getId())) {
                 DatabaseConnection.rollbackTransaction();
-                return OperationResult.failure("Database failure occurred while trying to drop Room: " + roomNumber);
+                return OperationResult.failure("Failed to delete room.");
             }
 
             DatabaseConnection.commitTransaction();
-            return OperationResult.success(null, "Room " + roomNumber + " and its connected assets dropped successfully.");
+            return OperationResult.success(null, "Room dropped successfully.");
 
-        } catch (ResourceNotFoundException e) {
+        } catch (Exception e) {
             DatabaseConnection.rollbackTransaction();
-            return OperationResult.failure("Lookup Error: " + e.getMessage());
-        } catch (SQLException e) {
-            DatabaseConnection.rollbackTransaction();
-            return OperationResult.failure("Critical infrastructure storage error on delete execution: " + e.getMessage());
+            return OperationResult.failure("Error: " + e.getMessage());
         }
     }
 
     @Override
-    public OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber, double initialReading) {
+    public OperationResult<Void> updateSubmeter(String roomNumber, String oldMeterSerialNumber, String newMeterSerialNumber, long initialReading) {
         try {
             DatabaseConnection.beginTransaction();
 
             Room room = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
                     .orElseThrow(() -> new ResourceNotFoundException("Room not found."));
 
-            // 1. Find and Delete (or Archive) the old meter for this room
-            Optional<Submeter> oldMeter = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId());
-            Optional<Submeter>  newMeterOptional = DaoManager.getSubmeterDao().getSubmeterBySerialNumber(newMeterSerialNumber);
-            if (oldMeter.isPresent()) {
-                // Delete the old meter reference (or mark as inactive)
-                DaoManager.getSubmeterDao().deactivateSubmeter(oldMeter.get().getMeterId());
+            // Deactivate old meter if present
+            DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getId())
+                    .ifPresent(old -> {
+                        try {
+                            DaoManager.getSubmeterDao().deactivateSubmeter(old.getId());
+                        } catch (SQLException e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
+
+            // Setup new meter
+            Optional<Submeter> existingMeter = DaoManager.getSubmeterDao().getSubmeterBySerialNumber(newMeterSerialNumber);
+            int meterId;
+
+            if (existingMeter.isPresent()) {
+                Submeter meter = existingMeter.get();
+                meter.setInitialReading(initialReading);
+                DaoManager.getSubmeterDao().updateSubmeter(meter);
+                meterId = meter.getId();
+            } else {
+                Submeter meter = new Submeter();
+                meter.setMeterSerialNumber(newMeterSerialNumber);
+                meter.setInitialReading(initialReading);
+                meterId = DaoManager.getSubmeterDao().insertSubmeter(meter);
             }
-            Submeter newMeter = new Submeter();
-            newMeter.setRoomId(room.getRoomId());
 
-            if(newMeterOptional.isPresent()){
-                newMeter = newMeterOptional.get();
-                newMeter.setInitialReading(initialReading);
-                newMeter.setIsActive(1);
-
-                boolean isUpdated = DaoManager.getSubmeterDao().updateSubmeter(newMeter);
-                if (!isUpdated) {
-                    throw new SQLException("Failed to insert new submeter hardware.");
-                }
-
-                // 3. Record the initial reading in the readings table so billing starts fresh
-                double noCharge = 0;
-                meterBillingService.initialMeterReading(newMeter.getMeterId(), initialReading, noCharge, noCharge);
-
-            }else{
-
-                // 2. Provision the new hardware
-                newMeter.setMeterSerialNumber(newMeterSerialNumber);
-                newMeter.setInitialReading(initialReading);
-                newMeter.setIsActive(1);
-
-                int newMeterId = DaoManager.getSubmeterDao().insertSubmeter(newMeter);
-                if (newMeterId < 0) {
-                    throw new SQLException("Failed to insert new submeter hardware.");
-                }
-
-                // 3. Record the initial reading in the readings table so billing starts fresh
-                double noCharge = 0;
-                meterBillingService.initialMeterReading(newMeterId, initialReading, noCharge, noCharge);
+            if (meterId < 0) {
+                DatabaseConnection.rollbackTransaction();
+                return OperationResult.failure("Failed to save submeter hardware.");
             }
+
+            meterBillingService.initialMeterReading(meterId, initialReading, 0, 0);
 
             DatabaseConnection.commitTransaction();
-            return OperationResult.success(null, "Hardware replaced. New meter sequence started.");
+            return OperationResult.success(null, "Hardware replaced successfully.");
+
         } catch (Exception e) {
             DatabaseConnection.rollbackTransaction();
             return OperationResult.failure("Hardware swap failed: " + e.getMessage());
         }
     }
 
-    // --- Data Query Methods (Refactored to cleanly pass structural anomalies back to the ViewModel) ---
+    // --- Query Methods (Read-Only) ---
 
     @Override
     public OperationResult<List<RoomRegistryDto>> getAllRoomReport() {
-        List<RoomRegistryDto> registryList = new ArrayList<>();
         try {
+            List<RoomRegistryDto> list = new ArrayList<>();
             List<Room> rooms = DaoManager.getRoomDao().getAllRooms();
 
             for (Room room : rooms) {
-                Optional<Tenancy> lease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getRoomId());
-                String tenantName = "N/A";
-                boolean isVacant = true;
-
-                if (lease.isPresent()) {
-                    tenantName = DaoManager.getTenantDao().getTenantById(lease.get().getTenantId())
-                            .map(Tenant::getName).orElse("N/A");
-                    isVacant = false;
-                }
-
-                String serialNumber = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getRoomId())
+                Optional<Tenancy> lease = DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.getId());
+                String tenantName = lease.flatMap(t -> {
+                            try {
+                                return DaoManager.getTenantDao().getTenantById(t.getTenantId());
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .map(Tenant::getName).orElse("N/A");
+                String serialNumber = DaoManager.getSubmeterDao().getSubmeterByRoomId(room.getId())
                         .map(Submeter::getMeterSerialNumber).orElse("NOT DEPLOYED");
 
-                registryList.add(new RoomRegistryDto(room.getRoomNumber(), tenantName, serialNumber, isVacant));
+                list.add(new RoomRegistryDto(room.getRoomNumber(), tenantName, serialNumber, lease.isEmpty()));
             }
-            return OperationResult.success(registryList, "Report dataset loaded successfully.");
+            return OperationResult.success(list, "Report loaded successfully.");
         } catch (SQLException e) {
-            // Rather than a standard system break, pass structural anomalies up to the ViewModel to handle inside your LiveData streams
-            return OperationResult.failure("Failed to read database records while compiling the report: " + e.getMessage());
+            return OperationResult.failure("Failed to load report: " + e.getMessage());
         }
     }
 
@@ -220,51 +207,34 @@ public class RoomMeterServiceImpl implements RoomMeterService {
             List<String> numbers = DaoManager.getRoomDao().getAllRooms().stream()
                     .map(Room::getRoomNumber)
                     .collect(Collectors.toList());
-            return OperationResult.success(numbers, "Room metrics collection verified.");
+            return OperationResult.success(numbers, "Rooms loaded.");
         } catch (Exception e) {
-            return OperationResult.failure("Failed to fetch room records list: " + e.getMessage());
+            return OperationResult.failure("Failed: " + e.getMessage());
         }
     }
 
     @Override
     public OperationResult<SubmeterDTO> getSubmeterByRoomNumber(String roomNumber) {
         try {
-            Optional<Room> roomOpt = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
-            if (roomOpt.isEmpty()) {
-                return OperationResult.failure("Room " + roomNumber + " does not exist.");
-            }
+            Optional<Room> room = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
+            if (room.isEmpty()) return OperationResult.failure("Room not found.");
 
-            Optional<SubmeterDTO> dtoOpt = DaoManager.getSubmeterDao().getSubmeterByRoomId(roomOpt.get().getRoomId())
-                    .map(submeter -> new SubmeterDTO(
-                            submeter.getMeterId(),
-                            submeter.getRoomId(),
-                            submeter.getMeterSerialNumber(),
-                            submeter.getInitialReading()
-                    ));
-
-            if (dtoOpt.isPresent()) {
-                return OperationResult.success(dtoOpt.get(), "Submeter identity metrics compiled.");
-            } else {
-                return OperationResult.failure("No active submeter hardware attached to room " + roomNumber);
-            }
+            return DaoManager.getSubmeterDao().getSubmeterByRoomId(room.get().getId())
+                    .map(sub -> OperationResult.success(new SubmeterDTO(sub.getId(), sub.getMeterSerialNumber(), sub.getInitialReading()), "Found."))
+                    .orElse(OperationResult.failure("No submeter attached."));
         } catch (SQLException e) {
-            return OperationResult.failure("Database lookup operation failure details: " + e.getMessage());
+            return OperationResult.failure("Error: " + e.getMessage());
         }
     }
 
     @Override
     public OperationResult<RoomDTO> findByRoomNumber(String roomNumber) {
         try {
-            Optional<RoomDTO> roomDto = DaoManager.getRoomDao().getRoomByNumber(roomNumber)
-                    .map(room -> new RoomDTO(room.getRoomNumber(), room.getRentAmount(),room.getRoomType()));
-
-            if (roomDto.isPresent()) {
-                return OperationResult.success(roomDto.get(), "Room payload generated.");
-            } else {
-                return OperationResult.failure("Room number " + roomNumber + " was not found in the database system.");
-            }
+            return DaoManager.getRoomDao().getRoomByNumber(roomNumber)
+                    .map(r -> OperationResult.success(new RoomDTO(r.getRoomNumber(), r.getRoomType()), "Found."))
+                    .orElse(OperationResult.failure("Room not found."));
         } catch (SQLException e) {
-            return OperationResult.failure("Infrastructure connectivity error reading room records: " + e.getMessage());
+            return OperationResult.failure("Error: " + e.getMessage());
         }
     }
 
@@ -282,9 +252,9 @@ public class RoomMeterServiceImpl implements RoomMeterService {
         try {
             Optional<Room> room = DaoManager.getRoomDao().getRoomByNumber(roomNumber);
             if (room.isEmpty()) return true;
-            return DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.get().getRoomId()).isEmpty();
+            return DaoManager.getTenancyDao().getActiveTenancyByRoomId(room.get().getId()).isEmpty();
         } catch (SQLException e) {
-            return true; // Fallback configuration on infrastructure drops
+            return true;
         }
     }
 }

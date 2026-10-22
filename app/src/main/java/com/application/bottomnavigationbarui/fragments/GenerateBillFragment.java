@@ -48,8 +48,8 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
     private String getArgRoomnumber;
     private String getArgTenantname;
     private String getArgSubmeterserialnumber;
-    private double getArgCurrentReading;
-    private double getArgPreviousReading;
+    private long getArgCurrentReading;
+    private long getArgPreviousReading;
     private double getArgRateperunit;
     private double getArgFixedcharge;
     private double getArgExtraCharge;
@@ -93,8 +93,8 @@ public class GenerateBillFragment extends Fragment implements VerifyMpinDialogFr
             getArgRoomnumber = getArguments().getString(ARG_ROOMNUMBER);
             getArgTenantname = getArguments().getString(ARG_TENANTNAME);
             getArgSubmeterserialnumber = getArguments().getString(ARG_SUBMETERSERIALNUMBER);
-            getArgCurrentReading = getArguments().getDouble(ARG_METERREADING);
-            getArgPreviousReading = getArguments().getDouble(ARG_PREVIOUSMETERREADING);
+            getArgCurrentReading = getArguments().getLong(ARG_METERREADING);
+            getArgPreviousReading = getArguments().getLong(ARG_PREVIOUSMETERREADING);
             getArgRateperunit = getArguments().getDouble(ARG_RATEPERUNIT);
             getArgFixedcharge = getArguments().getDouble(ARG_FIXEDCHARGE);
             getArgExtraCharge = getArguments().getDouble(ARG_EXTRACHARGE);

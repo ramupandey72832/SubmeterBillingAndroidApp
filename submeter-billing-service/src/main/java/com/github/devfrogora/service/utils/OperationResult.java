@@ -1,5 +1,7 @@
 package com.github.devfrogora.service.utils;
 
+
+
 public class OperationResult<T> {
     private final boolean isSuccess;
     private final T data;

@@ -13,10 +13,10 @@ import java.util.Optional;
 public class SQLiteSubmeterDao implements SubmeterDao {
 
     @Override
-    public int insertSubmeter(Submeter submeter) throws SQLException{
+    public int insertSubmeter(Submeter submeter) throws SQLException {
+        // Room ID is excluded here because submeters are pure hardware assets
         String sql = SqlLoader.get("submeter.insert");
         return DbUtils.executeInsert(sql,
-                submeter.getRoomId(),
                 submeter.getMeterSerialNumber(),
                 submeter.getInitialReading(),
                 submeter.getIsActive()
@@ -30,28 +30,28 @@ public class SQLiteSubmeterDao implements SubmeterDao {
     }
 
     @Override
-    public Optional<Submeter> getSubmeterBySerialNumber(String serialNumber)  throws SQLException{
+    public Optional<Submeter> getSubmeterBySerialNumber(String serialNumber) throws SQLException {
         String sql = SqlLoader.get("submeter.get_by_serial");
         return DbUtils.executeQuerySingle(sql, this::mapResultSetToSubmeter, serialNumber);
     }
 
     @Override
-    public Optional<Submeter> getSubmeterByRoomId(int roomId) throws SQLException{
-        String sql = SqlLoader.get("submeter.get_by_room");
+    public Optional<Submeter> getSubmeterByRoomId(int roomId) throws SQLException {
+        // Fetches the submeter linked to a room via the allocation table join
+        String sql = SqlLoader.get("submeter.get_by_room_join");
         return DbUtils.executeQuerySingle(sql, this::mapResultSetToSubmeter, roomId);
     }
 
     @Override
-    public Optional<Submeter> getInactiveSubmeterByRoomId(int roomId) throws SQLException{
-        String sql = SqlLoader.get("submeter.get_inactive_by_room");
+    public Optional<Submeter> getInactiveSubmeterByRoomId(int roomId) throws SQLException {
+        String sql = SqlLoader.get("submeter.get_inactive_by_room_join");
         return DbUtils.executeQuerySingle(sql, this::mapResultSetToSubmeter, roomId);
     }
 
     @Override
     public boolean detachSubmeter(int meterId) throws SQLException {
-        // We set room_id to null (or -1 if your schema doesn't allow nulls)
-        // to "archive" the meter hardware while keeping its ID for old bills.
-        String sql = "UPDATE submeters SET room_id = NULL WHERE meter_id = ?";
+        // Handled via allocation update (e.g., closing the allocation record) rather than updating submeters table
+        String sql = SqlLoader.get("submeter.detach");
         return DbUtils.executeUpdate(sql, meterId);
     }
 
@@ -69,9 +69,9 @@ public class SQLiteSubmeterDao implements SubmeterDao {
 
     @Override
     public boolean updateSubmeter(Submeter submeter) throws SQLException {
+        // Room ID is no longer updated here
         String sql = SqlLoader.get("submeter.update");
         return DbUtils.executeUpdate(sql,
-                submeter.getRoomId(),
                 submeter.getMeterSerialNumber(),
                 submeter.getInitialReading(),
                 submeter.getIsActive(),
@@ -80,18 +80,17 @@ public class SQLiteSubmeterDao implements SubmeterDao {
     }
 
     @Override
-    public boolean deleteSubmeter(int meterId) throws SQLException{
+    public boolean deleteSubmeter(int meterId) throws SQLException {
         String sql = SqlLoader.get("submeter.delete");
         return DbUtils.executeUpdate(sql, meterId);
     }
 
     /**
-     * Maps a single row from the ResultSet to a Submeter entity object.
+     * Maps a single row from the ResultSet to a Submeter entity object (without room_id).
      */
     private Submeter mapResultSetToSubmeter(ResultSet rs) throws SQLException {
         Submeter submeter = new Submeter();
         submeter.setMeterId(rs.getInt("meter_id"));
-        submeter.setRoomId(rs.getInt("room_id"));
         submeter.setMeterSerialNumber(rs.getString("meter_serial_number"));
         submeter.setInitialReading(rs.getDouble("initial_reading"));
         submeter.setIsActive(rs.getInt("is_active"));

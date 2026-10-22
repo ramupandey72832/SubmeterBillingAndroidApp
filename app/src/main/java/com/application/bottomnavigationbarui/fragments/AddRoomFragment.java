@@ -114,7 +114,7 @@ public class AddRoomFragment extends Fragment implements VerifyMpinDialogFragmen
         String initialReading = binding.layoutAddroom.etInitialReading.getText().toString();
 
         // Hand over execution control directly to the ViewModel
-        viewModel.createRoom(roomNumber, roomType, meterSerial,Double.parseDouble(initialReading));
+        viewModel.createRoom(roomNumber, roomType, meterSerial,Long.parseLong(initialReading));
     }
 
     /**

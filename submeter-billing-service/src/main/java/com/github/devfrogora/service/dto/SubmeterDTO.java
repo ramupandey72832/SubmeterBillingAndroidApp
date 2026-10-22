@@ -3,15 +3,13 @@ package com.github.devfrogora.service.dto;
 public class SubmeterDTO {
 
     private int meterId;
-    private int roomId;
     private String meterSerialNumber;
     private double initialReading;
 
     public SubmeterDTO() {}
 
-    public SubmeterDTO(int meterId, int roomId, String meterSerialNumber, double initialReading) {
+    public SubmeterDTO(int meterId, String meterSerialNumber, double initialReading) {
         this.meterId = meterId;
-        this.roomId = roomId;
         this.meterSerialNumber = meterSerialNumber;
         this.initialReading = initialReading;
     }
@@ -20,8 +18,6 @@ public class SubmeterDTO {
     public int getMeterId() { return meterId; }
     public void setMeterId(int meterId) { this.meterId = meterId; }
 
-    public int getRoomId() { return roomId; }
-    public void setRoomId(int roomId) { this.roomId = roomId; }
 
     public String getMeterSerialNumber() { return meterSerialNumber; }
     public void setMeterSerialNumber(String meterSerialNumber) { this.meterSerialNumber = meterSerialNumber; }
@@ -33,7 +29,6 @@ public class SubmeterDTO {
     public String toString() {
         return "Submeter{" +
                 "meterId=" + meterId +
-                ", roomId=" + roomId +
                 ", meterSerialNumber='" + meterSerialNumber + '\'' +
                 ", initialReading=" + initialReading +
                 '}';

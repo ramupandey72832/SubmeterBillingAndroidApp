@@ -14,7 +14,7 @@ import com.application.baselibrary.libs.qr.QrCodeHelper;
 import com.application.bottomnavigationbarui.databinding.RoomsItemRoomBinding;
 
 import com.github.devfrogora.service.dto.reports.RoomRegistryDto;
-import com.github.devfrogora.service.utils.CryptoHelper;
+import com.example.rrallutilitylib.util.CryptoHelper;
 
 import java.util.List;
 

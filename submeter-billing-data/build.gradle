@@ -20,6 +20,9 @@ sourceSets {
 }
 
 dependencies {
+
+    implementation(project(":submeterDataLib"))
+
     // RUNTIME DATABASE DRIVERS
     implementation 'org.sqldroid:sqldroid:1.0.3' // Keep active FOR ANDROID
     // implementation 'org.xerial:sqlite-jdbc:3.45.1.0' // COMMENTED OUT: Use this for DESKTOP instead of SQLDroid

@@ -55,7 +55,6 @@ public class DatabaseMigrationFragment extends Fragment {
         ui = new ToastMessage(this.getContext());
         viewModel = new DatabaseMigrationViewModel(new DatabaseMigratonServiceImpl());
 
-
         binding.btnMigrateDb.setOnClickListener( v ->{
                 viewModel.runMigrationDb();
         });

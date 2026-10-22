@@ -62,7 +62,10 @@ android {
 }
 
 dependencies {
+    implementation(project(":rrAllUtilityLib"))
+
     implementation(project(":submeter-billing-service"))
+    implementation(project(":submeterServiceLib"))
     implementation(project(":BaseLibrary"))
     implementation(project(":android_ui_templete1"))
     implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'

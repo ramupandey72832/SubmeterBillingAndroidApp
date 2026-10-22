@@ -86,7 +86,7 @@ public class ReplaceSubmeterFragment extends Fragment implements VerifyMpinDialo
         String roomNumber = binding.etRoomNumber.getText().toString().trim();
         String oldMeterSerialNumber = binding.etOldMeterNumber.getText().toString().trim();
         String newMeterSerialNumber = binding.etNewSerialNumber.getText().toString().trim();
-        double initialReading = Double.parseDouble(binding.etInitialReading.getText().toString().trim());
+        long initialReading = Long.parseLong(binding.etInitialReading.getText().toString().trim());
 
         // Forward the operational parameters down to the ViewModel
         viewModel.replaceSubmeter(roomNumber, oldMeterSerialNumber, newMeterSerialNumber,initialReading);

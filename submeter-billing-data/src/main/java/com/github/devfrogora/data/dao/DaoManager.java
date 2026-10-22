@@ -1,6 +1,20 @@
 package com.github.devfrogora.data.dao;
 
-import com.github.devfrogora.data.dao.impl.*;
+
+import com.github.devfrogora.data.dao.impl.SQLiteDbMigrationDao;
+import com.github.devfrogora.data.dao.impl.SQLiteMeterReadingDao;
+import com.submeter.data.dao.impl.SqlLiteRoomDao;
+import com.submeter.data.dao.impl.SqlLiteSubmeterAllocationDao;
+import com.submeter.data.dao.impl.SqlLiteSubmeterDao;
+import com.submeter.data.dao.SubmeterDao;
+import com.github.devfrogora.data.dao.impl.SQLiteSubmeterAllocationDao;
+import com.github.devfrogora.data.dao.impl.SQLiteTenancyDao;
+import com.github.devfrogora.data.dao.impl.SQLiteTenantDao;
+import com.submeter.data.dao.impl.SqlLiteBillDao;
+import com.submeter.data.dao.impl.SqlLiteTenantDao;
+import com.submeter.data.dao.impl.SqlLiteMeterReadingDao;
+import com.submeter.data.dao.impl.SqlLiteTenancyDao;
+
 /**
  * Centrally manages DAO instances.
  * This ensures your UI components don't have to keep calling "new SQLiteTenantDao()"
@@ -8,40 +22,39 @@ import com.github.devfrogora.data.dao.impl.*;
 
 
 public class DaoManager {
-    private static TenantDao tenantDao;
-    private static RoomDao roomDao;
-    private static SubmeterDao submeterDao;
-    private static MeterReadingDao meterReadingDao;
-    private static BillDao billDao;
-    private static BillSummaryDao billSummaryDao;
-    private static TenancyDao tenancyDao;
+    private static com.submeter.data.dao.TenantDao tenantDao;
+    private static com.submeter.data.dao.RoomDao roomDao;
+    private static com.submeter.data.dao.SubmeterDao submeterDao;
+    private static com.submeter.data.dao.MeterReadingDao meterReadingDao;
+    private static com.submeter.data.dao.BillDao billDao;
+    private static com.submeter.data.dao.TenancyDao tenancyDao;
+    private static com.submeter.data.dao.SubmeterAllocationDao submeterAllocationDao;
     private static DbMigrationDao dbMigrationDao;
-    private static SubmeterAllocationDao submeterAllocationDao;
 
 
     // Initialize all implementations at once
     public static void initialize() {
-        tenantDao = new SQLiteTenantDao();
-        roomDao = new SQLiteRoomDao();
-        submeterDao = new SQLiteSubmeterDao();
-        meterReadingDao = new SQLiteMeterReadingDao();
-        billDao = new SQLiteBillDao();
-        billSummaryDao = new SQLiteBillSummaryDao();
-        tenancyDao = new SQLiteTenancyDao();
+        tenantDao = new SqlLiteTenantDao();
+        roomDao = new SqlLiteRoomDao();
+        submeterDao = new SqlLiteSubmeterDao();
+        meterReadingDao = new SqlLiteMeterReadingDao();
+        billDao = new SqlLiteBillDao();
+        tenancyDao = new SqlLiteTenancyDao();
+
         dbMigrationDao = new SQLiteDbMigrationDao();
-        submeterAllocationDao = new SQLiteSubmeterAllocationDao();
+        submeterAllocationDao = new SqlLiteSubmeterAllocationDao();
+
     }
 
-    public static TenantDao getTenantDao() { return tenantDao; }
-    public static RoomDao getRoomDao() { return roomDao; }
-    public static SubmeterDao getSubmeterDao() { return submeterDao; }
-    public static SubmeterAllocationDao getSubmeterAllocationDao() { return submeterAllocationDao; }
-    public static MeterReadingDao getMeterReadingDao() { return meterReadingDao; }
-    public static BillDao getBillDao() { return billDao; }
-    public static BillSummaryDao getBillSummaryDao() { return billSummaryDao; }
-    public static DbMigrationDao getDbMigrationDao() { return dbMigrationDao; }
-
-    public static TenancyDao getTenancyDao() {
+    public static com.submeter.data.dao.TenantDao getTenantDao() { return tenantDao; }
+    public static com.submeter.data.dao.RoomDao getRoomDao() { return roomDao; }
+    public static com.submeter.data.dao.SubmeterDao getSubmeterDao() { return submeterDao; }
+    public static com.submeter.data.dao.SubmeterAllocationDao getSubmeterAllocationDao() { return submeterAllocationDao; }
+    public static com.submeter.data.dao.MeterReadingDao getMeterReadingDao() { return meterReadingDao; }
+    public static com.submeter.data.dao.BillDao getBillDao() { return billDao; }
+    public static com.submeter.data.dao.TenancyDao getTenancyDao() {
         return tenancyDao;
     }
+
+    public static DbMigrationDao getDbMigrationDao() { return dbMigrationDao; }
 }

@@ -1,4 +1,3 @@
-// File: submeter-billing-service/.../service/viewmodel/MeterReadingViewModel.java
 package com.github.devfrogora.service.viewmodel;
 
 import com.github.devfrogora.service.RoomMeterService;
@@ -10,6 +9,7 @@ import com.github.devfrogora.service.dto.SubmeterDTO;
 import com.github.devfrogora.service.utils.OperationResult;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public class MeterReadingViewModel {
 
@@ -17,22 +17,34 @@ public class MeterReadingViewModel {
     private final MeterBillingService meterBillingService;
     private final TenancyManagementService tenancyManagementService;
 
-    // Simple primitive UI State fields
-    private boolean isLoading = false;
-    private String errorMessage = null;
-    private boolean isRoomVerified = false;
+    // 1. UI State Holder Pattern: Single source of truth for the screen
+    public static class UiState {
+        public final boolean isLoading;
+        public final String errorMessage;
+        public final boolean isRoomVerified;
+        public final String meterSerialNumber;
+        public final double previousReading;
+        public final String tenantName;
+        public final String tenantContactNumber;
 
-    // Mapped business payload targets
-    private String meterSerialNumber = "";
-    private double previousReading = 0.0;
-    private String tenantName = "";
-    private String tenantContactNumber ="";
+        public UiState(boolean isLoading, String errorMessage, boolean isRoomVerified,
+                       String meterSerialNumber, double previousReading, String tenantName, String tenantContactNumber) {
+            this.isLoading = isLoading;
+            this.errorMessage = errorMessage;
+            this.isRoomVerified = isRoomVerified;
+            this.meterSerialNumber = meterSerialNumber;
+            this.previousReading = previousReading;
+            this.tenantName = tenantName;
+            this.tenantContactNumber = tenantContactNumber;
+        }
 
-    public interface StateListener {
-        void onStateChanged();
+        public static UiState initial() {
+            return new UiState(false, null, false, "", 0.0, "", "");
+        }
     }
 
-    private StateListener listener;
+    private UiState currentState = UiState.initial();
+    private Consumer<UiState> stateObserver;
 
     public MeterReadingViewModel(RoomMeterService roomMeterService,
                                  MeterBillingService meterBillingService,
@@ -42,82 +54,78 @@ public class MeterReadingViewModel {
         this.tenancyManagementService = tenancyManagementService;
     }
 
-    public void setStateListener(StateListener listener) {
-        this.listener = listener;
+    // Register UI listener
+    public void observeState(Consumer<UiState> observer) {
+        this.stateObserver = observer;
+        observer.accept(currentState); // Emit initial state immediately
     }
 
-    private void notifyUi() {
-        if (listener != null) {
-            listener.onStateChanged();
+    private void updateState(UiState newState) {
+        this.currentState = newState;
+        if (stateObserver != null) {
+            stateObserver.accept(currentState);
         }
     }
 
-    // --- State Getters ---
-    public boolean isLoading() { return isLoading; }
-    public String getErrorMessage() { return errorMessage; }
-    public boolean isRoomVerified() { return isRoomVerified; }
-    public String getMeterSerialNumber() { return meterSerialNumber; }
-    public double getPreviousReading() { return previousReading; }
-    public String getTenantName() { return tenantName; }
-    public String getTenantContactNumber() { return tenantContactNumber; }
-
-    // --- UI Presentation Actions ---
+    // --- Clean Action Flow ---
 
     public void checkRoomDetails(String roomNumber) {
         if (roomNumber == null || roomNumber.trim().isEmpty()) {
-            this.errorMessage = "Validation Error: Room number cannot be blank.";
-            notifyUi();
+            updateState(new UiState(false, "Validation Error: Room number cannot be blank.", false, "", 0.0, "", ""));
             return;
         }
 
-        this.isLoading = true;
-        this.errorMessage = null;
-        this.isRoomVerified = false;
-        notifyUi();
+        String cleanRoom = roomNumber.trim();
 
+        // Show Loading State
+        updateState(new UiState(true, null, false, "", 0.0, "", ""));
+
+        // Execute background check (Consider using an ExecutorService or Android Architecture Components)
         new Thread(() -> {
             try {
-
-                OperationResult<SubmeterDTO> submeterOpt = roomMeterService.getSubmeterByRoomNumber(roomNumber.trim());
+                // Step 1: Verify Submeter
+                OperationResult<SubmeterDTO> submeterOpt = roomMeterService.getSubmeterByRoomNumber(cleanRoom);
                 if (!submeterOpt.isSuccess()) {
-                    this.errorMessage = "Asset Error: No deployed submeter found for room " + roomNumber;
-                    this.isLoading = false;
-                    notifyUi();
+                    emitError("Asset Error: No deployed submeter found for room " + cleanRoom);
                     return;
                 }
                 SubmeterDTO submeter = submeterOpt.getData();
 
-                // 2. Resolve active leasing bindings
-                TenancyDTO tenancy = tenancyManagementService.findActiveTenancyByRoomNumber(roomNumber.trim());
+                // Step 2: Verify Active Tenancy
+                TenancyDTO tenancy = tenancyManagementService.findActiveTenancyByRoomNumber(cleanRoom);
                 if (tenancy == null) {
-                    this.errorMessage = "Lease Error: There is no active tenant assigned to room " + roomNumber;
-                    this.isLoading = false;
-                    notifyUi();
+                    emitError("Lease Error: There is no active tenant assigned to room " + cleanRoom);
                     return;
                 }
 
-                // 3. Hydrate matching occupant demographics
+                // Step 3: Verify Tenant Demographics
                 Optional<TenantDTO> tenantOpt = tenancyManagementService.findTenantByAadhar(tenancy.getTenantAaddhar());
                 if (tenantOpt.isEmpty()) {
-                    this.errorMessage = "Data Inconsistency: Active occupant records are missing from system tracking.";
-                    this.isLoading = false;
-                    notifyUi();
+                    emitError("Data Inconsistency: Active occupant records are missing.");
                     return;
                 }
 
-                // 4. Retrieve historical metric logs from storage engines
-                this.previousReading = meterBillingService.getLatestReading(submeter.getMeterSerialNumber());
-                this.meterSerialNumber = submeter.getMeterSerialNumber();
-                this.tenantName = tenantOpt.get().getName();
-                this.tenantContactNumber = tenantOpt.get().getPhoneNumber();
-                this.isRoomVerified = true;
+                // Step 4: Fetch Historical Data & Publish Success State
+                double prevReading = meterBillingService.getLatestReading(submeter.getMeterSerialNumber());
+                TenantDTO tenant = tenantOpt.get();
+
+                updateState(new UiState(
+                        false,
+                        null,
+                        true,
+                        submeter.getMeterSerialNumber(),
+                        prevReading,
+                        tenant.getName(),
+                        tenant.getPhoneNumber()
+                ));
 
             } catch (Exception e) {
-                this.errorMessage = "Critical Verification Failure: " + e.getMessage();
-            } finally {
-                this.isLoading = false;
-                notifyUi();
+                emitError("Critical Verification Failure: " + e.getMessage());
             }
         }).start();
+    }
+
+    private void emitError(String message) {
+        updateState(new UiState(false, message, false, "", 0.0, "", ""));
     }
 }
