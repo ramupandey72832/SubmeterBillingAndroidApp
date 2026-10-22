@@ -129,8 +129,8 @@ public class EditBillFragment extends Fragment {
             return;
         }
 
-        double previous = selectedBill.getPreviousReading();
-        double current = Double.parseDouble(curRaw);
+        long previous = selectedBill.getPreviousReading() ;
+        long current = Long.parseLong(curRaw);
         double rate = Double.parseDouble(ratRaw);
         double fixed = Double.parseDouble(fixRaw);
         double extra = Double.parseDouble(extraRaw);
