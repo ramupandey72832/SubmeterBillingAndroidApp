@@ -2,6 +2,8 @@
 package com.github.devfrogora.service.viewmodel;
 
 import com.github.devfrogora.service.MeterBillingService;
+//import com.github.devfrogora.service.dto.BillDTO;
+import com.submeter.commonlib.dto.BillDTO;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 
 import java.util.ArrayList;
@@ -23,7 +25,7 @@ public class DashboardViewModel {
     private double totalRevenue = 0.0;
 
     // Core list collections cached safely across fragment lifecycles
-    private List<BillReportDto> pendingBillsList = new ArrayList<>();
+    private List<BillDTO> pendingBillsList = new ArrayList<>();
 
 
     public interface StateListener {
@@ -55,7 +57,7 @@ public class DashboardViewModel {
     public double getTotalUnits() { return totalUnits; }
     public int getTotalBillsCount() { return totalBillsCount; }
     public double getTotalRevenue() { return totalRevenue; }
-    public List<BillReportDto> getPendingBillsList() { return pendingBillsList; }
+    public List<BillDTO> getPendingBillsList() { return pendingBillsList; }
 
     // --- UI Actions ---
 
@@ -86,7 +88,7 @@ public class DashboardViewModel {
                 this.totalRevenue = tempRevenue;
 
                 // 2. Gather matching pending collections
-                List<BillReportDto> pending = meterBillingService.getAllPendingBills();
+                List<BillDTO> pending = meterBillingService.getAllPendingBills();
                 this.pendingBillsList = pending != null ? new ArrayList<>(pending) : new ArrayList<>();
 
                 this.isDataLoaded = true;
@@ -99,7 +101,7 @@ public class DashboardViewModel {
         }).start();
     }
 
-    public void changeBillPaymentStatus(BillReportDto bill) {
+    public void changeBillBalance(BillDTO bill) {
         if (bill == null) return;
 
         this.isLoading = true;
@@ -109,19 +111,20 @@ public class DashboardViewModel {
 
         new Thread(() -> {
             try {
-                boolean currentIsPaid = bill.getPaymentStatus().equalsIgnoreCase("YES") ||
-                        bill.getPaymentStatus().equalsIgnoreCase("PAID");
-                boolean targetStatus = !currentIsPaid;
+
+                // set the payment balance
+
 
                 // 1. Fire database update logic routines
-                meterBillingService.updateBillPaymentStatus(bill.getBillId(), targetStatus);
+                meterBillingService.updateBillPaymentDate(bill.getId(), "add date here");
 
-                // 2. Adjust local list status models instantly
-                bill.setPaymentStatus(targetStatus ? "PAID" : "UNPAID");
 
                 // 3. Evict from pending views instantly if marked paid
-                if (targetStatus) {
-                    this.pendingBillsList.removeIf(item -> item.getBillId() == bill.getBillId());
+                int balance = 0;
+
+                if (balance == 0) {
+                } else {
+                    this.pendingBillsList.removeIf(item -> item.getId() == bill.getId());
                 }
 
                 // Recalculate summary metrics automatically via a background refresh cycle

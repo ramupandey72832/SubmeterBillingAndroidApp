@@ -10,30 +10,56 @@ public class DatabaseInitializer {
     private static String dbUsername = null;
     private static String dbPassword = null;
     private static String driverClassName = "org.sqldroid.SQLDroidDriver";
-    public static void initializeDb(String AndroidOrDesktop,String dbPath) throws Exception {
-        System.out.println("System: Initializing database connection configurations...");
-        if(AndroidOrDesktop.equalsIgnoreCase("Desktop")){
-            DatabaseConfig desktopConfig = new DatabaseConfig(
+    public static void initializeDb(
+            String androidOrDesktop,
+            String dbPath) throws Exception {
+
+        if (androidOrDesktop == null || androidOrDesktop.trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Platform must be specified as Android or Desktop."
+            );
+        }
+
+        System.out.println(
+                "System: Initializing database connection configurations..."
+        );
+
+        DatabaseConfig dbConfig;
+
+        if ("Desktop".equalsIgnoreCase(androidOrDesktop)) {
+
+            dbConfig = new DatabaseConfig(
                     "jdbc:sqlite:submeter_bill.db",
                     null,
                     null,
                     "org.sqlite.JDBC"
             );
-            DatabaseConnection.initialize(desktopConfig);
-            SchemaInitializer.initializeSchema();
-            DaoManager.initialize();
-        }else{
-//            String dbPath = getFilesDir().getAbsolutePath() + "/submeter_bill.db";
-            DatabaseConfig androidConfig = new DatabaseConfig(
+
+        } else if ("Android".equalsIgnoreCase(androidOrDesktop)) {
+
+            if (dbPath == null || dbPath.trim().isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Database path must be provided for Android."
+                );
+            }
+
+            dbConfig = new DatabaseConfig(
                     "jdbc:sqldroid:" + dbPath,
                     null,
                     null,
                     "org.sqldroid.SQLDroidDriver"
             );
-            DatabaseConnection.initialize(androidConfig);
 
+        } else {
+            throw new IllegalArgumentException(
+                    "Unsupported platform: " + androidOrDesktop
+            );
         }
+
+        DatabaseConnection.initialize(dbConfig);
+
         SchemaInitializer.initializeSchema();
+
         DaoManager.initialize();
     }
 

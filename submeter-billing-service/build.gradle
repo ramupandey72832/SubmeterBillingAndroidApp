@@ -12,6 +12,7 @@ repositories {
 dependencies {
     implementation(project(":rrAllUtilityLib"))
     implementation(project(":submeterDataLib"))
+    implementation(project(":submeterCommonLib"))
 
     implementation(project(":submeter-billing-data"))
     implementation 'net.sourceforge.jexcelapi:jxl:2.6.12'

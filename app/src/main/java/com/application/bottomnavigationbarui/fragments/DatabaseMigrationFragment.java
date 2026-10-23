@@ -15,16 +15,11 @@ import com.application.android_ui_templete1.templates.nav_activity.bottom_nav_ac
 import com.application.baselibrary.ui.utils.NavigationUtils;
 import com.application.baselibrary.ui.utils.ToastMessage;
 import com.application.bottomnavigationbarui.R;
-import com.application.bottomnavigationbarui.RoomsFragment;
-import com.application.bottomnavigationbarui.databinding.FragmentDatabaseInspectorBinding;
 import com.application.bottomnavigationbarui.databinding.FragmentDatabaseMigrationBinding;
 import com.application.bottomnavigationbarui.utils.ErrorUtils;
-import com.github.devfrogora.service.DatabaseMigrationService;
-import com.github.devfrogora.service.impl.DatabaseMigratonServiceImpl;
-import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
-import com.github.devfrogora.service.impl.RoomMeterServiceImpl;
-import com.github.devfrogora.service.viewmodel.DatabaseMigrationViewModel;
-import com.github.devfrogora.service.viewmodel.RoomMeterViewModel;
+import com.submeter.presentation.viewmodel.BaseViewModel;
+import com.submeter.service.impl.DatabaseMigrationServiceImpl;
+import com.submeter.presentation.viewmodel.DatabaseMigrationViewModel;
 
 
 public class DatabaseMigrationFragment extends Fragment {
@@ -53,13 +48,14 @@ public class DatabaseMigrationFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ui = new ToastMessage(this.getContext());
-        viewModel = new DatabaseMigrationViewModel(new DatabaseMigratonServiceImpl());
+        viewModel = new DatabaseMigrationViewModel(new DatabaseMigrationServiceImpl());
 
         binding.btnMigrateDb.setOnClickListener( v ->{
                 viewModel.runMigrationDb();
         });
 
-        viewModel.setStateListener( new RoomMeterViewModel.StateListener() {
+
+        viewModel.addStateListener( new BaseViewModel.StateListener() {
             @Override
             public void onStateChanged() {
                 // Ensure UI mutations always run on Android's Main Thread

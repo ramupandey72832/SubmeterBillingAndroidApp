@@ -29,7 +29,7 @@ public class DaoManager {
     private static com.submeter.data.dao.BillDao billDao;
     private static com.submeter.data.dao.TenancyDao tenancyDao;
     private static com.submeter.data.dao.SubmeterAllocationDao submeterAllocationDao;
-    private static DbMigrationDao dbMigrationDao;
+
 
 
     // Initialize all implementations at once
@@ -41,7 +41,6 @@ public class DaoManager {
         billDao = new SqlLiteBillDao();
         tenancyDao = new SqlLiteTenancyDao();
 
-        dbMigrationDao = new SQLiteDbMigrationDao();
         submeterAllocationDao = new SqlLiteSubmeterAllocationDao();
 
     }
@@ -56,5 +55,4 @@ public class DaoManager {
         return tenancyDao;
     }
 
-    public static DbMigrationDao getDbMigrationDao() { return dbMigrationDao; }
 }

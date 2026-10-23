@@ -34,6 +34,7 @@ import com.application.baselibrary.ui.utils.NavigationUtils;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
 import com.github.devfrogora.service.impl.MeterBillingServiceImpl;
 import com.github.devfrogora.service.viewmodel.DashboardViewModel;
+import com.submeter.commonlib.dto.BillDTO;
 
 import com.application.android_ui_templete1.R;
 
@@ -45,8 +46,8 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
     private ToastMessage ui;
     private FragmentDashboardBinding binding;
     private DashboardBillsAdapter billAdapter;
-    private List<BillReportDto> pendingBills;
-    private BillReportDto selectedBillForProcessing;
+    private List<BillDTO> pendingBills;
+    private BillDTO selectedBillForProcessing;
 
     // Decoupled Business Core presentation layer coordinator
     private DashboardViewModel viewModel;
@@ -68,11 +69,11 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
         pendingBills = new ArrayList<>();
         binding.rvPendingBills.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        billAdapter = new DashboardBillsAdapter(pendingBills, new DashboardBillsAdapter.OnBillStatusClickListener() {
+        billAdapter = new DashboardBillsAdapter(pendingBills, new DashboardBillsAdapter.btnPayListener() {
             @Override
-            public void onStatusBadgeClicked(BillReportDto bill) {
+            public void onClick(BillDTO bill) {
                 selectedBillForProcessing = bill;
-                String message = "Bill No: " + bill.getBillId() + "  Room: " + bill.getRoomNumber() +
+                String message = "Bill No: " + bill.getId() + "  Room: " + bill.getRoomNumber() +
                         " Tenant: " + bill.getTenantName() + " Amount: ₹" + bill.getTotalAmount();
                 VerifyMpinDialogFragment dialog = VerifyMpinDialogFragment.newInstance(message);
                 dialog.show(getChildFragmentManager(), "MpinVerifyDialog");
@@ -185,7 +186,7 @@ public class DashboardFragment extends Fragment implements VerifyMpinDialogFragm
     @Override
     public void onMpinVerified(boolean isSuccess) {
         if (isSuccess && selectedBillForProcessing != null) {
-            viewModel.changeBillPaymentStatus(selectedBillForProcessing);
+            viewModel.changeBillBalance(selectedBillForProcessing);
             selectedBillForProcessing = null;
         } else {
             Toast.makeText(getContext(), "Verification failed", Toast.LENGTH_SHORT).show();

@@ -10,7 +10,7 @@ public interface MeterBillingService {
 
     public void initialMeterReading(int submeterId, long initialReading , double fixedCharge, double rate) throws SQLException;
     void addMeterReadingAndGenerateBill(String roomNumber, long currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes) throws SQLException;
-    void updateBillPaymentStatus(long billId, String paymentDate) throws SQLException;
+    void updateBillPaymentDate(long billId, String paymentDate) throws SQLException;
 
     BillReportDto getLatestBill(String roomNumber) throws SQLException;
     List<BillReportDto> getAllBillsReport() throws SQLException;

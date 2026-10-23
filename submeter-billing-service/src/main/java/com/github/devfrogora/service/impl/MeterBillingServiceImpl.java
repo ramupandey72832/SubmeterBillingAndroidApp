@@ -105,7 +105,7 @@ public class MeterBillingServiceImpl implements MeterBillingService {
                 ""
         );
 
-        updateBillPaymentStatus(billId,"put the paymentDate here ");
+        updateBillPaymentDate(billId,"put the paymentDate here ");
     }
 
     public void addMeterReadingAndGenerateBill(String roomNumber, long currentMeterReading, double rate, double fixedCharge,double extraCharge, String notes)throws SQLException  {
@@ -210,12 +210,12 @@ public class MeterBillingServiceImpl implements MeterBillingService {
     }
 
     @Override
-    public void updateBillPaymentStatus(long billId, String paymentDate) throws SQLException{
+    public void updateBillPaymentDate(long billId, String paymentDate) throws SQLException{
         Bill bill = DaoManager.getBillDao().findById(billId)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot update payment status. Bill ID " + billId + " not found."));
 
         // Optimization Check: Skip database write if the status matches the intent
-
+        // have to implement payment table
 
 //        boolean isUpdated = DaoManager.getBillDao().markAsPaid(billId, paymentDate);
         boolean isUpdated = false; /// wait let me review

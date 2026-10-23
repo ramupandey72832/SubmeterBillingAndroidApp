@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Payment {
     private int id;
     private int billId;
-    private long amountPaise;
+    private long amountPaid;
     private String paymentDate;
     private String note;
 }

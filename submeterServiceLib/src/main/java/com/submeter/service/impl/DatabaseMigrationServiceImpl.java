@@ -12,29 +12,37 @@ public class DatabaseMigrationServiceImpl
     @Override
     public OperationResult<Void> migrationDb() {
 
+        boolean transactionStarted = false;
+
         try {
             DatabaseConnection.beginTransaction();
+            transactionStarted = true;
 
-            boolean isDbMigrated =
+            boolean migrated =
                     DaoManager.getDbMigrationDao().executeMigration();
 
-            if (!isDbMigrated) {
-                throw new ResourceNotFoundException("Not Migrated.");
+            if (!migrated) {
+                throw new IllegalStateException(
+                        "Database migration did not complete."
+                );
             }
 
             DatabaseConnection.commitTransaction();
+            transactionStarted = false;
 
             return OperationResult.success(
                     null,
-                    "DB migration successfully."
+                    "Database migration completed successfully."
             );
 
         } catch (Exception e) {
 
-            try {
-                DatabaseConnection.rollbackTransaction();
-            } catch (Exception rollbackException) {
-                e.addSuppressed(rollbackException);
+            if (transactionStarted) {
+                try {
+                    DatabaseConnection.rollbackTransaction();
+                } catch (Exception rollbackException) {
+                    e.addSuppressed(rollbackException);
+                }
             }
 
             return OperationResult.failure(

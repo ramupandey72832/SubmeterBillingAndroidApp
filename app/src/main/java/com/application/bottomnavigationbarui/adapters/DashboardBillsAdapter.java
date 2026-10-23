@@ -17,26 +17,28 @@ import java.util.List;
 
 import com.application.bottomnavigationbarui.R;
 import com.github.devfrogora.service.dto.reports.BillReportDto;
+import com.submeter.commonlib.dto.BillDTO;
+import com.submeter.commonlib.dto.PaymentDTO;
 
 public class DashboardBillsAdapter extends RecyclerView.Adapter<DashboardBillsAdapter.DashboardBillViewHolder>  {
 
-    private List<BillReportDto> billList;          // This list will change during filtering
-    private List<BillReportDto> billListFull;      // Keeps a copy of the original list
-    private final OnBillStatusClickListener clickListener; // 1. Add listener field
+    private List<BillDTO> billList;          // This list will change during filtering
+    private List<BillDTO> billListFull;      // Keeps a copy of the original list
+    private final btnPayListener clickListener; // 1. Add listener field
 
     // 2. Define the interface
-    public interface OnBillStatusClickListener {
-        void onStatusBadgeClicked(BillReportDto bill);
+    public interface btnPayListener {
+        void onClick(BillDTO bill);
     }
 
-    public DashboardBillsAdapter(List<BillReportDto> billList, OnBillStatusClickListener clickListener) {
+    public DashboardBillsAdapter(List<BillDTO> billList, btnPayListener clickListener) {
         this.billList = billList;
         this.billListFull = new ArrayList<>(billList);
         this.clickListener = clickListener;
     }
 
     // Call this method whenever you fetch fresh data from your database/API
-    public void updateData(List<BillReportDto> newList) {
+    public void updateData(List<BillDTO> newList) {
         this.billList = newList;
         this.billListFull = new ArrayList<>(newList);
         notifyDataSetChanged();
@@ -48,7 +50,7 @@ public class DashboardBillsAdapter extends RecyclerView.Adapter<DashboardBillsAd
             billList.addAll(billListFull);
         } else {
             String filterPattern = text.toLowerCase().trim();
-            for (BillReportDto item : billListFull) {
+            for (BillDTO item : billListFull) {
                 // Adjust these getters to match your Bill model class
                 if (item.getRoomNumber().toLowerCase().contains(filterPattern) ||
                         item.getTenantName().toLowerCase().contains(filterPattern)) {
@@ -76,16 +78,17 @@ public class DashboardBillsAdapter extends RecyclerView.Adapter<DashboardBillsAd
 
     @Override
     public void onBindViewHolder(@NonNull DashboardBillViewHolder holder, int position) {
-        BillReportDto currentItem = billList.get(position);
+        BillDTO currentItem = billList.get(position);
         Context context = holder.itemView.getContext();
 
         // Access views safely directly through the binding object
         holder.binding.tvRoomName.setText(currentItem.getRoomNumber());
         holder.binding.tvTenantName.setText("Tenant: " + currentItem.getTenantName());
         holder.binding.tvPrice.setText("₹" + currentItem.getTotalAmount());
-        holder.binding.tvBillMeta.setText("Bill No.: " + currentItem.getBillId() + "  •  " + currentItem.getBillingDate() + "");
+        holder.binding.tvBillMeta.setText("Bill No.: " + currentItem.getId() + "  •  " + currentItem.getBillingDate() + "");
 
-        if (currentItem.getPaymentStatus().equalsIgnoreCase("YES")) {
+        List<PaymentDTO> paymentsOfBillId = null; // filll here once viewModel is ready
+        if (calculateBalance(currentItem, paymentsOfBillId) == 0) {
             holder.binding.btnStatusBadge.setText("Paid");
             // Set text color to green and button tint to a soft green
             holder.binding.btnStatusBadge.setTextColor(ContextCompat.getColor(context, R.color.green_text));
@@ -103,11 +106,23 @@ public class DashboardBillsAdapter extends RecyclerView.Adapter<DashboardBillsAd
 
         holder.binding.btnStatusBadge.setOnClickListener(v -> {
             if (clickListener != null) {
-                clickListener.onStatusBadgeClicked(currentItem);
+                clickListener.onClick(currentItem);
             }
         });
 
     }
+
+    public double calculateBalance(BillDTO bill, List<PaymentDTO> payments) {
+
+        double totalPaid = payments.stream()
+                .filter(payment -> payment.getBillId() == bill.getId())
+                .mapToLong(PaymentDTO::getAmountPaid)
+                .sum() / 100.0;
+
+        return bill.getTotalAmount() - totalPaid;
+    }
+
+
 
     @Override
     public int getItemCount() {
